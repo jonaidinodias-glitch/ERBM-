@@ -93,6 +93,56 @@ label>input,label>select,label>textarea{margin-top:4px}
 .ft{border-collapse:collapse;width:100%;font-size:14px}.ft th{text-align:left;font-size:12px;color:var(--mute);font-weight:600;padding:6px;border-bottom:1px solid var(--line)}.ft td{padding:6px;border-bottom:1px solid var(--line);vertical-align:middle}.ft td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}.ft input{width:80px;min-height:38px;padding:6px}.ft .b{min-height:36px;padding:0 10px}.scroll{overflow-x:auto}
 .chk{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--ink);font-weight:500;min-height:44px}.chk input{width:22px;height:22px;min-height:0;margin:0;accent-color:var(--brick)}
 .cklot{font-size:15px;margin:16px 0 6px;color:var(--brick)}
+.vprog{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:16px 0 8px;padding:12px 14px;border-radius:12px;background:var(--bg2);font-size:14px}
+.vbar{flex:1 1 160px;height:8px;border-radius:5px;background:var(--line);overflow:hidden}.vbar i{display:block;height:100%;background:var(--brick);border-radius:5px;transition:width .3s}
+.vzone{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--slate);margin:22px 0 8px;padding-bottom:6px;border-bottom:2px solid var(--brick)}
+.vsec{border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:var(--card);overflow:hidden}
+.vsec>summary{list-style:none;display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer;font:700 15px Archivo,Inter,sans-serif;min-height:48px}
+.vsec>summary::-webkit-details-marker{display:none}
+.vsec>summary::before{content:"";width:8px;height:8px;border-right:2px solid var(--mute);border-bottom:2px solid var(--mute);transform:rotate(-45deg);transition:transform .15s;flex:none}
+.vsec[open]>summary::before{transform:rotate(45deg)}
+.vsec>summary .vt{flex:1}.vsec>summary .vc{font:600 13px Inter,sans-serif;color:var(--mute);display:flex;gap:8px;align-items:center}
+.vsec>summary em{font-style:normal;background:var(--brick2);color:var(--brick);padding:2px 8px;border-radius:12px}
+.vsec.full>summary .vc{color:var(--slate)}
+.vsec[open]>summary{border-bottom:1px solid var(--line)}
+.vsec .ck{border:0;border-bottom:1px solid var(--line);border-radius:0;margin:0;padding:10px 14px}.vsec .ck:last-child{border-bottom:0}
+.vsec .ck.no .ckh>span:first-child{color:var(--mute)}
+.cmd{border:2px solid var(--slate);border-radius:14px;padding:14px;margin:0 0 22px;background:var(--card)}.cmdh{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}.cmdh h2{text-transform:capitalize}.cmdh .pchip{flex:none}
+.cmdi{border-left:5px solid var(--ec)}.cmdl{background:color-mix(in srgb,#C00000 6%,var(--card))}.cmdc{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.tpgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px}.tpc{border:1px solid var(--line);border-radius:12px;padding:12px;background:var(--card)}.tpc.tpok{border-color:#2e7d32;box-shadow:inset 4px 0 0 #2e7d32}
+.tpimg{width:100%;max-height:220px;object-fit:contain;background:#fff;border:1px solid var(--line);border-radius:8px;margin-top:8px}.tpnone{display:flex;align-items:center;justify-content:center;height:120px;border:1px dashed var(--line);border-radius:8px;color:var(--mute);margin-top:8px}
+.tpv{border-top:1px solid var(--line);padding-top:8px;margin-top:8px;display:grid;gap:6px}.tpv select,.tpv input{min-height:38px;padding:6px 8px;font-size:14px}
+.rot td{vertical-align:top;min-width:170px}.rcell,.rtir{display:flex;flex-direction:column;gap:2px;width:100%;text-align:left;border:1px solid var(--line);border-left:4px solid var(--mute);border-radius:8px;padding:6px 8px;background:var(--card);color:var(--ink);font:13px Inter,sans-serif;cursor:pointer}
+.rtir{border-left-color:var(--slate);flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px}
+.rcell span{color:var(--mute)}.rcell em{font-style:normal;font-size:12px;font-weight:600}.rcell.rcur{border-left-color:var(--brick)}.rcell.rcur em{color:var(--brick)}.rcell.rdone{border-left-color:#2e7d32;opacity:.7}.rcell.rdone em{color:#2e7d32}.rcell.rwarn{border-color:#C00000;border-left-color:#C00000}.rcell.rwarn em{color:#C00000}
+.seg2{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}.seg2 button{border:0;background:var(--bg);color:var(--ink);font:600 15px Inter;min-height:44px;padding:0 14px;cursor:pointer}.seg2 button+button{border-left:1px solid var(--line)}.seg2 button.on{background:var(--slate);color:#fff}
+.gwrap{position:relative;--gl:150px;--gc:40px;overflow-x:auto;border:1px solid var(--line);border-radius:10px;background:var(--card);-webkit-overflow-scrolling:touch}
+.grow{display:grid;min-width:max-content;border-bottom:1px solid var(--line);background:linear-gradient(to right,var(--line) 1px,transparent 1px) var(--gl) 0/var(--gc) 100% repeat-x;min-height:34px;align-items:center}
+.grow>*{grid-row:1}
+.glab{position:sticky;left:0;z-index:2;background:var(--card);grid-column:1;font:600 12.5px Inter,sans-serif;padding:6px 8px;border:0;border-right:1px solid var(--line);text-align:left;color:var(--ink);align-self:stretch;display:flex;align-items:center;gap:6px;overflow:hidden}
+.glog{background:var(--bg2)}.glog .glab{background:var(--bg2);font:700 12.5px Archivo,sans-serif;cursor:pointer;text-transform:uppercase}
+.gent{border-left:4px solid var(--ec);font-weight:600;color:var(--mute)}
+.ghead{background-color:var(--bg2);position:sticky;top:0;z-index:3}.ghead .glab{background:var(--bg2)}
+.gwk{font:700 12px Archivo;text-align:center;padding:4px 0;border-left:1px solid var(--line);color:var(--slate)}
+.gday{font:600 11px Inter;text-align:center;line-height:1.2;padding:3px 0;color:var(--mute)}.gday.gtd{background:var(--brick);color:#fff;border-radius:4px}
+.gtdc{align-self:stretch;background:color-mix(in srgb,var(--brick) 12%,transparent)}
+.gbar{z-index:1;margin:4px 2px;min-height:24px;border:0;border-radius:5px;font:600 11px Inter,sans-serif;padding:2px 6px;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.gbar.gblk{outline:2px dashed #C00000;outline-offset:-2px}.gbar.gdone{opacity:.45}
+@media(max-width:600px){.gwrap{--gl:110px;--gc:34px}}
+.mic.rec{background:#C00000;border-color:#C00000;animation:pulse 1.2s infinite}@keyframes pulse{50%{opacity:.7}}
+.cra{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:6px;display:grid;gap:6px}.cra.done{opacity:.55}.cra.done input[data-cra$="|txt"]{text-decoration:line-through}
+.cra2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,150px) auto;gap:6px}.cra input{min-height:40px;padding:6px 10px}
+.crchk{width:24px;height:24px;accent-color:var(--brick)}
+@media(prefers-reduced-motion:reduce){.mic.rec{animation:none}}
+.pchip{display:inline-block;font:700 12px Archivo,sans-serif;padding:3px 9px;border-radius:20px;color:#fff;background:var(--pc);white-space:nowrap}
+.pst{border:1px solid var(--line);border-left:5px solid var(--ec);border-radius:10px;padding:10px 12px;margin-bottom:8px;background:var(--card)}
+.pst-h{display:flex;justify-content:space-between;gap:8px;align-items:center}.pst-g{margin-top:8px}.pst-g .wide{grid-column:1/-1}
+.item .entn{color:var(--ec);font-weight:700}.list .item[style*="--ec"]{border-left:5px solid var(--ec)}
+button.kpi{font:inherit;color:inherit;background:var(--card);text-align:left;cursor:pointer;border-left:5px solid var(--pc)}button.kpi.on{outline:2px solid var(--pc)}button.kpi b{color:var(--pc)}
+.vmt{display:block;font-size:12px;color:var(--brick);font-weight:600;margin-top:2px}
+.ckb .wide{grid-column:1/-1}
+.phl{display:flex!important;align-items:center;justify-content:center;min-height:40px;border:1px dashed var(--line);border-radius:10px;color:var(--ink)!important;cursor:pointer;font-weight:600!important}
+.ckph{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.ckph .ckimg{width:88px;height:88px;object-fit:cover;margin:0}
 .ck{border:1px solid var(--line);border-radius:10px;padding:8px 10px;margin-bottom:6px}.ck.on{border-color:var(--brick);background:color-mix(in srgb,var(--brick2) 35%,var(--bg))}
 .ckh{display:flex;justify-content:space-between;align-items:center;gap:10px}.ckh>span:first-child{font-size:15px}
 .yn{display:flex;flex:none;border:1px solid var(--line);border-radius:10px;overflow:hidden}.yn button{border:0;background:var(--bg);color:var(--ink);font:600 14px Inter;min-height:40px;min-width:52px;cursor:pointer}.yn button+button{border-left:1px solid var(--line)}.yn button.sel{background:var(--brick);color:#fff}.yn button.sel[data-ckon$="|0"]{background:var(--mute)}
@@ -114,9 +164,12 @@ label>input,label>select,label>textarea{margin-top:4px}
 <nav id="nav">
 <a href="#tableau" data-v="tableau">Tableau de bord</a>
 <a href="#logements" data-v="logements">Logements</a>
+<a href="#planning" data-v="planning">Planning</a>
+<a href="#cr" data-v="cr">CR</a>
 <a href="#tiroirs" data-v="tiroirs">Tiroirs</a>
 <a href="#reserves" data-v="reserves">Réserves</a>
 <a href="#finances" data-v="finances">Finances</a>
+<a href="#pilotage" data-v="pilotage">Pilotage</a>
 <a href="#reglages" data-v="reglages">Réglages</a>
 </nav>
 <main id="main"><p class="empty">Chargement des données du chantier…</p></main>
@@ -134,7 +187,8 @@ const P={
   lots:['Curage / démolition','Gros œuvre / maçonnerie','Couverture / zinguerie','Menuiseries extérieures','Isolation / plâtrerie','Électricité','Plomberie / sanitaires','Chauffage / VMC','Menuiseries intérieures','Revêtements de sol','Peinture','Façade / ravalement','Extérieurs / VRD']}
 };
 const LOTST=['À faire','En cours','Fait','Non prévu'];
-const S={logs:{},tirs:{},cfg:{},bpu:[],view:'tableau',open:null,q:'',fp:'',fe:'',fc:''};
+const STK={L:'logs',T:'tirs',R:'crs'},STT={L:'logement',T:'tiroir',R:'cr'},COLK={logements:'L',tiroirs:'T',crs:'R'};
+const S={logs:{},tirs:{},crs:{},cfg:{},bpu:[],view:'tableau',open:null,q:'',fp:'',fe:'',fc:''};
 let readonly=false;
 /* ---------- stockage local + synchro serveur Évolud (action « erbm ») ---------- */
 const LSK='evolud_erbm_v1',ME='erbm';
@@ -144,7 +198,12 @@ const driveLink=id=>'https://drive.google.com/file/d/'+encodeURIComponent(id)+'/
 function dl(filename,data){try{const b=data instanceof Blob?data:new Blob([data],{type:/\.csv$/.test(filename)?'text/csv;charset=utf-8':'application/octet-stream'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=filename;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);return true}catch(e){return false}}
 const downloads={save:async({filename,data})=>{if(!dl(filename,data))throw {code:'unavailable'};return {status:'saved'}}};
 function toJpeg(file,max=1600){return new Promise((ok,ko)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.82).split(',')[1])};im.onerror=ko;im.src=fr.result};fr.onerror=ko;fr.readAsDataURL(file)})}
-const assets={upload:async(file)=>{const l=S.open&&S.logs[S.open];const b64=await toJpeg(file);const ug=String((l&&(l.ug||l.num))||'ERBM');const name='ERBM_'+ug+'_'+Date.now()+'.jpg';const j=await api({action:'photo',ug,name,b64,kind:'ERBM',meta:{adresse:l?l.adresse:'',ts:Date.now(),comment:'ERBM'}});return {id:j.fileId,url:j.url}}};
+async function pdfToJpeg(file,max=2400){
+ if(!window.pdfjsLib){await new Promise((ok,ko)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';sc.onload=ok;sc.onerror=ko;document.head.appendChild(sc)});pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'}
+ const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise,pg=await pdf.getPage(1),v0=pg.getViewport({scale:1}),k=max/Math.max(v0.width,v0.height),vp=pg.getViewport({scale:k});
+ const c=document.createElement('canvas');c.width=Math.round(vp.width);c.height=Math.round(vp.height);const cx=c.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,c.width,c.height);await pg.render({canvasContext:cx,viewport:vp}).promise;return c.toDataURL('image/jpeg',.85).split(',')[1]}
+const toJpegAny=(file,max)=>/pdf$/i.test(file.type)||/\.pdf$/i.test(file.name||'')?pdfToJpeg(file,Math.max(max||1600,2400)):toJpeg(file,max);
+const assets={upload:async(file,max)=>{const l=S.open&&S.logs[S.open];const b64=await toJpegAny(file,max);const ug=String((l&&(l.ug||l.num))||'ERBM');const name='ERBM_'+ug+'_'+Date.now()+'.jpg';const j=await api({action:'photo',ug,name,b64,kind:'ERBM',meta:{adresse:l?l.adresse:'',ts:Date.now(),comment:'ERBM'}});return {id:j.fileId,url:j.url}}};
 function conf(){const d=SY.det||{},c=SY.conf||{};return {u:c.u||d.u||'',t:c.t||d.t||'',d:c.d||d.d||SY.dev||'',n:c.n||d.n||''}}
 async function api(body){const c=conf();if(!c.u||!c.t)throw new Error('Connexion au serveur non réglée (Réglages)');const r=await fetch(c.u,{method:'POST',body:JSON.stringify(Object.assign({token:c.t,device:c.d,user:c.n?c.n+' (ERBM)':'ERBM'},body))});const j=await r.json();if(!j.ok)throw new Error(j.error||'erreur serveur');return j}
 function detect(){
@@ -163,10 +222,10 @@ function setSt(){const e=$('syncst');if(!e)return;const n=Object.keys(SY.dirty).
 const typing=()=>{const a=document.activeElement;return a&&/INPUT|TEXTAREA|SELECT/.test(a.tagName)&&a.type!=='file'};
 function recOf(key){
  const [k,id]=[key.slice(0,1),key.slice(2)];
- if(k==='L'||k==='T'){const store=k==='L'?S.logs:S.tirs,o=store[id];
-  if(!o){const ts=SY.dead[key];return ts?[{c:ME,id:key,updatedAt:ts,data:{id:key,type:k==='L'?'logement':'tiroir',deleted:true,updatedAt:ts}}]:[]}
-  const u=o._u||Date.now(),d={id:key,type:k==='L'?'logement':'tiroir',updatedAt:u,v:o};
-  if(k==='L'){d.ug=o.ug||'';d.adresse=o.adresse||'';d.cite=o.cite||'';d.parcours=(P[o.parcours]||{}).court||'';d.etape=etat(o);d.montant=Math.round(montant(o)*100)/100}else{d.adresse=(o.num?'N° '+o.num+' ':'')+(o.adresse||'')}
+ if(STK[k]){const store=S[STK[k]],o=store[id];
+  if(!o){const ts=SY.dead[key];return ts?[{c:ME,id:key,updatedAt:ts,data:{id:key,type:STT[k],deleted:true,updatedAt:ts}}]:[]}
+  const u=o._u||Date.now(),d={id:key,type:STT[k],updatedAt:u,v:o};
+  if(k==='R'){d.date=o.date||'';d.titre=o.titre||''}else if(k==='L'){d.ug=o.ug||'';d.adresse=o.adresse||'';d.cite=o.cite||'';d.parcours=(P[o.parcours]||{}).court||'';d.etape=etat(o);d.montant=Math.round(montant(o)*100)/100}else{d.adresse=(o.num?'N° '+o.num+' ':'')+(o.adresse||'')}
   return [{c:ME,id:key,updatedAt:u,data:d}]}
  if(key==='C:cfg')return [{c:ME,id:key,updatedAt:SY.cfgU||Date.now(),data:{id:key,type:'config',updatedAt:SY.cfgU||Date.now(),v:S.cfg}}];
  if(key==='B:bpu'){const U=SY.bpuU||Date.now(),N=250,n=Math.max(1,Math.ceil(S.bpu.length/N)),out=[];for(let i=0;i<Math.max(n,SY.bpuN||0);i++){const id='B:'+i;out.push({c:ME,id,updatedAt:U,data:{id,type:'bpu',updatedAt:U,i,n,v:i<n?S.bpu.slice(i*N,i*N+N):[]}})}SY.bpuN=n;return out}
@@ -174,7 +233,7 @@ function recOf(key){
 function applyRecs(recs){
  let ch=false;
  recs.forEach(r=>{const d=r.data||{},key=String(r.id),k=key.slice(0,1),U=+d.updatedAt||0;
-  if(k==='L'||k==='T'){const store=k==='L'?S.logs:S.tirs,id=key.slice(2),loc=store[id];
+  if(STK[k]){const store=S[STK[k]],id=key.slice(2),loc=store[id];
    if(SY.dirty[key]&&((loc&&(loc._u||0)>U)||(SY.dead[key]||0)>U))return;
    if(d.deleted){if(loc&&(loc._u||0)<=U){delete store[id];ch=true}SY.dead[key]=U;return}
    if(!loc||(loc._u||0)<U||!SY.dirty[key]){if(!loc||(loc._u||0)!==U){store[id]={...d.v,_u:U};ch=true}}}
@@ -187,11 +246,11 @@ async function sync(){
  if(syncing){again=true;return}
  const c=conf();if(!c.u||!c.t){SY.err='serveur non réglé';setSt();return}
  syncing=true;SY.err='';setSt();
- const keys=Object.keys(SY.dirty),sentU={};keys.forEach(k=>{sentU[k]=k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0)});
+ const keys=Object.keys(SY.dirty),sentU={};keys.forEach(k=>{sentU[k]=k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((S[STK[k[0]]]||{})[k.slice(2)]||{})._u||SY.dead[k]||0)});
  const records=[].concat(...keys.map(recOf));
  try{
   const j=await api({action:'erbm',since:SY.since||0,records});
-  keys.forEach(k=>{const now=k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0);if(now===sentU[k])delete SY.dirty[k]});
+  keys.forEach(k=>{const now=k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((S[STK[k[0]]]||{})[k.slice(2)]||{})._u||SY.dead[k]||0);if(now===sentU[k])delete SY.dirty[k]});
   const ch=applyRecs(j.records||[]);SY.since=j.now||Date.now();SY.last=Date.now();persistLocal();
   if(ch&&!typing())render();
  }catch(e){SY.err=String(e&&e.message||e).slice(0,140);if(/non autoris|bloqu/i.test(SY.err))readonly=false}
@@ -217,7 +276,12 @@ const etat=l=>{const i=curIdx(l),e=etapes(l);return i>=e.length?'Terminé':e[i]}
 function tileColor(l){const p=pct(l);if(p===0)return 'light-dark(#c9c5bf,#45474d)';if(p>=100||recu(l))return 'var(--slate)';const k=[.5,.65,.82,1][Math.min(3,Math.floor(p/25))];return `color-mix(in srgb,var(--brick) ${k*100}%,#e8a58f)`}
 const logArr=()=>Object.entries(S.logs).map(([id,v])=>({id,...v})).sort((a,b)=>(a.cite||'').localeCompare(b.cite||'')||String(a.num||'').localeCompare(String(b.num||''),'fr',{numeric:true}));
 const tirArr=()=>Object.entries(S.tirs).map(([id,v])=>({id,...v})).sort((a,b)=>String(a.num||'').localeCompare(String(b.num||''),'fr',{numeric:true}));
-const occupant=tid=>logArr().find(l=>l.parcours==='TIR'&&l.tir&&l.tir.id===tid&&!(l.et&&l.et[8]));
+const isTirLocked=tid=>rotOf(tid).some(l=>l.tir.def&&((l.et&&l.et[2])||(l.tir.du&&l.tir.du<=today())));
+const rotOf=tid=>logArr().filter(l=>l.parcours==='TIR'&&l.tir&&l.tir.id===tid).sort((a,b)=>(a.tir.du||'9999').localeCompare(b.tir.du||'9999'));
+const retourne=l=>!!(l.et&&l.et[8]);
+const occupant=tid=>{const R=rotOf(tid).filter(l=>l.tir.def||!retourne(l));const td=today();return R.find(l=>(l.et&&l.et[2])||(l.tir.du&&l.tir.du<=td))||null};
+const finRot=l=>l.tir?.def?'9999':(l.tir?.au||'9999');
+const rotConflit=(l,lid=l.id)=>{if(!l.tir?.id)return null;const a=l.tir.du||'',b=finRot(l);return rotOf(l.tir.id).find(o=>o.id!==lid&&!retourne(o)&&(o.tir.du||'')<=b&&finRot(o)>=a&&(a||o.tir.du))||null};
 const PROVDEF=['Plancher voûtain','Escalier (reprise / remplacement)','Marches','Dallage','Chape / ragréage','Plancher bois','Linteau','Reprise maçonnerie / fissures','Charpente','Plafond / double plafond','Conduit de cheminée','Traitement humidité','Réseaux enterrés','Autre'];
 const provCat=()=>{const t=(S.cfg.provs||'').trim();return (t?t.split(/\r?\n/):PROVDEF).map(x=>{const [n,c]=x.split(';').map(y=>(y||'').trim());return {n,c:c||''}}).filter(x=>x.n)};
 const PST={av:'À valider',ok:'Validée',ko:'Refusée'};
@@ -230,33 +294,48 @@ const escSt=e=>!e?.prevu?'':e.pose?'Posé':e.liv?'Livré':e.cmd?'Commandé':e.co
 const CURACT=['Démolir','Déposer','Conserver / protéger'];
 const CUREL=['Cloison','Mur / doublage','Plafond','Sol / chape','Conduit de cheminée','Escalier','Placard','Autre'];
 /* modèle de fiche VTE ERBM : Lot ; Libellé ; champs (q, loc, dim, photo, choix:A|B) ; code BPU */
-const MODDEF=`Curage ; Démolition de parasitaire extérieure ; loc ;
-Curage ; Création d'une tranchée gaz pour alimentation chaudière ; q ;
-GO ; Renfort de cave (équerres métalliques) ; q,loc ;
-GO ; Voûtain de cave ; q,loc ;
-GO ; Dallage de cave ; q,loc ;
-GO ; Réparation marches de cave ; q,loc ;
-GO ; Passivation de fer en cave ; q,loc ;
-Mext ; Mise en place d'un velux ; q,loc,choix:55x70=1602505005|55x98=1602505010|78x98=1602505015|78x118=1602505020|78x140=1602505025|114x118=1602505030|134x98=1602505035 ;
-Placo ; Cloison RDC (chambre RDC) pour séparation salon / séjour ; q,loc ; 1300505005
-Placo ; Création de cloison spécifique ; q,loc ; 1300505005
-Placo ; Dimensionnement spécifique de portes de distribution ; q,loc,dim,choix:Passage 60 cm=1301005005|Passage 70 cm=1301005010|Passage 80 cm=1301005015|Passage 90 cm=1301005020 ;
-Mint ; Remplacement de l'escalier ; loc ;
-Mint ; Remplacement / renfort de marches d'escalier ; q,loc ;
-Électricité ; Mise en place d'une boîte de dérivation ; q,loc ;
-Électricité ; Alimentation spécifique pour la cuisine ; q,photo ; 1501035010
-Électricité ; Photo cuisine à l'identique ; photo ;
-Plomberie ; Appareil sanitaire ; choix:Douche 90x90=1400540015|Baignoire=1400535005|Douche extra-plate (PMR)=1400540025 ;
-Plomberie ; WC ; choix:WC standard=1400520005|WC suspendu ;
-Plomberie ; Pompe à chaleur ; ;
-Carrelage ; Carrelage spécifique ; q,loc ;
-Sol souple ; Sols souples SdB étage ; q ; 1702505005`;
+const MODDEF=`INT · Escalier ; Remplacement de l'escalier ; loc ; ; Escalier (fabricant)
+INT · Escalier ; Remplacement / renfort de marches d'escalier ; q,loc ; ; Menuisier int.
+INT · Escalier ; Main courante à créer ; q,loc ; ; Menuisier int.
+INT · Curage ; Dépose revêtements de sol souple ; q,loc ; ; Cureur
+INT · Curage ; Débarras et nettoyage du logement ; loc ; ; Cureur
+INT · Curage ; Démolition de parasitaire extérieure ; loc ; ; Cureur
+INT · Curage ; Création d'une tranchée gaz pour alimentation chaudière ; q ; ; Cureur
+INT · Cheminées ; Cheminée à supprimer ; q,loc ; ; Maçon
+INT · BP RDC ; Cloison RDC (chambre RDC) pour séparation salon / séjour ; q,loc ; 1300505005 ; Plaquiste
+INT · BP RDC ; Création de cloison spécifique ; q,loc ; 1300505005 ; Plaquiste
+INT · BP RDC ; Dimensionnement spécifique de portes de distribution ; q,loc,dim,choix:Passage 60 cm=1301005005|Passage 70 cm=1301005010|Passage 80 cm=1301005015|Passage 90 cm=1301005020 ; ; Plaquiste
+INT · BP RDC ; Faïence à reprendre (lavabo, crédence évier, douche) ; q,loc ; ; Carreleur / sols
+INT · BP RDC ; Carrelage spécifique ; q,loc ; ; Carreleur / sols
+INT · BP RDC ; Sols souples SdB étage ; q ; 1702505005 ; Carreleur / sols
+INT · Électricité ; Mise en place d'une boîte de dérivation ; q,loc ; ; Électricien
+INT · Électricité ; Alimentation spécifique pour la cuisine ; q,photo ; 1501035010 ; Électricien
+INT · Électricité ; Photo cuisine à l'identique ; photo ; ; Électricien
+INT · BP Cave ; Remplacement plancher voûtains par plancher préfabriqué hourdis béton (> 3,50 m, chape comprise) ; q,loc ; ; Maçon
+INT · BP Cave ; Carrelage collé sur nouvelle chape, fourniture et pose des plinthes ; q,loc ; ; Maçon
+INT · BP Cave ; Traitement des fers en cave (passivation + mortier) ; q,loc ; ; Maçon
+INT · BP Cave ; Réfection des marches de cave ; q,loc ; ; Maçon
+INT · BP Cave ; Renfort de cave (équerres métalliques) ; q,loc ; ; Maçon
+INT · BP Cave ; Dallage de cave ; q,loc ; ; Maçon
+INT · BS RDC ; Conservation chaudière (réemploi) ; loc ; ; Plombier / chauffagiste
+INT · BS RDC ; Pompe à chaleur air / eau ; ; ; Plombier / chauffagiste
+INT · BS RDC ; Appareil sanitaire ; choix:Douche 90x90=1400540015|Baignoire=1400535005|Douche extra-plate (PMR)=1400540025 ; ; Plombier / chauffagiste
+INT · BS RDC ; WC ; choix:WC standard=1400520005|WC suspendu ; ; Plombier / chauffagiste
+INT · Travaux supplémentaires ; TS intérieurs ; q,loc ; ; Autre
+EXT · Couverture ; Mise en place d'un velux ; q,loc,choix:55x70=1602505005|55x98=1602505010|78x98=1602505015|78x118=1602505020|78x140=1602505025|114x118=1602505030|134x98=1602505035 ; ; Couvreur
+EXT · Couverture ; Gouttière à refaire ; q,loc ; ; Couvreur
+EXT · Menuiseries ; Conservation menuiseries extérieures (GR) ; loc ; ; Menuisier ext.
+EXT · Espaces verts ; Portillon métallique 1,00 m de passage x 1,20 m de haut ; q,loc ; ; VRD / extérieurs
+EXT · Espaces verts ; Terrasse à refaire (dépose dalle + nouvelle terrasse) ; q,loc ; ; VRD / extérieurs
+EXT · Espaces verts ; Clôture séparative entre logements à l'arrière ; q,loc ; ; VRD / extérieurs
+EXT · Espaces verts ; Remise : porte ou reprise ; q,loc ; ; VRD / extérieurs
+EXT · Travaux supplémentaires ; TS extérieurs ; q,loc ; ; Autre`;
 const LOTMAP={'curage':'Cureur','go':'Maçon','gros oeuvre':'Maçon','gros œuvre':'Maçon','mext':'Menuisier ext.','placo':'Plaquiste','mint':'Menuisier int.','électricité':'Électricien','electricite':'Électricien','plomberie':'Plombier / chauffagiste','carrelage':'Carreleur / sols','sol souple':'Carreleur / sols','peinture':'Peintre','couverture':'Couvreur','façade':'Façadier'};
 const slug=t=>t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'').slice(0,60);
-const modele=()=>(S.cfg.modele||MODDEF).split(/\r?\n/).map(x=>x.split(';').map(y=>y.trim())).filter(x=>x[0]&&x[1]).map(([lot,lib,f,c])=>{const fl=(f||'').split(',').map(z=>z.trim()).filter(Boolean);const ch=fl.find(z=>z.startsWith('choix:'));return {id:slug(lot+'-'+lib),lot,lib,q:fl.includes('q'),loc:fl.includes('loc'),dim:fl.includes('dim'),photo:fl.includes('photo'),choix:ch?ch.slice(6).split('|').map(z=>z.split('=')[0].trim()):null,chc:ch?Object.fromEntries(ch.slice(6).split('|').map(z=>z.split('=')).filter(z=>z[1]).map(z=>[z[0].trim(),z[1].trim()])):{},c:c||''}});
+const modele=()=>(S.cfg.modele||MODDEF).split(/\r?\n/).map(x=>x.split(';').map(y=>y.trim())).filter(x=>x[0]&&x[1]).map(([lot,lib,f,c,ce])=>{const fl=(f||'').split(',').map(z=>z.trim()).filter(Boolean);const ch=fl.find(z=>z.startsWith('choix:'));return {id:slug(lot+'-'+lib),lot,lib,q:fl.includes('q'),loc:fl.includes('loc'),dim:fl.includes('dim'),photo:fl.includes('photo'),choix:ch?ch.slice(6).split('|').map(z=>z.split('=')[0].trim()):null,chc:ch?Object.fromEntries(ch.slice(6).split('|').map(z=>z.split('=')).filter(z=>z[1]).map(z=>[z[0].trim(),z[1].trim()])):{},c:c||'',ce:INTERV.includes(ce)?ce:''}});
 let DEFM=null;const defIt=id=>{if(!DEFM){DEFM={};const k=S.cfg.modele;S.cfg.modele='';modele().forEach(it=>DEFM[it.id]=it);if(k===undefined)delete S.cfg.modele;else S.cfg.modele=k}return DEFM[id]||{}};
 const chkCode=(it,v)=>{v=v||{};if(v.c)return v.c;if(it.choix){if(!v.choix)return '';return it.chc[v.choix]||defIt(it.id).chc?.[v.choix]||''}return it.c||defIt(it.id).c||''};
-const chkLines=l=>{const m=bpuMap();return modele().filter(it=>{const v=(l.chk||{})[it.id];return v&&(it.choix?!!v.choix:v.on===true)}).map(it=>{const v=l.chk[it.id],cd=chkCode(it,v);const b=cd?m[cd]:null;const qq=(v.q===undefined||v.q===null||v.q==='')?((b?.u||'').toUpperCase()==='UN'||!it.q?1:0):(+v.q||0);return {src:'VTE',type:it.lib+(v.choix?' · '+v.choix:''),piece:v.loc||'',c:cd,d:b?.d||'',u:b?.u||'',p:cd?(+(b?.p)||+v.p||0):0,q:it.q?qq:1,com:[v.dim&&'Dim. '+v.dim].filter(Boolean).join(' '),lot:v.lot||LOTMAP[it.lot.toLowerCase()]||guessLot(it.lot+' '+it.lib),photos:v.photos||[]}})};
+const chkLines=l=>{const m=bpuMap();return modele().filter(it=>{const v=(l.chk||{})[it.id];return v&&(it.choix?!!v.choix:v.on===true)}).map(it=>{const v=l.chk[it.id],cd=chkCode(it,v);const b=cd?m[cd]:null;const qq=(v.q===undefined||v.q===null||v.q==='')?((b?.u||'').toUpperCase()==='UN'||!it.q?1:0):(+v.q||0);return {src:'VTE',type:it.lib+(v.choix?' · '+v.choix:''),piece:v.loc||'',c:cd,d:b?.d||'',u:b?.u||'',p:cd?(+(b?.p)||+v.p||0):0,q:it.q?qq:1,com:[v.dim&&'Dim. '+v.dim,v.obs].filter(Boolean).join(' · '),lot:v.lot||it.ce||LOTMAP[it.lot.toLowerCase()]||guessLot(it.lib),photos:v.photos||[]}})};
 const provMt=l=>(l.prov||[]).filter(x=>x.st==='ok').reduce((s,x)=>s+ligneMt(x),0)+(l.vte?.ok?chkLines(l).reduce((s,x)=>s+ligneMt(x),0):0);
 const provAv=l=>(l.prov||[]).filter(x=>x.st!=='ok'&&x.st!=='ko').reduce((s,x)=>s+ligneMt(x),0)+(l.vte?.ok?0:chkLines(l).reduce((s,x)=>s+ligneMt(x),0));
 const eur=n=>(Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
@@ -268,13 +347,13 @@ const lname=l=>`${l.ug?'UG '+l.ug+' · ':''}`+`${l.num?'N° '+l.num+' · ':''}${
 
 /* --- stockage --- */
 const pend={},busy={};
-function save(coll,id,obj){obj._u=Date.now();S[coll==='logements'?'logs':'tirs'][id]=obj;SY.dirty[(coll==='logements'?'L:':'T:')+id]=1;persistLocal();setSt();sched()}
+function save(coll,id,obj){obj._u=Date.now();const K=COLK[coll];S[STK[K]][id]=obj;SY.dirty[K+':'+id]=1;persistLocal();setSt();sched()}
 function flush(){}
-async function del(coll,id){const k=(coll==='logements'?'L:':'T:')+id;delete S[coll==='logements'?'logs':'tirs'][id];SY.dead[k]=Date.now();SY.dirty[k]=1;persistLocal();setSt();sched()}
+async function del(coll,id){const K=COLK[coll],k=K+':'+id;delete S[STK[K]][id];SY.dead[k]=Date.now();SY.dirty[k]=1;persistLocal();setSt();sched()}
 async function saveBpu(){SY.bpuU=Date.now();SY.dirty['B:bpu']=1;persistLocal();setSt();sched()}
 async function saveCfg(){SY.cfgU=Date.now();SY.dirty['C:cfg']=1;persistLocal();setSt();sched(2500)}
-function persistLocal(){try{localStorage.setItem(LSK,JSON.stringify({logs:S.logs,tirs:S.tirs,cfg:S.cfg,bpu:S.bpu,SY:{...SY,det:undefined}}))}catch(e){SY.err='mémoire du téléphone pleine'}}
-function loadLocal(){try{const d=JSON.parse(localStorage.getItem(LSK)||'null');if(d){S.logs=d.logs||{};S.tirs=d.tirs||{};S.cfg=d.cfg||{};S.bpu=d.bpu||[];SY={...SY,...(d.SY||{})}}}catch(e){}if(!SY.dev){SY.dev='ERBM-'+Math.random().toString(36).slice(2,8).toUpperCase()+Date.now().toString(36).slice(-4).toUpperCase();persistLocal()}}
+function persistLocal(){try{localStorage.setItem(LSK,JSON.stringify({logs:S.logs,tirs:S.tirs,crs:S.crs,cfg:S.cfg,bpu:S.bpu,SY:{...SY,det:undefined}}))}catch(e){SY.err='mémoire du téléphone pleine'}}
+function loadLocal(){try{const d=JSON.parse(localStorage.getItem(LSK)||'null');if(d){S.logs=d.logs||{};S.tirs=d.tirs||{};S.crs=d.crs||{};S.cfg=d.cfg||{};S.bpu=d.bpu||[];SY={...SY,...(d.SY||{})}}}catch(e){}if(!SY.dev){SY.dev='ERBM-'+Math.random().toString(36).slice(2,8).toUpperCase()+Date.now().toString(36).slice(-4).toUpperCase();persistLocal()}}
 
 /* --- vues --- */
 function render(){
@@ -282,8 +361,426 @@ function render(){
  $('titre').textContent=S.cfg.nom||'ERBM';
  $('soustitre').textContent=[S.cfg.bailleur&&'Bailleur : '+S.cfg.bailleur,S.cfg.entreprise].filter(Boolean).join(' · ')||'Réhabilitation de cités minières';
  const m=$('main');const cc=conf();const banner=(!cc.u||!cc.t)?'<div class="note warn">Connexion au serveur Évolud non réglée : les données restent sur ce téléphone. Allez dans Réglages → Connexion.</div>':SY.err?'<div class="note warn">Synchro : '+esc(SY.err)+'</div>':'';
- m.innerHTML=banner+({tableau:vTableau,logements:vLogements,tiroirs:vTiroirs,reserves:vReserves,finances:vFinances,reglages:vReglages}[S.view]||vTableau)();
- if(S.open)renderPanel();
+ m.innerHTML=banner+({tableau:vTableau,logements:vLogements,planning:vPlanning,cr:vCR,tiroirs:vTiroirs,reserves:vReserves,finances:vFinances,pilotage:vPilotage,reglages:vReglages}[S.view]||vTableau)();
+ const gt=document.querySelector('.gwrap .gtd');if(gt){const w=gt.closest('.gwrap');w.scrollLeft=Math.max(0,gt.offsetLeft-w.clientWidth/3)}
+ if(S.open)renderPanel();else if(S.cr)renderCr();
+}
+
+
+/* --- import de la demande d'acompte (Excel du groupement) --- */
+function parseSituation(rows){
+ const T=v=>String(v??'').replace(/\s+/g,' ').trim();
+ const N=v=>typeof v==='number'?v:(parseFloat(String(v??'').replace(/\s|€/g,'').replace(',','.'))||0);
+ const find=(re,from=0)=>{for(let i=from;i<rows.length;i++){const r=rows[i]||[];for(let j=0;j<r.length;j++)if(re.test(T(r[j])))return {i,j}}return null};
+ const right=(p)=>{const r=rows[p.i]||[];for(let j=p.j+1;j<r.length;j++)if(T(r[j])!=='')return r[j];return ''};
+ const out={n:'',date:'',chantier:'',code:'',membres:[]};
+ const a=find(/^demande d.acompte/i);if(a)out.n=T(right(a));
+ const d=find(/^avancement au/i);if(d){const v=right(d);const loc=x=>{const y=new Date(x.getTime()+432e5);return y.getFullYear()+'-'+String(y.getMonth()+1).padStart(2,'0')+'-'+String(y.getDate()).padStart(2,'0')};out.date=v instanceof Date?loc(v):typeof v==='number'?new Date(Math.round((v-25569)*864e5)).toISOString().slice(0,10):String(v).slice(0,10)}
+ const c=find(/^nom du chantier$/i);if(c)out.chantier=T(right(c));
+ const k=find(/^code chantier$/i);if(k)out.code=T(right(k));
+ // ligne des membres : celle qui contient « Montant HT ATH » plusieurs fois -> colonnes ; noms juste au-dessus du bloc
+ const sections=[['marche',/^repartition du march/i],['cumul',/^cumul a fin m$/i]];
+ const norm=t=>t.normalize('NFD').replace(/[̀-ͯ]/g,'');
+ const findN=(re,from=0)=>{for(let i=from;i<rows.length;i++){const r=rows[i]||[];for(let j=0;j<r.length;j++)if(re.test(norm(T(r[j]))))return {i,j}}return null};
+ const sec={};
+ for(const [key,re] of sections){const h=findN(re);if(!h)continue;
+  const hd=findN(/^montant ht ath$/i,h.i);if(!hd)continue;
+  const cols=[];(rows[hd.i]||[]).forEach((v,j)=>{if(/^montant ht ath$/i.test(norm(T(v))))cols.push(j)});
+  // noms des membres : ligne entre h.i et hd.i qui porte un texte au-dessus de chaque colonne ATH
+  let names=cols.map(()=>'');for(let i=h.i;i<hd.i;i++){const r=rows[i]||[];cols.forEach((cj,x)=>{if(!names[x]&&T(r[cj]))names[x]=T(r[cj])})}
+  const tot=findN(/^montant travaux$/i,hd.i);if(!tot)continue;
+  const r=rows[tot.i]||[];
+  sec[key]=cols.map((cj,x)=>({nom:names[x]||('Membre '+(x+1)),ath:N(r[cj]),gr:N(r[cj+1]),tot:N(r[cj+2])}))}
+ const base=sec.marche||sec.cumul||[];
+ out.membres=base.map((m,x)=>({nom:m.nom,marche:sec.marche?.[x]||null,cumul:sec.cumul?.[x]||null}));
+ return out;
+}
+async function importSituation(input){
+ const f=input.files?.[0];if(!f)return;
+ if(readonly)return toast('Lecture seule');
+ toast('Lecture du fichier…');
+ try{
+  if(!window.XLSX)await new Promise((ok,ko)=>{const sc=document.createElement('script');sc.src='https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js';sc.onload=ok;sc.onerror=ko;document.head.appendChild(sc)});
+  const wb=XLSX.read(await f.arrayBuffer(),{cellDates:true});
+  const rows=XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]],{header:1,raw:true,defval:null,blankrows:true});
+  const sit=parseSituation(rows);
+  const me=sit.membres.find(m=>/bbne/i.test(m.nom))||sit.membres[0];
+  if(!me||!me.marche)return toast('Fichier non reconnu : ce n\'est pas une demande d\'acompte du groupement');
+  const f2=n=>(Math.round(n*100)/100).toFixed(2).replace('.',',');
+  S.cfg.mATH=f2(me.marche.ath);S.cfg.mGR=f2(me.marche.gr);
+  if(me.cumul){S.cfg.fATH=f2(me.cumul.ath);S.cfg.fGR=f2(me.cumul.gr)}
+  if(sit.n)S.cfg.sitN=sit.n;if(sit.date)S.cfg.sitD=new Date(sit.date+'T12:00').toLocaleDateString('fr-FR');
+  await saveCfg();render();toast('Situation n°'+(sit.n||'?')+' importée');
+ }catch(e){toast('Lecture impossible : vérifiez que c\'est bien le fichier Excel de la demande d\'acompte')}
+ input.value='';
+}
+
+
+/* --- entreprises, prestations et planning --- */
+const PST2={a_planifier:'À planifier',affectee:'Affectée',rdv:'RDV calé',en_cours:'En cours',terminee:'Terminée',bloquee:'Bloquée'};
+const PCOL={a_planifier:'#8a8d93',affectee:'#2F5597',rdv:'#7030A0',en_cours:'#E26B0A',terminee:'#2e7d32',bloquee:'#C00000'};
+const ENTDEF='BBNE;#c95f12\nDG Sanitaire;#0091c7\nGDS;#4c8c2b';
+const ents=()=>(S.cfg.ents||ENTDEF).split(/\r?\n/).map(x=>{const[n,c]=x.split(';').map(y=>(y||'').trim());return {n,c:/^#[0-9a-f]{3,6}$/i.test(c||'')?c:'#686a70'}}).filter(x=>x.n);
+const entCol=n=>(ents().find(e=>e.n===n)||{}).c||'#686a70';
+const prestArr=()=>{const o=[];logArr().forEach(l=>(l.prest||[]).forEach((p,i)=>o.push({l,p,i})));return o};
+const fdt=v=>v?new Date(v).toLocaleString('fr-FR',{weekday:'short',day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+const pchip=st=>`<span class="pchip" style="--pc:${PCOL[st]||'#888'}">${PST2[st]||esc(st)}</span>`;
+const isoDay=n=>{const d=new Date(Date.now()+n*864e5);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function prestBlock(l){
+ const PR=l.prest||[],E=ents(),lots=(P[l.parcours]||P.GR).lots;
+ return `<div class="sec" id="prest"><h3>Prestations & RDV ${PR.length?`<span class="sub" style="font:400 14px Inter;color:var(--mute)">· ${PR.filter(p=>p.st==='terminee').length}/${PR.length} terminées</span>`:''}</h3>
+ ${PR.length?PR.map((p,i)=>`<div class="pst" style="--ec:${entCol(p.ent)}"><div class="pst-h"><b>${esc(p.lib)}</b>${pchip(p.st)}</div>
+  <div class="grid pst-g"><label>Entreprise<select data-pr="${i}|ent">${E.map(e=>`<option ${p.ent===e.n?'selected':''}>${esc(e.n)}</option>`).join('')}${p.ent&&!E.some(e=>e.n===p.ent)?`<option selected>${esc(p.ent)}</option>`:''}</select></label>
+  <label>Statut<select data-pr="${i}|st">${Object.entries(PST2).map(([k,v])=>`<option value="${k}" ${p.st===k?'selected':''}>${v}</option>`).join('')}</select></label>
+  <label>Début<input type="date" data-pr="${i}|deb" value="${esc(p.deb||'')}"></label>
+  <label>Fin<input type="date" data-pr="${i}|fin" value="${esc(p.fin||'')}"></label>
+  <label>${l.parcours==='GR'?'RDV locataire':'RDV'}<input type="datetime-local" data-pr="${i}|rdv" value="${esc(p.rdv||'')}"></label>
+  <label class="wide">Note<input data-pr="${i}|note" value="${esc(p.note||'')}" placeholder="Ex. clé chez la voisine, attendre la livraison"></label></div>
+  <div class="tools" style="margin:8px 0 0">${l.loc?.tel?`<a class="b" href="tel:${esc(String(l.loc.tel).replace(/\s/g,''))}" style="display:inline-flex;align-items:center;text-decoration:none;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:10px;color:var(--ink);font:600 15px Inter,sans-serif">Appeler le locataire</a>`:''}<button class="b d" data-prdel="${i}">Supprimer</button></div></div>`).join(''):'<p class="note" style="margin:0 0 8px">Aucune prestation. Générez-les depuis la VTE et la fiche travaux, ou ajoutez-les une par une.</p>'}
+ <div class="grid" style="margin-top:10px;background:var(--bg2);padding:12px;border-radius:12px">
+  <label>Prestation<input id="prl" list="prlist" placeholder="Ex. Menuiseries ext., Curage, VMC"></label>
+  <label>Entreprise<select id="pre">${E.map(e=>`<option>${esc(e.n)}</option>`).join('')}</select></label>
+  <div style="grid-column:1/-1;display:flex;gap:8px;flex-wrap:wrap"><button class="b p" data-act="addprest">Ajouter</button><button class="b" data-act="genprest">Générer depuis la VTE et la fiche travaux</button></div></div>
+ <datalist id="prlist">${[...new Set([...lots,...INTERV])].map(x=>`<option value="${esc(x)}">`).join('')}</datalist></div>`;
+}
+function entFor(corps){const E=ents();if(/plomb|chauff|sanit/i.test(corps)){const s2=E.find(e=>/sanit/i.test(e.n));if(s2)return s2.n}return (E[0]||{}).n||''}
+function genPrest(l){
+ const have=new Set((l.prest||[]).map(p=>p.lib.toLowerCase()));let add=[];
+ const corps=[...new Set(finLines(l).map(x=>lotOf(x)))];
+ const src=corps.length?corps:(P[l.parcours]||P.GR).lots.filter(n=>((l.lots||{})[n]||0)!==3);
+ src.forEach(c=>{if(!have.has(c.toLowerCase()))add.push({id:uid(),lib:c,ent:entFor(c),st:'a_planifier',rdv:'',note:''})});
+ return add;
+}
+function vPlanning(){
+ const A=prestArr(),E=ents(),fe=S.pe||'',fs=S.ps||'';
+ const fpp=S.pp||'';
+ const base=A.filter(x=>(!fe||x.p.ent===fe)&&(!fpp||x.l.parcours===fpp));
+ const L=base.filter(x=>!fs||x.p.st===fs);
+ if(!A.length)return `<div class="empty"><h2>Aucune prestation planifiée</h2><p>Ouvrez un logement, puis « Prestations & RDV » : générez les prestations depuis la VTE ou ajoutez-les. Elles apparaîtront ici, classées par jour de RDV.</p><div class="tools" style="justify-content:center"><button class="b p" data-act="genall">Générer pour tous les logements</button></div></div>`;
+ const td=isoDay(0),dm=isoDay(1),wk=isoDay(7),day=x=>(x.p.rdv||x.p.deb||'').slice(0,10),open=x=>x.p.st!=='terminee';
+ const by=(a,b)=>(a.p.rdv||'').localeCompare(b.p.rdv||'');
+ const groups=[
+  ['En retard',L.filter(x=>open(x)&&day(x)&&(x.p.fin||day(x))<td),'late'],
+  ['Aujourd\'hui',L.filter(x=>day(x)===td),''],
+  ['Demain',L.filter(x=>day(x)===dm),''],
+  ['7 prochains jours',L.filter(x=>day(x)>dm&&day(x)<=wk),''],
+  ['Plus tard',L.filter(x=>day(x)>wk),''],
+  ['Bloquées',L.filter(x=>x.p.st==='bloquee'&&!day(x)),'late'],
+  ['À planifier (sans date)',L.filter(x=>open(x)&&x.p.st!=='bloquee'&&!day(x)&&x.l.parcours!=='GR'),'']];
+ groups.splice(0,0,['GR · RDV locataire à prendre',L.filter(x=>open(x)&&x.p.st!=='bloquee'&&!x.p.rdv&&x.l.parcours==='GR'),'late']);
+ const row=x=>`<button class="item" data-open="${x.l.id}" style="--ec:${entCol(x.p.ent)}">${pchip(x.p.st)}<span><span class="t">${esc(x.p.lib)} <span class="entn">· ${esc(x.p.ent||'')}</span>${x.l.parcours==='GR'?' <span class="badge gr" style="font-size:11px;padding:1px 6px">GR</span>':''}</span><br><span class="s">${esc(lname(x.l))}${x.l.loc?.nom?' · '+esc(x.l.loc.nom):''}${x.p.note?' · '+esc(x.p.note):''}</span></span><span class="s" style="text-align:right;white-space:nowrap">${x.p.rdv?esc(fdt(x.p.rdv)):x.p.deb?esc(fdate(x.p.deb)+(x.p.fin&&x.p.fin!==x.p.deb?' → '+fdate(x.p.fin):'')):''}</span></button>`;
+ const tog=`<div class="seg2"><button class="${S.pv!=='liste'?'on':''}" data-pv="gantt">Planning</button><button class="${S.pv==='liste'?'on':''}" data-pv="liste">Liste</button></div>`;
+ const filt=`<select id="pp"><option value="">GR et tiroirs</option><option value="GR" ${fpp==='GR'?'selected':''}>GR · site occupé</option><option value="TIR" ${fpp==='TIR'?'selected':''}>Opérations tiroir</option></select><select id="pe"><option value="">Toutes les entreprises</option>${E.map(e=>`<option ${fe===e.n?'selected':''}>${esc(e.n)}</option>`).join('')}</select>`;
+ if(S.pv!=='liste')return `<div class="tools">${tog}${filt}</div>${vGantt(base)}`;
+ return `<div class="tools">${tog}${filt}<button class="b" data-act="genall">Générer les prestations manquantes</button></div>
+ <div class="kpis">${Object.entries(PST2).map(([k,v])=>`<button class="kpi pk ${fs===k?'on':''}" data-ps="${k}" style="--pc:${PCOL[k]}"><b>${base.filter(x=>x.p.st===k).length}</b><span>${v}</span></button>`).join('')}</div>
+ ${fs?`<p class="note">Filtre : ${PST2[fs]} · <a href="#" data-ps="${fs}">tout afficher</a></p>`:''}
+ ${groups.filter(g=>g[1].length).map(([t,arr,c])=>`<h3 style="margin:20px 0 8px;${c?'color:var(--warn)':''}">${t} <span class="sub" style="font:400 14px Inter;color:var(--mute)">· ${arr.length}</span></h3><div class="list">${arr.sort(by).map(row).join('')}</div>`).join('')||'<p class="empty">Rien pour ce filtre.</p>'}`;
+}
+
+
+/* --- comptes rendus à la voix --- */
+const crArr=()=>Object.entries(S.crs).map(([id,v])=>({id,...v})).sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b._u||0)-(a._u||0));
+const CRSEC=[['avancement','Avancement et constats'],['problemes','Problèmes et réserves'],['securite','Sécurité'],['decisions','Décisions']];
+const deacc=t=>String(t||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+const JOURS=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'],MOIS=['janvier','fevrier','mars','avril','mai','juin','juillet','aout','septembre','octobre','novembre','decembre'];
+function crQuand(s){
+ const x=deacc(s),b=new Date();b.setHours(12,0,0,0);
+ const add=n=>{const d=new Date(b.getTime()+n*864e5);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+ const ymd=(y,m,d)=>y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+ if(/apres-?demain/.test(x))return add(2);
+ if(/\bdemain\b/.test(x))return add(1);
+ if(/aujourd.?hui|ce jour|dans la journee|ce soir/.test(x))return add(0);
+ if(/semaine prochaine/.test(x))return add(((8-b.getDay())%7)||7);
+ if(/fin de (la )?semaine/.test(x))return add((5-b.getDay()+7)%7);
+ let m=x.match(/\b(\d{1,2})(?:er)?\s+(janvier|fevrier|mars|avril|mai|juin|juillet|aout|septembre|octobre|novembre|decembre)\b/);
+ if(m){const mo=MOIS.indexOf(m[2])+1;let y=b.getFullYear();if(ymd(y,mo,+m[1])<add(0))y++;return ymd(y,mo,+m[1])}
+ m=x.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);
+ if(m){let y=m[3]?(+m[3]<100?2000+ +m[3]:+m[3]):b.getFullYear();return ymd(y,+m[2],+m[1])}
+ for(let i=0;i<7;i++)if(new RegExp('\\b'+JOURS[i]+'\\b').test(x))return add(((i-b.getDay()+7)%7)||7);
+ m=x.match(/\ble (\d{1,2})(?:er)?\b/);
+ if(m){const d=+m[1];if(d>=1&&d<=31){let y=b.getFullYear(),mo=b.getMonth()+1;if(d<b.getDate()){mo++;if(mo>12){mo=1;y++}}return ymd(y,mo,d)}}
+ return ''}
+function crQui(s){
+ const x=deacc(s);
+ for(const e of ents())if(x.includes(deacc(e.n)))return e.n;
+ const W=[['bailleur','Bailleur'],['maisons et cites','Bailleur'],['maison et cite','Bailleur'],['locataire','Locataire'],['conducteur','Conducteur de travaux'],['chef d.equipe','Chef d\'équipe'],['plombier','Plombier / chauffagiste'],['electricien','Électricien'],['macon','Maçon'],['couvreur','Couvreur'],['menuisier','Menuisier'],['plaquiste','Plaquiste'],['peintre','Peintre'],['cureur','Cureur'],['fabricant','Fabricant escalier']];
+ for(const [k,v] of W)if(new RegExp('\\b'+k).test(x))return v;
+ return ''}
+function crStruct(txt){
+ let t=' '+String(txt||'').replace(/\s+/g,' ')+' ';
+ t=t.replace(/\s(point a la ligne|point à la ligne|a la ligne|à la ligne|nouveau paragraphe|point suivant|autre point|ensuite|deuxiemement|deuxièmement|troisiemement|troisièmement|par ailleurs|d.autre part)\s/gi,'. ');
+ const S2=t.split(/[.!?;\n]+/).map(x=>x.trim().replace(/^(et|alors|donc|bon|euh)\s+/i,'')).filter(x=>x.length>3).map(x=>x[0].toUpperCase()+x.slice(1));
+ const out={avancement:[],problemes:[],securite:[],decisions:[],actions:[]};
+ const RA=/\b(doit|doivent|devra|devront|faut|faudra|a faire|à faire|prevoir|prévoir|penser a|penser à|relancer|commander|envoyer|appeler|rappeler|caler|planifier|programmer|reprendre|verifier|vérifier|demander|livrer|poser|terminer)\b/i;
+ const RS=/(securite|sécurité|\bepi\b|casque|harnais|garde-corps|echafaudage|échafaudage|balisage|amiante|plomb\b|chute|accident|incident|consignation|extincteur)/i;
+ const RP=/(probleme|problème|souci|fissure|fuite|humidite|humidité|retard|bloqu|absent|reserve|réserve|manque|casse|cassé|defaut|défaut|non conforme|degat|dégât|endommag|infiltration)/i;
+ const RD=/(decid|décid|valide|validé|accord|on part sur|retenu|acte|acté)/i;
+ S2.forEach(x=>{
+  if(RA.test(x)){out.actions.push({txt:x,qui:crQui(x),quand:crQuand(x),fait:false});return}
+  if(RS.test(x)){out.securite.push(x);return}
+  if(RP.test(x)){out.problemes.push(x);return}
+  if(RD.test(x)){out.decisions.push(x);return}
+  out.avancement.push(x)});
+ return out}
+function vCR(){
+ const C=crArr(),A=[];C.forEach(c=>(c.actions||[]).forEach((a,i)=>{if(!a.fait)A.push({c,a,i})}));
+ A.sort((x,y)=>(x.a.quand||'9').localeCompare(y.a.quand||'9'));
+ const td=isoDay(0);
+ return `<div class="tools"><button class="b p" data-act="newcr">🎤 Nouveau compte rendu</button></div>
+ <p class="note">Parlez pendant la visite : le texte est retranscrit, puis rangé en avancement, problèmes, sécurité, décisions et actions (qui, pour quand). Relisez toujours avant d'envoyer.</p>
+ ${A.length?`<h3 style="margin:18px 0 8px">Actions en cours · ${A.length}</h3><div class="list">${A.map(x=>`<div class="item" style="cursor:default"><input type="checkbox" class="crchk" data-crdone="${x.c.id}|${x.i}" aria-label="Fait"><span><span class="t">${esc(x.a.txt)}</span><br><span class="s">${esc(x.a.qui||'Qui ?')} · CR du ${esc(fdate(x.c.date))}${x.c.titre?' · '+esc(x.c.titre):''}</span></span><span class="badge ${x.a.quand&&x.a.quand<td?'late':''}">${x.a.quand?esc(fdate(x.a.quand)):'Sans date'}</span></div>`).join('')}</div>`:''}
+ <h3 style="margin:22px 0 8px">Comptes rendus · ${C.length}</h3>
+ ${C.length?`<div class="list">${C.map(c=>`<button class="item" data-opencr="${c.id}"><span class="badge">${esc(fdate(c.date))}</span><span><span class="t">${esc(c.titre||'Compte rendu')}</span><br><span class="s">${esc(c.type||'')}${c.log&&S.logs[c.log]?' · '+esc(lname(S.logs[c.log])):''} · ${(c.actions||[]).filter(a=>!a.fait).length} action(s) ouverte(s)</span></span><span></span></button>`).join('')}</div>`:'<p class="empty">Aucun compte rendu pour l\'instant.</p>'}`;
+}
+let REC=null,RECON=false;
+function micStop(){RECON=false;if(REC)try{REC.stop()}catch(e){}}
+function micStart(){
+ const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+ if(!SR){toast('Dictée directe indisponible ici : touchez la zone de texte puis le micro du clavier');$('crt')?.focus();return}
+ const ta=$('crt');if(!ta)return;let base=ta.value.trim();
+ const r=new SR();r.lang='fr-FR';r.continuous=true;r.interimResults=true;
+ r.onresult=ev=>{let fin='',tmp='';for(let i=ev.resultIndex;i<ev.results.length;i++){const t=ev.results[i][0].transcript;if(ev.results[i].isFinal)fin+=t;else tmp+=t}if(fin)base=(base?base+' ':'')+fin.trim();const ta2=$('crt');if(ta2)ta2.value=base+(tmp?' '+tmp:'')};
+ r.onerror=e=>{if(e.error==='not-allowed'||e.error==='service-not-allowed'){RECON=false;toast('Autorisez le micro pour cette appli')}};
+ r.onend=()=>{REC=null;if(RECON){try{micStart()}catch(e){}return}const b=$('micbtn');if(b){b.classList.remove('rec');b.textContent='🎤 Parler'}updCr(c=>{c.transcript=base})};
+ try{r.start();REC=r;RECON=true;const b=$('micbtn');if(b){b.classList.add('rec');b.textContent='⏹ Arrêter la dictée'}}catch(e){toast('Micro indisponible')}
+}
+function openCr(id){micStop();S.open=null;S.fiche=null;S.cr=id;$('sheet').classList.add('on');renderCr();$('panel').scrollTop=0}
+function updCr(fn,rr=true){const id=S.cr;if(!id||!S.crs[id])return;const c=JSON.parse(JSON.stringify(S.crs[id]));fn(c);save('crs',id,c);if(rr&&S.cr===id)renderCr()}
+function renderCr(){
+ const c=S.crs[S.cr];if(!c){closePanel();return}
+ const L=logArr();
+ $('panel').innerHTML=`<div class="top"><h2>${esc(c.titre||'Compte rendu')}</h2><button class="b" data-act="close">Fermer</button></div>
+ <div class="sec"><div class="grid">
+  <label>Titre<input data-crf="titre" value="${esc(c.titre||'')}" placeholder="Ex. Visite rue Albert"></label>
+  <label>Date<input type="date" data-crf="date" value="${esc(c.date||'')}"></label>
+  <label>Type<select data-crf="type">${['Visite de logement','Réunion de chantier','Visite bailleur','Visite sécurité','Réception / VTS'].map(o=>`<option ${c.type===o?'selected':''}>${o}</option>`).join('')}</select></label>
+  <label>Logement (facultatif)<select data-crf="log"><option value="">— aucun —</option>${L.map(l=>`<option value="${l.id}" ${c.log===l.id?'selected':''}>${esc(lname(l))}</option>`).join('')}</select></label>
+  <label style="grid-column:1/-1">Présents<input data-crf="pres" value="${esc(c.pres||'')}" placeholder="Ex. S. Oufqir (BBNE), DG Sanitaire, locataire"></label></div></div>
+ <div class="sec"><h3>Dictée</h3>
+  <div class="tools" style="margin-top:0"><button class="b p mic" id="micbtn" data-act="mic">🎤 Parler</button><button class="b" data-act="crfmt">✨ Mettre en forme le CR</button></div>
+  <textarea id="crt" data-crf="transcript" style="min-height:160px" placeholder="Touchez « Parler » et décrivez la visite. Dites « point suivant » pour changer de sujet. Ex. : Curage terminé au 12 rue Albert. Point suivant : fissure sur le voûtain de cave, DG Sanitaire doit reprendre la fuite sous l'évier avant vendredi.">${esc(c.transcript||'')}</textarea>
+  <p style="font-size:13px;color:var(--mute);margin:6px 0 0">La mise en forme range chaque phrase automatiquement, selon des mots-clés : relisez et corrigez ci-dessous.</p></div>
+ ${CRSEC.map(([k,t])=>`<div class="sec"><h3>${t}</h3><textarea data-crs="${k}" placeholder="Une ligne par point">${esc((c[k]||[]).join('\n'))}</textarea></div>`).join('')}
+ <div class="sec"><h3>Actions · ${(c.actions||[]).filter(a=>!a.fait).length} ouverte(s)</h3>
+  ${(c.actions||[]).map((a,i)=>`<div class="cra ${a.fait?'done':''}"><label class="chk" style="min-height:0"><input type="checkbox" data-cra="${i}|fait" ${a.fait?'checked':''}> Fait</label><input data-cra="${i}|txt" value="${esc(a.txt)}" aria-label="Action"><div class="cra2"><input data-cra="${i}|qui" value="${esc(a.qui||'')}" list="crqui" placeholder="Qui ?" aria-label="Qui"><input type="date" data-cra="${i}|quand" value="${esc(a.quand||'')}" aria-label="Pour quand"><button class="b d" data-cradel="${i}" aria-label="Supprimer" style="min-height:38px">✕</button></div></div>`).join('')||'<p class="note" style="margin:0">Aucune action.</p>'}
+  <datalist id="crqui">${[...ents().map(e=>e.n),'Bailleur','Locataire','Conducteur de travaux',...INTERV].map(x=>`<option value="${esc(x)}">`).join('')}</datalist>
+  <div class="tools"><button class="b" data-act="craadd">+ Action</button></div></div>
+ <div class="sec"><div class="tools" style="margin:0"><button class="b p" data-act="crpdf">PDF du compte rendu</button><button class="b d" data-act="crdel">Supprimer ce CR</button></div></div>`;
+}
+async function crPdf(c){
+ if(!downloads)return toast('Téléchargement indisponible ici');
+ toast('Préparation du PDF…');
+ try{
+  if(!window.jspdf)await new Promise((ok,ko)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';sc.onload=ok;sc.onerror=ko;document.head.appendChild(sc)});
+  const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4'});
+  const clean=t=>String(t??'').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').replace(/ | /g,' ').replace(/[^\x00-\xFF€]/g,'-');
+  const NAVY=[15,42,68],BRICK=[201,95,18],GREY=[104,106,112],LINE=[226,223,218],X=14,W=182;let y=0;
+  const need=h=>{if(y+h>280){doc.addPage();y=16}};
+  const txt=(t,x,yy,o={})=>{doc.setFont('helvetica',o.b?'bold':'normal');doc.setFontSize(o.s||10);doc.setTextColor(...(o.c||[27,29,34]));doc.text(clean(t),x,yy,o.a?{align:o.a}:undefined)};
+  const para=(t,o={})=>{doc.setFontSize(o.s||10);doc.splitTextToSize(clean(t),o.w||W-6).forEach(l=>{need(5);txt(l,o.x||X+4,y,o);y+=4.6})};
+  doc.setFillColor(...NAVY);doc.rect(0,0,210,30,'F');doc.setFillColor(...BRICK);doc.rect(0,30,210,1.6,'F');
+  txt('COMPTE RENDU',X,13,{s:16,b:true,c:[255,255,255]});txt([S.cfg.nom||'Chantier ERBM',S.cfg.entreprise].filter(Boolean).join('  -  '),X,21,{s:10,c:[200,214,230]});
+  txt('ERBM',196,13,{s:16,b:true,c:[240,138,60],a:'right'});txt(c.date?new Date(c.date+'T12:00').toLocaleDateString('fr-FR'):'',196,21,{s:10,c:[200,214,230],a:'right'});
+  y=40;txt(c.titre||'Compte rendu',X,y,{s:13,b:true});y+=6;
+  const lg=c.log&&S.logs[c.log];
+  [['Type',c.type],['Logement',lg?lname(lg):''],['Présents',c.pres],['Bailleur',S.cfg.bailleur]].filter(r=>r[1]).forEach(([k,v])=>{need(6);txt(k,X,y,{s:9,c:GREY});doc.setFontSize(10);const L=doc.splitTextToSize(clean(v),W-32);L.forEach((l,i)=>{txt(l,X+30,y+i*4.6)});y+=Math.max(5.5,L.length*4.6+1)});
+  y+=3;
+  const sec=(t,items)=>{if(!items.length)return;need(14);txt(t.toUpperCase(),X,y+4,{s:10.5,b:true,c:NAVY});doc.setDrawColor(...BRICK);doc.setLineWidth(.5);doc.line(X,y+6,X+W,y+6);doc.setLineWidth(.2);y+=11;items.forEach(it=>{need(6);txt('-',X+1,y,{});para(it);y+=1});y+=3};
+  CRSEC.forEach(([k,t])=>sec(t,c[k]||[]));
+  const A=c.actions||[];
+  if(A.length){need(20);txt('ACTIONS',X,y+4,{s:10.5,b:true,c:NAVY});doc.setDrawColor(...BRICK);doc.setLineWidth(.5);doc.line(X,y+6,X+W,y+6);doc.setLineWidth(.2);y+=10;
+   doc.setFillColor(244,242,239);doc.rect(X,y,W,7,'F');txt('Action',X+2,y+4.8,{s:8.5,b:true,c:GREY});txt('Qui',X+118,y+4.8,{s:8.5,b:true,c:GREY});txt('Pour le',X+152,y+4.8,{s:8.5,b:true,c:GREY});txt('Fait',X+W-2,y+4.8,{s:8.5,b:true,c:GREY,a:'right'});y+=7;
+   A.forEach(a=>{doc.setFontSize(9.5);const L=doc.splitTextToSize(clean(a.txt),112),h=Math.max(7,L.length*4.3+3);need(h);L.forEach((l,i)=>txt(l,X+2,y+4.8+i*4.3,{s:9.5}));txt(a.qui||'-',X+118,y+4.8,{s:9.5,b:true});txt(a.quand?new Date(a.quand+'T12:00').toLocaleDateString('fr-FR'):'-',X+152,y+4.8,{s:9.5});txt(a.fait?'oui':'',X+W-2,y+4.8,{s:9.5,a:'right'});y+=h;doc.setDrawColor(...LINE);doc.line(X,y,X+W,y)});y+=6}
+  need(34);txt('Diffusion : présents, conducteur de travaux, entreprises concernées.',X,y,{s:8.5,c:GREY});
+  const n=doc.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);doc.setDrawColor(...LINE);doc.line(X,288,X+W,288);txt('ERBM - CR '+(c.titre||'')+' - '+(c.date||''),X,292.5,{s:7.5,c:GREY});txt('Page '+i+' / '+n,X+W,292.5,{s:7.5,c:GREY,a:'right'})}
+  await downloads.save({filename:'CR-'+(c.date||today())+'-'+slug(c.titre||'chantier')+'.pdf',data:doc.output('blob')});toast('PDF prêt');
+ }catch(e){toast(e&&e.code==='declined'?'Téléchargement annulé':'PDF impossible pour le moment')}
+}
+
+
+/* --- GR site occupé : menuiseries et RDV locataire --- */
+const mxPrevu=l=>l.mx?.prevu!==undefined?!!l.mx.prevu:l.parcours==='GR';
+const mxSt=l=>!mxPrevu(l)?'':l.mx?.pose?'Posées':l.mx?.liv?'Livrées':l.mx?.cmd?'Commandées':l.mx?.cotes?'Cotes prises':'À commander';
+const MXCOL={'À commander':'#C00000','Cotes prises':'#E26B0A','Commandées':'#2F5597','Livrées':'#7030A0','Posées':'#2e7d32'};
+const rdvAPrendre=l=>l.parcours==='GR'&&(l.prest||[]).some(p=>p.st!=='terminee'&&p.st!=='bloquee'&&!p.rdv);
+function mxBlock(l){
+ const m=l.mx||{},on=mxPrevu(l),st=mxSt(l);
+ return `<div class="sec" id="mx"><h3>Menuiseries extérieures ${st?`<span class="pchip" style="--pc:${MXCOL[st]};vertical-align:2px">${st}</span>`:''}</h3>
+  <label class="chk"><input type="checkbox" data-f="mx.prevu" ${on?'checked':''}> Remplacement des menuiseries prévu</label>
+  ${on?`<div class="grid" style="margin-top:8px">
+   <label>Nombre de menuiseries<input type="number" min="0" data-f="mx.nb" value="${esc(m.nb||'')}" inputmode="numeric"></label>
+   <label>Fournisseur<input data-f="mx.fab" value="${esc(m.fab||'')}"></label>
+   <label>Prise de cotes<input type="date" data-f="mx.cotes" value="${esc(m.cotes||'')}"></label>
+   <label>Commandées le<input type="date" data-f="mx.cmd" value="${esc(m.cmd||'')}"></label>
+   <label>N° de commande<input data-f="mx.ncmd" value="${esc(m.ncmd||'')}"></label>
+   <label>Livraison prévue<input type="date" data-f="mx.livp" value="${esc(m.livp||'')}"></label>
+   <label>Livrées le<input type="date" data-f="mx.liv" value="${esc(m.liv||'')}"></label>
+   <label>Posées le<input type="date" data-f="mx.pose" value="${esc(m.pose||'')}"></label>
+   <label style="grid-column:1/-1">Remarques<input data-f="mx.note" value="${esc(m.note||'')}" placeholder="Ex. 4 fenêtres + 1 porte-fenêtre, volets roulants conservés"></label></div>`:''}</div>`;
+}
+
+
+/* --- planning visuel (style Excel / Gantt) --- */
+const ymdD=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const txtOn=hex=>{const h=hex.replace('#','');const f=h.length===3?h.split('').map(c=>c+c).join(''):h;const r=parseInt(f.slice(0,2),16),g=parseInt(f.slice(2,4),16),b=parseInt(f.slice(4,6),16);return (r*299+g*587+b*114)/1000>150?'#1b1d22':'#fff'};
+function vGantt(items){
+ S.gw=S.gw||0;
+ const now=new Date();now.setHours(12,0,0,0);
+ const start=new Date(now);start.setDate(start.getDate()-((start.getDay()+6)%7)-7+S.gw*7);
+ const NW=6,days=[];for(let w=0;w<NW;w++)for(let k=0;k<5;k++)days.push(new Date(start.getTime()+(w*7+k)*864e5));
+ const K=days.map(ymdD),td=ymdD(now),N=days.length;
+ const span=(a,b)=>{let i=K.findIndex(k=>k>=a),j=-1;for(let x=N-1;x>=0;x--)if(K[x]<=b){j=x;break}return i<0||j<0||j<i?null:[i,j]};
+ const dated=items.filter(x=>x.p.deb||x.p.rdv).map(x=>{const a=(x.p.deb||x.p.rdv).slice(0,10),b=(x.p.fin||x.p.deb||x.p.rdv).slice(0,10);return {...x,a,b:b<a?a:b}}).filter(x=>span(x.a,x.b));
+ const wk=d=>{const t=new Date(Date.UTC(d.getFullYear(),d.getMonth(),d.getDate()));const n=(t.getUTCDay()+6)%7;t.setUTCDate(t.getUTCDate()-n+3);const f=new Date(Date.UTC(t.getUTCFullYear(),0,4));return 1+Math.round(((t-f)/864e5-3+((f.getUTCDay()+6)%7))/7)};
+ const cols=`grid-template-columns:var(--gl) repeat(${N},var(--gc))`;
+ const tdi=K.indexOf(td);
+ const head=`<div class="grow ghead" style="${cols}"><div class="glab">Semaine</div>${Array.from({length:NW},(_,w)=>`<div class="gwk" style="grid-column:${w*5+2}/span 5">S${wk(days[w*5])} · ${days[w*5].toLocaleDateString('fr-FR',{day:'2-digit',month:'short'})}</div>`).join('')}</div>
+ <div class="grow ghead" style="${cols}"><div class="glab"></div>${days.map((d,i)=>`<div class="gday ${i===tdi?'gtd':''}" style="grid-column:${i+2}">${'LMMJV'[i%5]}<br>${d.getDate()}</div>`).join('')}</div>`;
+ const byLog={};dated.forEach(x=>{(byLog[x.l.id]??=[]).push(x)});
+ const logs=Object.keys(byLog).map(id=>S.logs[id]).filter(Boolean).map(l=>({id:Object.keys(S.logs).find(k=>S.logs[k]===l),l}));
+ logs.sort((a,b)=>(a.l.adresse||'').localeCompare(b.l.adresse||'','fr',{numeric:true}));
+ const E=ents().map(e=>e.n);
+ const body=logs.map(({id,l})=>{
+  const its=byLog[id],ens=[...new Set(its.map(x=>x.p.ent||'—'))].sort((a,b)=>(E.indexOf(a)+1||99)-(E.indexOf(b)+1||99));
+  return `<div class="grow glog" style="${cols}"><button class="glab" data-open="${id}">${esc((l.num?l.num+' ':'')+(l.adresse||''))} <span class="badge ${l.parcours==='GR'?'gr':''}" style="font-size:10px;padding:1px 6px">${l.parcours==='GR'?'GR':'ATH'}</span></button><div style="grid-column:2/-1"></div></div>`+
+   ens.map(en=>`<div class="grow" style="${cols}"><div class="glab gent" style="--ec:${entCol(en)}">${esc(en)}</div>${tdi>=0?`<div class="gtdc" style="grid-column:${tdi+2}"></div>`:''}${its.filter(x=>(x.p.ent||'—')===en).map(x=>{const [i,j]=span(x.a,x.b);const c=entCol(en);return `<button class="gbar ${x.p.st==='bloquee'?'gblk':''} ${x.p.st==='terminee'?'gdone':''}" data-open="${id}" style="grid-column:${i+2}/${j+3};background:${c};color:${txtOn(c)}" title="${esc(x.p.lib+' · '+fdate(x.a)+(x.b!==x.a?' → '+fdate(x.b):'')+' · '+(PST2[x.p.st]||''))}">${esc(x.p.lib)}</button>`}).join('')}</div>`).join('')}).join('');
+ const sans=items.filter(x=>!(x.p.deb||x.p.rdv)&&x.p.st!=='terminee').length;
+ return `<div class="tools" style="align-items:center"><button class="b" data-gw="-1" aria-label="Semaines précédentes">◀</button><button class="b" data-gw="0">Aujourd'hui</button><button class="b" data-gw="1" aria-label="Semaines suivantes">▶</button><span class="sub" style="color:var(--mute);font-size:14px">${days[0].toLocaleDateString('fr-FR',{day:'2-digit',month:'long'})} → ${days[N-1].toLocaleDateString('fr-FR',{day:'2-digit',month:'long',year:'numeric'})}</span></div>
+ ${dated.length?`<div class="gwrap">${head}${body}</div><div class="legend" style="margin-top:10px">${ents().map(e=>`<span style="--c:${e.c}">${esc(e.n)}</span>`).join('')}</div>`:'<p class="empty">Aucune prestation datée sur ces 6 semaines. Dans la fiche d\'un logement, renseignez « Début » et « Fin » (ou un RDV) sur ses prestations.</p>'}
+ ${sans?`<p class="note">${sans} prestation(s) sans date ne figurent pas sur le planning : voir la vue Liste.</p>`:''}`;
+}
+
+
+/* --- rotations et déménagements --- */
+function vRotations(){
+ const T=tirArr();if(!T.length)return '<p class="empty">Ajoutez d\'abord les logements vides (tiroirs) avec « + Logement tiroir ».</p>';
+ const td=today(),lim=isoDay(21);
+ const mv=[];logArr().filter(l=>l.parcours==='TIR'&&l.tir?.id).forEach(l=>{const t=S.tirs[l.tir.id]||{};
+  if(l.tir.du&&!(l.et&&l.et[2])&&l.tir.du<=lim)mv.push({d:l.tir.du,k:'Aller',l,t});
+  if(!l.tir.def&&l.tir.au&&!retourne(l)&&l.tir.au<=lim)mv.push({d:l.tir.au,k:'Retour',l,t})});
+ mv.sort((a,b)=>a.d.localeCompare(b.d));
+ const tn=t=>(t.num?t.num+' ':'')+(t.adresse||'');
+ const moves=mv.length?`<div class="list">${mv.map(m=>`<button class="item" data-open="${m.l.id}"><span class="badge ${m.d<td?'late':m.k==='Retour'?'ok':''}">${m.k}</span><span><span class="t">${esc(m.l.loc?.nom||'Famille')} · ${esc(lname(m.l))}</span><br><span class="s">${m.k==='Aller'?'vers le tiroir':'quitte le tiroir'} ${esc(tn(m.t))}${m.t.role==='tampon'?' (tampon)':''}</span></span><span class="s" style="white-space:nowrap">${m.d<td?'en retard · ':''}${esc(fdate(m.d))}</span></button>`).join('')}</div>`:'<p class="note">Aucun déménagement prévu dans les 3 semaines.</p>';
+ const rows=T.map(t=>({t,R:rotOf(t.id)})),NR=Math.max(1,...rows.map(r=>r.R.length));
+ const cell=l=>{const done=!l.tir.def&&retourne(l),cur=!done&&((l.et&&l.et[2])||(l.tir.du&&l.tir.du<=td));const c=rotConflit(l);
+  return `<button class="rcell ${done?'rdone':cur?'rcur':''} ${c?'rwarn':''}" data-open="${l.id}"><b>${esc((l.num?l.num+' ':'')+(l.adresse||''))}</b><span>${l.tir.du?fdate(l.tir.du):'?'} → ${l.tir.def?'définitif':l.tir.au?fdate(l.tir.au):'?'}</span><em>${l.tir.def?(cur?'Mutation définitive':'Mutation définitive prévue'):done?'Revenu chez lui':cur?'Dans le tiroir':'À venir'}${c?' · chevauchement':''}</em></button>`};
+ const table=`<div class="scroll"><table class="ft rot"><thead><tr><th>Tiroir (vide)</th>${Array.from({length:NR},(_,i)=>`<th>Rotation ${i+1}</th>`).join('')}</tr></thead><tbody>${rows.map(({t,R})=>`<tr><td><button class="rtir" data-edittir="${t.id}"><b>${esc(tn(t))}</b>${t.role==='tampon'?'<span class="badge" style="font-size:11px">Tampon</span>':''}${t.dispo==='non'?'<span class="badge late" style="font-size:11px">Indispo</span>':''}${isTirLocked(t.id)?'<span class="badge ok" style="font-size:11px">Occupé définitivement</span>':''}${t.from?'<span class="badge gr" style="font-size:11px">Libéré par mutation</span>':''}</button></td>${Array.from({length:NR},(_,i)=>`<td>${R[i]?cell(R[i]):''}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+ // frise par semaine
+ S.rw=S.rw||0;const now=new Date();now.setHours(12,0,0,0);const st=new Date(now);st.setDate(st.getDate()-((st.getDay()+6)%7)-14+S.rw*7);
+ const NW=16,W=Array.from({length:NW},(_,i)=>new Date(st.getTime()+i*7*864e5)),K=W.map(ymdD),end=ymdD(new Date(st.getTime()+NW*7*864e5));
+ const wi=d=>{let i=-1;K.forEach((k,j)=>{if(k<=d)i=j});return i};
+ const cols=`grid-template-columns:var(--gl) repeat(${NW},var(--gc))`,cw=wi(ymdD(now));
+ const head=`<div class="grow ghead" style="${cols}"><div class="glab">Semaine</div>${W.map((d,i)=>`<div class="gday ${i===cw?'gtd':''}" style="grid-column:${i+2}">${d.toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit'})}</div>`).join('')}</div>`;
+ const pal=['#2F5597','#c95f12','#4c8c2b','#7030A0','#0091c7','#b8860b'];
+ const body=rows.map(({t,R})=>`<div class="grow" style="${cols}"><button class="glab" data-edittir="${t.id}">${esc(tn(t))}</button>${cw>=0?`<div class="gtdc" style="grid-column:${cw+2}"></div>`:''}${R.filter(l=>l.tir.du).map((l,k)=>{const a=l.tir.du,b=l.tir.def?end:l.tir.au||ymdD(new Date(new Date(a+'T12:00').getTime()+56*864e5));if(b<K[0]||a>=end)return '';const i=Math.max(0,wi(a)),j=Math.max(i,b>=end?NW-1:wi(b));const c=pal[k%pal.length];return `<button class="gbar ${retourne(l)&&!l.tir.def?'gdone':''} ${l.tir.au||l.tir.def?'':'gblk'}" data-open="${l.id}" style="grid-column:${i+2}/${j+3};background:${c};color:#fff" title="${esc(lname(l)+' · '+fdate(a)+' → '+(l.tir.def?'mutation définitive':l.tir.au?fdate(l.tir.au):'retour non daté'))}">${l.tir.def?'Définitif':'R'+(R.indexOf(l)+1)} · ${esc((l.num?l.num+' ':'')+(l.adresse||''))}</button>`}).join('')}</div>`).join('');
+ return `<h3 style="margin:6px 0 8px">Déménagements des 3 prochaines semaines</h3>${moves}
+ <h3 style="margin:24px 0 8px">Rotations par tiroir</h3><p class="note">Chaque famille part dans le tiroir pendant les travaux de son logement, puis revient chez elle ; le tiroir accueille alors la rotation suivante. En cas de mutation définitive, la famille reste dans le tiroir et c'est son ancien logement qui devient vide. Pour ajouter une rotation : dans la fiche du logement, choisissez le tiroir et les dates d'aller et de retour.</p>${table}
+ <h3 style="margin:24px 0 8px">Frise des rotations</h3><div class="tools" style="align-items:center"><button class="b" data-rw="-1" aria-label="Plus tôt">◀</button><button class="b" data-rw="0">Aujourd'hui</button><button class="b" data-rw="1" aria-label="Plus tard">▶</button></div>
+ <div class="gwrap" style="--gc:58px">${head}${body}</div><p class="note" style="margin-top:8px">Barre en pointillés rouges : retour pas encore daté (affiché sur 8 semaines par défaut).</p>`;
+}
+
+
+/* ---------- plans par typologie + validations ---------- */
+const CORPSVAL=['Plaquiste','Plombier / chauffagiste'];
+const VST={'':'À valider',ok:'Validé',ko:'À corriger'},VCOL={'':'#8a8d93',ok:'#2e7d32',ko:'#C00000'};
+const tpList=()=>[...new Set([...logArr().map(l=>(l.tp||'').trim()).filter(Boolean),...Object.keys(S.cfg.plans||{})])].sort((a,b)=>a.localeCompare(b,'fr',{numeric:true}));
+const tpPlan=tp=>(S.cfg.plans||{})[tp]||null;
+const planOf=l=>l.tech?.planId?{id:l.tech.planId,kind:l.tech.planKind||'img',src:'logement'}:(l.tp&&tpPlan(l.tp)?.id?{id:tpPlan(l.tp).id,kind:'img',src:'type',tp:l.tp}:null);
+const tpValide=tp=>{const P2=tpPlan(tp);return !!P2?.id&&CORPSVAL.every(c=>P2.vals?.[c]?.st==='ok')};
+const valChips=tp=>{const P2=tpPlan(tp);return CORPSVAL.map(c=>{const v=P2?.vals?.[c]||{};return `<span class="pchip" style="--pc:${VCOL[v.st||'']}" title="${esc((v.par?'Par '+v.par:'')+(v.date?' le '+fdate(v.date):'')+(v.note?' · '+v.note:''))}">${esc(c.split(' ')[0])} : ${VST[v.st||'']}</span>`}).join(' ')};
+function vPlans(){
+ const T=tpList(),L=logArr(),sans=L.filter(l=>!l.tp).length;
+ return `<p class="note">Un plan par type de logement (L10_ATH, M10_ATH…), valable pour tous les logements de ce type. Le plaquiste et le plombier valident chacun le plan avant les travaux. Un plan propre à un logement, joint dans sa fiche, reste prioritaire.</p>
+ ${sans?`<p class="note warn">${sans} logement(s) sans type de plan : renseignez « Type de plan » dans leur fiche pour qu'ils reprennent le bon plan.</p>`:''}
+ <div class="tools"><input id="tpnew" placeholder="Nouveau type, ex. L25_GR" style="flex:1 1 200px;width:auto"><button class="b p" data-act="tpadd">Ajouter le type</button></div>
+ ${T.length?`<div class="tpgrid">${T.map(tp=>{const P2=tpPlan(tp)||{},n=L.filter(l=>l.tp===tp).length;return `<div class="tpc ${tpValide(tp)?'tpok':''}"><div class="ckh"><h3 style="margin:0">${esc(tp)}</h3><span class="s" style="color:var(--mute);font-size:13px">${n} logement${n>1?'s':''}</span></div>
+  ${P2.id?`<a href="${esc(driveLink(P2.id))}" target="_blank" rel="noopener"><img src="${esc(blob(P2.id))}" alt="Plan ${esc(tp)}" class="tpimg"></a>`:'<div class="tpnone">Aucun plan</div>'}
+  <label class="phl" style="margin:8px 0">${P2.id?'Remplacer le plan':'Joindre le plan (image ou PDF)'}<input type="file" accept="image/*,application/pdf" data-tpup="${esc(tp)}" hidden></label>
+  ${CORPSVAL.map(c=>{const v=P2.vals?.[c]||{};return `<div class="tpv"><b>${esc(c)}</b><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px"><select data-tpv="${esc(tp)}|${esc(c)}|st" ${P2.id?'':'disabled'}>${Object.entries(VST).map(([k,t])=>`<option value="${k}" ${(v.st||'')===k?'selected':''}>${t}</option>`).join('')}</select><input data-tpv="${esc(tp)}|${esc(c)}|par" value="${esc(v.par||'')}" placeholder="Validé par"><input data-tpv="${esc(tp)}|${esc(c)}|note" value="${esc(v.note||'')}" placeholder="Remarque" style="grid-column:1/-1"></div>${v.date?`<span class="s" style="font-size:12px;color:var(--mute)">${VST[v.st||'']} le ${fdate(v.date)}</span>`:''}</div>`}).join('')}</div>`}).join('')}</div>`:'<p class="empty">Aucun type de plan. Ajoutez-en un, ou renseignez « Type de plan » dans les fiches logement.</p>'}`;
+}
+async function uploadTpPlan(input){const f=input.files?.[0],tp=input.dataset.tpup;if(!f||!tp)return;if(readonly)return toast('Lecture seule');toast('Envoi du plan '+tp+'…');try{const a=await assets.upload(f,2400);S.cfg.plans={...(S.cfg.plans||{})};S.cfg.plans[tp]={...(S.cfg.plans[tp]||{}),id:a.id,date:today(),vals:{}};await saveCfg();render();toast('Plan '+tp+' joint : à faire valider')}catch(e){toast('Plan non envoyé')}input.value=''}
+
+/* ---------- amiante ---------- */
+const amSt=l=>{const r=l.vte?.am||'',a=l.am||{};if(!r)return 'Diag manquant';if(/attente/i.test(r))return 'Diag en attente';if(/pas d/i.test(r))return 'Absence';if(!a.retrait)return 'Présence';return a.fait?'Retrait fait':a.dateR?'Retrait planifié':'Retrait à planifier'};
+const AMCOL={'Diag manquant':'#C00000','Diag en attente':'#E26B0A','Absence':'#2e7d32','Présence':'#7030A0','Retrait à planifier':'#C00000','Retrait planifié':'#2F5597','Retrait fait':'#2e7d32'};
+const amBloque=l=>['Diag manquant','Diag en attente','Retrait à planifier','Retrait planifié'].includes(amSt(l));
+function amBlock(l){const a=l.am||{},st=amSt(l),pres=/présence/i.test(l.vte?.am||'');
+ return `<div class="sec" id="amiante"><h3>Diagnostic amiante <span class="pchip" style="--pc:${AMCOL[st]};vertical-align:2px">${st}</span></h3><div class="grid">
+  <label>Résultat<select data-f="vte.am"><option value="">—</option>${['Pas d\'amiante','Présence d\'amiante','En attente du diag'].map(o=>`<option ${l.vte?.am===o?'selected':''}>${o}</option>`).join('')}</select></label>
+  <label>N° de rapport<input data-f="am.ref" value="${esc(a.ref||'')}"></label><label>Date du diag<input type="date" data-f="am.date" value="${esc(a.date||'')}"></label><label>Diagnostiqueur<input data-f="am.diag" value="${esc(a.diag||'')}"></label>
+  ${pres?`<label style="grid-column:1/-1">Matériaux et localisation<input data-f="am.mat" value="${esc(a.mat||'')}" placeholder="Ex. dalles de sol séjour, conduit fibrociment cave"></label>
+  <label class="chk" style="grid-column:1/-1"><input type="checkbox" data-f="am.retrait" ${a.retrait?'checked':''}> Retrait ou encapsulage nécessaire avant les travaux</label>
+  ${a.retrait?`<label>Entreprise de désamiantage<input data-f="am.ent" value="${esc(a.ent||'')}"></label><label>Sous-section<select data-f="am.ss"><option value="">—</option>${['SS3 (retrait)','SS4 (intervention)'].map(o=>`<option ${a.ss===o?'selected':''}>${o}</option>`).join('')}</select></label><label>Retrait prévu le<input type="date" data-f="am.dateR" value="${esc(a.dateR||'')}"></label><label>Retrait fait le<input type="date" data-f="am.fait" value="${esc(a.fait||'')}"></label><label>Mesures libératoires OK le<input type="date" data-f="am.lib" value="${esc(a.lib||'')}"></label>`:''}`:''}</div>
+  ${amBloque(l)&&l.parcours==='TIR'?'<p class="note warn" style="margin:10px 0 0">Pas de curage tant que l\'amiante n\'est pas levé (diag reçu et, si besoin, retrait fait).</p>':''}</div>`}
+
+/* ---------- performance énergétique ---------- */
+const ETQ=['A','B','C','D','E','F','G'];
+const cible=()=>+(S.cfg.cible||130);
+function dpeBlock(l){const d=l.dpe||{},ok=d.ap_kwh?(+d.ap_kwh<=cible()):null;
+ return `<div class="sec" id="dpe"><h3>Performance énergétique ${ok===null?'':`<span class="pchip" style="--pc:${ok?'#2e7d32':'#C00000'};vertical-align:2px">${ok?'Objectif atteint':'Au-dessus de l\'objectif'}</span>`}</h3>
+ <p style="margin:0 0 8px;font-size:13px;color:var(--mute)">Objectif du chantier : ${cible()} kWh/m².an (réglable dans Réglages).</p><div class="grid">
+  <label>Étiquette avant<select data-f="dpe.av_et"><option value="">—</option>${ETQ.map(e=>`<option ${d.av_et===e?'selected':''}>${e}</option>`).join('')}</select></label><label>Consommation avant (kWh/m².an)<input type="number" data-f="dpe.av_kwh" value="${esc(d.av_kwh||'')}" inputmode="numeric"></label>
+  <label>Étiquette après<select data-f="dpe.ap_et"><option value="">—</option>${ETQ.map(e=>`<option ${d.ap_et===e?'selected':''}>${e}</option>`).join('')}</select></label><label>Consommation après (kWh/m².an)<input type="number" data-f="dpe.ap_kwh" value="${esc(d.ap_kwh||'')}" inputmode="numeric"></label>
+  <label>Date du DPE après travaux<input type="date" data-f="dpe.date" value="${esc(d.date||'')}"></label></div></div>`}
+
+/* ---------- suivi locataire ---------- */
+const SUIT=['Appel','Courrier','Visite','Réclamation','Information travaux'];
+function suiviBlock(l){const R=l.suivi||[],sat=l.sat||{};
+ return `<div class="sec" id="suivi"><h3>Suivi locataire ${R.filter(x=>x.type==='Réclamation'&&!x.clos).length?`<span class="pchip" style="--pc:#C00000;vertical-align:2px">${R.filter(x=>x.type==='Réclamation'&&!x.clos).length} réclamation(s) ouverte(s)</span>`:''}</h3>
+ ${R.slice().reverse().map((x,k)=>{const i=R.length-1-k;return `<div class="res ${x.clos?'lev':''}"><span><b>${esc(x.type)}</b> · ${esc(fdate(x.d))}<br><span style="font-size:14px">${esc(x.t)}</span></span>${x.type==='Réclamation'?`<button class="b" data-suclos="${i}">${x.clos?'Rouvrir':'Clore'}</button>`:'<span></span>'}</div>`}).join('')||'<p class="note" style="margin:0 0 8px">Rien de noté.</p>'}
+ <div class="grid" style="margin-top:8px;background:var(--bg2);padding:12px;border-radius:12px"><label>Type<select id="sut">${SUIT.map(o=>`<option>${o}</option>`).join('')}</select></label><label style="grid-column:span 2">Détail<input id="sux" placeholder="Ex. se plaint du bruit le matin, prévenu de la coupure d'eau jeudi"></label><div style="grid-column:1/-1"><button class="b p" data-act="addsuivi">Noter</button></div></div>
+ <h3 style="margin:16px 0 8px;font-size:15px">Satisfaction à la livraison</h3><div class="grid"><label>Note (1 à 5)<select data-f="sat.note"><option value="">—</option>${[5,4,3,2,1].map(n=>`<option ${String(sat.note)===String(n)?'selected':''}>${n}</option>`).join('')}</select></label><label style="grid-column:span 2">Commentaire du locataire<input data-f="sat.com" value="${esc(sat.com||'')}"></label></div></div>`}
+
+/* ---------- onglet Pilotage ---------- */
+function vPilotage(){
+ const L=logArr(),E=ents(),ins=S.cfg.ins||[],obj=+(S.cfg.insObj||0);
+ const tot=ins.reduce((s,x)=>s+(+x.h||0),0),mois=[...new Set(ins.map(x=>x.m))].sort().slice(-6);
+ const byEnt=E.map(e=>({n:e.n,c:e.c,h:ins.filter(x=>x.ent===e.n).reduce((s,x)=>s+(+x.h||0),0)}));
+ const insT=`<h2 style="margin:0 0 8px">Heures d'insertion</h2>
+  <div class="kpis"><div class="kpi"><b>${Math.round(tot).toLocaleString('fr-FR')} h</b><span>réalisées${obj?' sur '+obj.toLocaleString('fr-FR')+' h':''}</span></div>${obj?`<div class="kpi"><b>${Math.round(tot/obj*100)} %</b><span>de l'objectif</span></div>`:''}</div>
+  ${obj?`<div class="vbar" style="margin:-10px 0 14px"><i style="width:${Math.min(100,tot/obj*100)}%"></i></div>`:''}
+  <div class="scroll"><table class="ft"><thead><tr><th>Entreprise</th>${mois.map(m=>`<th class="num">${esc(new Date(m+'-15').toLocaleDateString('fr-FR',{month:'short',year:'2-digit'}))}</th>`).join('')}<th class="num">Total</th></tr></thead><tbody>${byEnt.map(e=>`<tr><td><b style="color:${e.c}">${esc(e.n)}</b></td>${mois.map(m=>`<td class="num">${ins.filter(x=>x.ent===e.n&&x.m===m).reduce((s,x)=>s+(+x.h||0),0)||''}</td>`).join('')}<td class="num"><b>${e.h||0}</b></td></tr>`).join('')}</tbody></table></div>
+  <div class="grid" style="margin-top:10px;background:var(--bg2);padding:12px;border-radius:12px"><label>Mois<input type="month" id="inm" value="${today().slice(0,7)}"></label><label>Entreprise<select id="ine">${E.map(e=>`<option>${esc(e.n)}</option>`).join('')}</select></label><label>Heures du mois<input type="number" id="inh" min="0" inputmode="numeric"></label><label>Objectif total du marché (h)<input data-cfg="insObj" value="${esc(S.cfg.insObj||'')}" inputmode="numeric"></label><div style="grid-column:1/-1"><button class="b p" data-act="addins">Enregistrer les heures</button> <span style="font-size:13px;color:var(--mute)">Une saisie par entreprise et par mois : elle remplace la précédente.</span></div></div>`;
+ const rec=L.filter(recu),avec=L.filter(l=>l.dpe?.ap_kwh),okc=avec.filter(l=>+l.dpe.ap_kwh<=cible()).length;
+ const gain=avec.filter(l=>l.dpe.av_kwh).map(l=>+l.dpe.av_kwh-+l.dpe.ap_kwh),gm=gain.length?Math.round(gain.reduce((a,b)=>a+b,0)/gain.length):0;
+ const cnt=k=>ETQ.map(e=>L.filter(l=>l.dpe?.[k]===e).length);
+ const dpeT=`<h2 style="margin:28px 0 8px">Performance énergétique</h2>
+  <div class="kpis"><div class="kpi"><b>${avec.length}/${rec.length||L.length}</b><span>DPE après travaux saisis ${rec.length?'(logements réceptionnés)':''}</span></div><div class="kpi"><b>${avec.length?Math.round(okc/avec.length*100)+' %':'—'}</b><span>sous ${cible()} kWh/m².an</span></div><div class="kpi"><b>${gm?'−'+gm:'—'}</b><span>kWh/m².an gagnés en moyenne</span></div></div>
+  <div class="scroll"><table class="ft"><thead><tr><th>Étiquette</th>${ETQ.map(e=>`<th class="num">${e}</th>`).join('')}</tr></thead><tbody><tr><td>Avant travaux</td>${cnt('av_et').map(n=>`<td class="num">${n||''}</td>`).join('')}</tr><tr><td><b>Après travaux</b></td>${cnt('ap_et').map(n=>`<td class="num"><b>${n||''}</b></td>`).join('')}</tr></tbody></table></div>
+  ${rec.filter(l=>!l.dpe?.ap_kwh).length?`<p class="note warn" style="margin-top:8px">${rec.filter(l=>!l.dpe?.ap_kwh).length} logement(s) réceptionné(s) sans DPE après travaux.</p>`:''}`;
+ const recl=[];L.forEach(l=>(l.suivi||[]).forEach(x=>{if(x.type==='Réclamation'&&!x.clos)recl.push({l,x})}));
+ const sats=L.filter(l=>l.sat?.note).map(l=>+l.sat.note),sm=sats.length?(sats.reduce((a,b)=>a+b,0)/sats.length):0;
+ const locT=`<h2 style="margin:28px 0 8px">Locataires</h2><div class="kpis"><div class="kpi"><b>${recl.length}</b><span>réclamation(s) ouverte(s)</span></div><div class="kpi"><b>${sats.length?sm.toFixed(1).replace('.',',')+' / 5':'—'}</b><span>satisfaction moyenne (${sats.length} avis)</span></div><div class="kpi"><b>${L.filter(l=>l.parcours==='GR'&&rdvAPrendre(l)).length}</b><span>GR : RDV locataire à prendre</span></div></div>
+  ${recl.length?`<div class="list">${recl.sort((a,b)=>(a.x.d||'').localeCompare(b.x.d||'')).map(r=>`<button class="item" data-open="${r.l.id}"><span class="badge late">${esc(fdate(r.x.d))}</span><span><span class="t">${esc(r.x.t)}</span><br><span class="s">${esc(lname(r.l))}${r.l.loc?.nom?' · '+esc(r.l.loc.nom):''}</span></span><span></span></button>`).join('')}</div>`:''}`;
+ const T=tpList(),amC={};L.forEach(l=>{const st=amSt(l);amC[st]=(amC[st]||0)+1});
+ const ctrl=`<h2 style="margin:28px 0 8px">Plans et amiante</h2><div class="kpis"><div class="kpi"><b>${T.filter(tpValide).length}/${T.length}</b><span>plans types validés plaquiste + plombier</span></div>${Object.entries(AMCOL).filter(([k])=>amC[k]).map(([k,c])=>`<div class="kpi" style="border-left:5px solid ${c}"><b>${amC[k]}</b><span>${k}</span></div>`).join('')}</div>`;
+ return insT+dpeT+locT+ctrl;
+}
+
+/* ---------- poste de commandement ---------- */
+function vCommande(){
+ const td=today(),L=logArr(),O=[];
+ const push=(cat,col,txt,sub,attr,late)=>O.push({cat,col,txt,sub,attr,late});
+ prestArr().forEach(x=>{const p=x.p;if(p.st==='terminee')return;
+  if((p.rdv||'').slice(0,10)===td)push('RDV','#7030A0',`${p.lib} · ${p.ent||''} à ${new Date(p.rdv).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})}`,lname(x.l)+(x.l.loc?.tel?' · '+x.l.loc.tel:''),`data-open="${x.l.id}"`);
+  else if(p.deb===td)push('Démarrage','#2F5597',`${p.lib} · ${p.ent||''}`,lname(x.l),`data-open="${x.l.id}"`);
+  const fin=p.fin||(p.rdv||'').slice(0,10)||p.deb;if(fin&&fin<td)push('Retard','#C00000',`${p.lib} · ${p.ent||''} : prévu ${fdate(fin)}`,lname(x.l),`data-open="${x.l.id}"`,true);
+  if(p.st==='bloquee')push('Bloqué','#C00000',`${p.lib} · ${p.ent||''}${p.note?' : '+p.note:''}`,lname(x.l),`data-open="${x.l.id}"`,true)});
+ L.filter(l=>l.parcours==='TIR'&&l.tir?.id).forEach(l=>{const t=S.tirs[l.tir.id]||{};
+  if(l.tir.du&&l.tir.du<=td&&!(l.et&&l.et[2]))push('Déménagement','#c95f12',`Aller : ${l.loc?.nom||'famille'} vers ${(t.num||'')+' '+(t.adresse||'')}`,lname(l)+(l.tir.du<td?' · en retard depuis le '+fdate(l.tir.du):''),`data-open="${l.id}"`,l.tir.du<td);
+  if(!l.tir.def&&l.tir.au&&l.tir.au<=td&&!(l.et&&l.et[8]))push('Déménagement','#c95f12',`Retour : ${l.loc?.nom||'famille'} rentre chez elle`,lname(l)+(l.tir.au<td?' · en retard depuis le '+fdate(l.tir.au):''),`data-open="${l.id}"`,l.tir.au<td);
+  if(amBloque(l)&&(l.prest||[]).some(p=>/curage/i.test(p.lib)&&p.deb&&p.deb<=isoDay(14)&&p.st!=='terminee'))push('Amiante','#C00000',`Curage prévu mais amiante non levé (${amSt(l)})`,lname(l),`data-open="${l.id}"`,true)});
+ crArr().forEach(c=>(c.actions||[]).forEach(a=>{if(!a.fait&&a.quand&&a.quand<=td)push('Action CR','#E26B0A',a.txt,(a.qui||'Qui ?')+' · pour le '+fdate(a.quand),`data-opencr="${c.id}"`,a.quand<td)}));
+ L.forEach(l=>{const m=l.mx||{};if(mxPrevu(l)&&m.livp&&!m.liv&&m.livp<td)push('Menuiseries','#2F5597','Livraison des menuiseries en retard',lname(l)+' · prévue le '+fdate(m.livp),`data-open="${l.id}"`,true)});
+ const grR=L.filter(rdvAPrendre).length,pva=L.reduce((n,l)=>n+(l.prov||[]).filter(x=>x.st!=='ok'&&x.st!=='ko').length,0),tpv=tpList().filter(t=>tpPlan(t)?.id&&!tpValide(t)).length,recl=L.reduce((n,l)=>n+(l.suivi||[]).filter(x=>x.type==='Réclamation'&&!x.clos).length,0);
+ const late=O.filter(o=>o.late).length;
+ const d=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+ const chips=[[grR,'RDV locataire GR à prendre','data-go="planning"'],[pva,'provision(s) à valider','data-go="logements"'],[tpv,'plan(s) type à valider','data-go="logements" data-lv="plans"'],[recl,'réclamation(s) ouverte(s)','data-go="pilotage"']].filter(c=>c[0]);
+ O.sort((a,b)=>(b.late?1:0)-(a.late?1:0));
+ return `<section class="cmd"><div class="cmdh"><h2>Aujourd'hui · ${esc(d)}</h2><span class="pchip" style="--pc:${late?'#C00000':'#2e7d32'}">${late?late+' en retard':'À jour'}</span></div>
+ ${O.length?`<div class="list">${O.slice(0,25).map(o=>`<button class="item cmdi ${o.late?'cmdl':''}" ${o.attr} style="--ec:${o.col}"><span class="pchip" style="--pc:${o.col}">${esc(o.cat)}</span><span><span class="t">${esc(o.txt)}</span><br><span class="s">${esc(o.sub)}</span></span><span></span></button>`).join('')}</div>${O.length>25?`<p class="note">+ ${O.length-25} autre(s)…</p>`:''}`:'<p class="note">Rien de prévu ni en retard aujourd\'hui.</p>'}
+ ${chips.length?`<div class="cmdc">${chips.map(c=>`<button class="b" ${c[2]}><b>${c[0]}</b> ${c[1]}</button>`).join('')}</div>`:''}</section>`;
 }
 
 /* --- vue Finances --- */
@@ -296,7 +793,7 @@ function vFinances(){
  const LA=L.filter(l=>l.parcours==='TIR'),LG=L.filter(l=>l.parcours==='GR'),SA=finStats(LA),SG=finStats(LG);
  const pcs=(v,b)=>b?(Math.round(v/b*1000)/10).toLocaleString('fr-FR')+' %':'—';
  const mrow=(nom,m,f,St)=>`<tr><td><b>${nom}</b></td><td>${St.n}</td><td class="num">${eur(m)}</td><td class="num">${St.n&&m?eur(m/St.n):'—'}</td><td class="num">${eur(St.eng)}</td><td class="num">${St.ch?eur(St.moy):'—'}</td><td class="num">${St.ch&&m&&St.n?pcs(St.moy-m/St.n,m/St.n).replace(/^(?!-)/,'+'):'—'}</td><td class="num">${eur(f)}</td><td class="num">${pcs(f,m)}</td><td class="num">${eur(m-f)}</td></tr>`;
- const marche=`<h3 style="margin:8px 0 8px">Marché ${esc(S.cfg.mNom||'')}</h3><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px">
+ const marche=`<div class="tools" style="margin:0 0 6px"><label style="display:inline-flex;align-items:center;cursor:pointer;color:#fff;background:var(--brick);border-radius:10px;min-height:44px;padding:0 16px;font:600 15px Inter,sans-serif">Importer la demande d'acompte (Excel)<input type="file" id="sitfile" accept=".xlsx,.xls" hidden></label></div><p class="note" style="margin:0 0 12px">Chaque mois, importez le fichier Excel de la demande d'acompte du groupement : seuls le marché et le cumul facturé de BBNE (ATH et GR), le n° et la date de situation sont repris.</p><h3 style="margin:8px 0 8px">Marché ${esc(S.cfg.mNom||'')}</h3><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px">
  <label>Marché HT tiroirs (ATH)<input data-cfg="mATH" value="${esc(S.cfg.mATH||'')}" inputmode="decimal"></label>
  <label>Marché HT GR<input data-cfg="mGR" value="${esc(S.cfg.mGR||'')}" inputmode="decimal"></label>
  <label>Facturé cumulé HT ATH<input data-cfg="fATH" value="${esc(S.cfg.fATH||'')}" inputmode="decimal"></label>
@@ -338,13 +835,19 @@ function vTableau(){
  const alerts=[];
  ti.forEach(l=>{if(l.tir&&l.tir.au&&!(l.et&&l.et[8])){const d=days(l.tir.au);if(d<=14)alerts.push({l,t:d<0?`Retour dépassé de ${-d} j`:`Retour locataire dans ${d} j`,late:d<0,k:d})}});
  L.forEach(l=>resOuv(l).forEach(r=>{if(r.date&&days(r.date)<-15)alerts.push({l,t:`Réserve ouverte depuis ${-days(r.date)} j : ${r.txt}`,late:true,k:days(r.date)})}));
+ L.forEach(l=>{const m=l.mx||{};if(mxPrevu(l)&&m.livp&&!m.liv&&days(m.livp)<0)alerts.push({l,t:`Menuiseries : livraison prévue le ${fdate(m.livp)} dépassée`,late:true,k:days(m.livp)});if(mxPrevu(l)&&m.liv&&!m.pose&&days(m.liv)<-14)alerts.push({l,t:'Menuiseries livrées depuis '+(-days(m.liv))+' j, pas encore posées',late:true,k:days(m.liv)})});
  L.forEach(l=>{if(l.esc?.prevu&&!l.esc.cmd)alerts.push({l,t:l.esc.cotes?'Escalier : cotes prises, à commander':'Escalier à faire coter et commander',late:true,k:-999});if((l.vte?.ok||(l.et&&l.et[0]))&&l.tech?.planSt!=='valide')alerts.push({l,t:'VTE faite, plan à valider',late:false,k:50})});
  alerts.sort((a,b)=>a.k-b.k);
  const cites={};L.forEach(l=>(cites[l.cite||'Sans cité']??=[]).push(l));
  const bars=(arr,p)=>P[p].etapes.map((e,i)=>{const n=arr.filter(l=>curIdx(l)===i).length;return `<div class="row"><span>${esc(e)}</span><div class="track"><div class="fill" style="width:${arr.length?n/arr.length*100:0}%"></div></div><span class="n">${n}</span></div>`}).join('')+`<div class="row"><span><b>Terminés</b></span><div class="track"><div class="fill" style="background:var(--slate);width:${arr.length?arr.filter(l=>curIdx(l)>=P[p].etapes.length).length/arr.length*100:0}%"></div></div><span class="n">${arr.filter(l=>curIdx(l)>=P[p].etapes.length).length}</span></div>`;
- return `<h2>${rec} logement${rec>1?'s':''} réceptionné${rec>1?'s':''} sur ${L.length}</h2>
+ return `${vCommande()}<h2>${rec} logement${rec>1?'s':''} réceptionné${rec>1?'s':''} sur ${L.length}</h2>
  <div class="kpis"><div class="kpi"><b>${gr.length}</b><span>en GR · site occupé</span></div><div class="kpi"><b>${ti.length}</b><span>en opération tiroir</span></div><div class="kpi"><b>${ro}</b><span>réserves ouvertes</span></div><div class="kpi"><b>${libres}</b><span>tiroirs libres sur ${tirArr().length}</span></div></div>
  <div class="kpis" style="margin-top:-12px"><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mtot)}</b><span>montant HT des fiches travaux (BPU)</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mrec)}</b><span>dont logements en VTS / réceptionnés</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mgr)}</b><span>GR · site occupé</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mti)}</b><span>opérations tiroir</span></div></div>
+ <h3 style="margin:4px 0 8px">GR · site occupé</h3><div class="kpis" style="margin-top:0">
+  <button class="kpi pk" data-go="planning" style="--pc:#C00000"><b>${gr.filter(rdvAPrendre).length}</b><span>RDV locataire à prendre</span></button>
+  <div class="kpi" style="border-left:5px solid #C00000"><b>${L.filter(l=>mxSt(l)==='À commander'||mxSt(l)==='Cotes prises').length}</b><span>menuiseries à commander</span></div>
+  <div class="kpi" style="border-left:5px solid #2F5597"><b>${L.filter(l=>mxSt(l)==='Commandées').length}</b><span>menuiseries commandées, en attente</span></div>
+  <div class="kpi" style="border-left:5px solid #7030A0"><b>${L.filter(l=>mxSt(l)==='Livrées').length}</b><span>livrées, à poser</span></div></div>
  <div class="kpis" style="margin-top:-12px"><div class="kpi"><b>${vteN}/${L.length}</b><span>VTE faites</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(pvok)}</b><span>provisions validées</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(pva)}</b><span>${pvn} provision${pvn>1?'s':''} à valider</span></div><div class="kpi"><b>${L.filter(l=>l.esc?.prevu&&!l.esc.cmd).length}</b><span>escalier(s) à commander</span></div></div>
  ${Object.entries(cites).map(([c,arr])=>`<div class="cite"><h3>${esc(c)} <span class="sub" style="font:400 14px Inter;color:var(--mute)">· ${arr.filter(recu).length}/${arr.length} réceptionnés</span></h3><div class="tiles">${arr.map(l=>`<button class="tile" data-open="${l.id}" style="background:${tileColor(l)}" title="${esc(lname(l)+' — '+etat(l))}">${esc(l.num||'?')}<i>${l.parcours==='GR'?'GR':'TIR'}</i></button>`).join('')}</div></div>`).join('')}
  <div class="legend"><span style="--c:light-dark(#c9c5bf,#45474d)">Pas commencé</span><span style="--c:color-mix(in srgb,var(--brick) 50%,#e8a58f)">Début</span><span style="--c:var(--brick)">Bien avancé</span><span style="--c:var(--slate)">Réceptionné</span></div>
@@ -353,18 +856,22 @@ function vTableau(){
 }
 function ring(l){const p=pct(l),r=22,c=2*Math.PI*r;return `<svg class="prog" viewBox="0 0 56 56"><circle cx="28" cy="28" r="${r}" fill="none" stroke="var(--bg2)" stroke-width="6"/><circle cx="28" cy="28" r="${r}" fill="none" stroke="${p>=100?'var(--slate)':'var(--brick)'}" stroke-width="6" stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 28 28)" stroke-linecap="round"/><text x="28" y="32" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" font-family="Archivo">${p}%</text></svg>`}
 function vLogements(){
+ const tglv=`<div class="seg2"><button class="${S.lv!=='plans'?'on':''}" data-lv="liste">Logements</button><button class="${S.lv==='plans'?'on':''}" data-lv="plans">Plans types</button></div>`;
+ if(S.lv==='plans')return `<div class="tools">${tglv}</div>${vPlans()}`;
  const all=logArr(),cs=[...new Set(all.map(l=>l.cite||'Sans cité'))];
  const q=S.q.toLowerCase();
  const L=all.filter(l=>(!S.fp||l.parcours===S.fp)&&(!S.fc||(l.cite||'Sans cité')===S.fc)&&(!S.fe||etat(l)===S.fe)&&(!q||[l.ug,l.num,l.adresse,l.cite,l.loc?.nom,l.tranche].join(' ').toLowerCase().includes(q)));
  const ets=[...new Set([...P.GR.etapes,...P.TIR.etapes,'Terminé'])];
- return `<div class="tools"><input id="q" placeholder="Chercher un UG, une adresse, un locataire" value="${esc(S.q)}"><select id="fp"><option value="">Tous parcours</option><option value="GR" ${S.fp==='GR'?'selected':''}>GR · site occupé</option><option value="TIR" ${S.fp==='TIR'?'selected':''}>Opération tiroir</option></select><select id="fc"><option value="">Toutes cités</option>${cs.map(c=>`<option ${S.fc===c?'selected':''}>${esc(c)}</option>`).join('')}</select><select id="fe"><option value="">Toutes étapes</option>${ets.map(e=>`<option ${S.fe===e?'selected':''}>${esc(e)}</option>`).join('')}</select><button class="b p" data-act="new">+ Logement</button></div>
+ return `<div class="tools">${tglv}</div><div class="tools"><input id="q" placeholder="Chercher un UG, une adresse, un locataire" value="${esc(S.q)}"><select id="fp"><option value="">Tous parcours</option><option value="GR" ${S.fp==='GR'?'selected':''}>GR · site occupé</option><option value="TIR" ${S.fp==='TIR'?'selected':''}>Opération tiroir</option></select><select id="fc"><option value="">Toutes cités</option>${cs.map(c=>`<option ${S.fc===c?'selected':''}>${esc(c)}</option>`).join('')}</select><select id="fe"><option value="">Toutes étapes</option>${ets.map(e=>`<option ${S.fe===e?'selected':''}>${esc(e)}</option>`).join('')}</select><button class="b p" data-act="new">+ Logement</button></div>
  <p class="sub" style="color:var(--mute);font-size:14px">${L.length} logement${L.length>1?'s':''}</p>
- ${L.length?`<div class="list">${L.map(l=>`<button class="item" data-open="${l.id}">${ring(l)}<span><span class="t">${esc(lname(l))}</span><br><span class="s">${esc(l.cite||'')}${l.loc?.nom?' · '+esc(l.loc.nom):''} · ${esc(etat(l))}${resOuv(l).length?' · '+resOuv(l).length+' réserve(s)':''}${montant(l)?' · '+eur(montant(l)):''}</span></span><span class="badge ${l.parcours==='GR'?'gr':''}">${P[l.parcours]?.court||'?'}</span></button>`).join('')}</div>`:'<p class="empty">Aucun logement ne correspond.</p>'}`;
+ ${L.length?`<div class="list">${L.map(l=>`<button class="item" data-open="${l.id}">${ring(l)}<span><span class="t">${esc(lname(l))}</span><br><span class="s">${esc(l.cite||'')}${l.loc?.nom?' · '+esc(l.loc.nom):''} · ${esc(etat(l))}${resOuv(l).length?' · '+resOuv(l).length+' réserve(s)':''}${montant(l)?' · '+eur(montant(l)):''}${mxSt(l)?' · Menuiseries : '+mxSt(l):''}${rdvAPrendre(l)?' · RDV locataire à prendre':''}</span></span><span class="badge ${l.parcours==='GR'?'gr':''}">${P[l.parcours]?.court||'?'}</span></button>`).join('')}</div>`:'<p class="empty">Aucun logement ne correspond.</p>'}`;
 }
 function vTiroirs(){
+ const tog=`<div class="seg2" style="margin-bottom:6px"><button class="${S.tv!=='liste'?'on':''}" data-tv="rot">Rotations</button><button class="${S.tv==='liste'?'on':''}" data-tv="liste">Liste des tiroirs</button></div>`;
+ if(S.tv!=='liste')return `<div class="tools">${tog}<button class="b p" data-act="newtir">+ Logement tiroir</button></div>${vRotations()}`;
  const T=tirArr();
  const enAtt=logArr().filter(l=>l.parcours==='TIR'&&!(l.tir&&l.tir.id));
- return `<div class="tools"><button class="b p" data-act="newtir">+ Logement tiroir</button></div>
+ return `<div class="tools">${tog}<button class="b p" data-act="newtir">+ Logement tiroir</button></div>
  <p class="note">Les logements tiroirs accueillent les familles pendant les travaux. L'occupant s'affiche ici dès qu'un tiroir est attribué dans la fiche du logement en travaux.</p>
  ${T.length?`<div class="list">${T.map(t=>{const o=occupant(t.id);const d=o&&o.tir.au?days(o.tir.au):null;return `<div class="item tr" style="cursor:default"><span class="badge ${o?'':'ok'}">${o?'Occupé':t.dispo==='non'?'Indispo':'Libre'}</span><span><span class="t">${esc((t.num?'N° '+t.num+' · ':'')+(t.adresse||''))}</span><br><span class="s">${esc(t.type||'')}${o?` · ${esc(o.loc?.nom||'Locataire')} (logement ${esc(o.num||o.adresse||'')}) · retour prévu ${o.tir.au?fdate(o.tir.au):'non daté'}${d!==null&&d<0?' — dépassé':''}`:''}${t.note?' · '+esc(t.note):''}</span></span><span style="display:flex;gap:6px;flex-wrap:wrap">${o?`<button class="b" data-open="${o.id}">Voir</button>`:''}<button class="b" data-edittir="${t.id}">Modifier</button></span></div>`}).join('')}</div>`:'<p class="empty">Aucun logement tiroir enregistré.</p>'}
  ${enAtt.length?`<h3 style="margin:24px 0 10px">En attente d'un tiroir (${enAtt.length})</h3><div class="list">${enAtt.map(l=>`<button class="item" data-open="${l.id}"><span class="badge">Tiroir</span><span><span class="t">${esc(lname(l))}</span><br><span class="s">${esc(l.loc?.nom||'')}</span></span><span></span></button>`).join('')}</div>`:''}`;
@@ -383,6 +890,11 @@ function vReglages(){
  <label>Bailleur<input data-cfg="bailleur" value="${esc(c.bailleur||'')}"></label>
  <label>Entreprise<input data-cfg="entreprise" value="${esc(c.entreprise||'')}"></label>
  <label>Conducteur de travaux<input data-cfg="cdt" value="${esc(c.cdt||'')}"></label></div>
+ <h2 style="margin:28px 0 8px">Objectif énergétique</h2>
+ <label style="max-width:320px">Consommation maximale visée (kWh/m².an)<input data-cfg="cible" value="${esc(S.cfg.cible||'130')}" inputmode="numeric"></label>
+ <h2 style="margin:28px 0 8px">Entreprises du chantier</h2>
+ <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Une entreprise par ligne, avec sa couleur après un point-virgule : <code>BBNE;#c95f12</code>. Elles servent aux prestations et au planning.</p>
+ <textarea data-cfg="ents" style="min-height:110px">${esc(S.cfg.ents||ENTDEF)}</textarea>
  <h2 style="margin:28px 0 8px">Importer les logements d'Évolud</h2>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Reprend les logements déjà connus d'Évolud (UG, adresse, cité). Choisissez la cité et le parcours, puis importez. Un UG déjà présent n'est jamais importé deux fois.</p>
  <div class="tools"><button class="b" data-act="evscan">Chercher les logements Évolud</button></div><div id="evres"></div>
@@ -425,31 +937,38 @@ function renderPanel(){
   <label>Cité<input data-f="cite" value="${esc(l.cite||'')}"></label>
   <label>Tranche<input data-f="tranche" value="${esc(l.tranche||'')}"></label>
   <label>Type<input data-f="type" value="${esc(l.type||'')}" placeholder="T3, T4…"></label>
+  <label>Type de plan<input data-f="tp" value="${esc(l.tp||'')}" list="tplist" placeholder="Ex. L10_ATH, M10_ATH"></label><datalist id="tplist">${tpList().map(t=>`<option value="${esc(t)}">`).join('')}</datalist>
   <label>Parcours<select data-f="parcours"><option value="GR" ${l.parcours==='GR'?'selected':''}>GR · site occupé</option><option value="TIR" ${l.parcours==='TIR'?'selected':''}>Opération tiroir</option></select></label>
  </div></div>
+ ${l.parcours==='GR'?`<div class="note warn" style="margin:12px 18px 0">Site occupé : le locataire reste dans le logement. Chaque intervention demande un RDV calé avec lui${l.loc?.tel?` · <a href="tel:${esc(String(l.loc.tel).replace(/\s/g,''))}" style="color:inherit;font-weight:700">appeler ${esc(l.loc.nom||'le locataire')}</a>`:''}.</div>`:''}
  <div class="sec"><h3>Locataire</h3><div class="grid">
   <label>Nom<input data-f="loc.nom" value="${esc(l.loc?.nom||'')}"></label>
   <label>Téléphone<input data-f="loc.tel" value="${esc(l.loc?.tel||'')}" inputmode="tel"></label>
   <label style="grid-column:1/-1">Disponibilités, contraintes<input data-f="loc.note" value="${esc(l.loc?.note||'')}" placeholder="Ex. absent le mercredi, chien, personne âgée…"></label>
  </div></div>
  ${l.parcours==='TIR'?`<div class="sec"><h3>Logement tiroir</h3><div class="grid">
-  <label>Tiroir attribué<select data-f="tir.id"><option value="">— aucun —</option>${tiroirs.map(t=>{const o=occupant(t.id);const busy=o&&o.id!==id;return `<option value="${t.id}" ${l.tir?.id===t.id?'selected':''} ${busy?'disabled':''}>${esc((t.num?'N° '+t.num+' · ':'')+(t.adresse||''))}${busy?' (occupé)':''}</option>`}).join('')}</select></label>
+  <label>Tiroir attribué<select data-f="tir.id"><option value="">— aucun —</option>${tiroirs.map(t=>{const R=rotOf(t.id).filter(o=>o.id!==id&&!retourne(o));const last=R.filter(o=>o.tir.au).map(o=>o.tir.au).sort().pop();return `<option value="${t.id}" ${l.tir?.id===t.id?'selected':''}>${esc((t.role==='tampon'?'[Tampon] ':'')+(t.num?'N° '+t.num+' · ':'')+(t.adresse||''))}${R.length?` (${R.length} rotation${R.length>1?'s':''}${last?', libre après le '+fdate(last):''})`:''}</option>`}).join('')}</select></label>
   <label>Déménagement aller<input type="date" data-f="tir.du" value="${esc(l.tir?.du||'')}"></label>
-  <label>Retour prévu<input type="date" data-f="tir.au" value="${esc(l.tir?.au||'')}"></label>
- </div>${tiroirs.length?'':'<p class="note" style="margin:10px 0 0">Ajoutez d\'abord les logements tiroirs dans l\'onglet Tiroirs.</p>'}</div>`:''}
+  ${l.tir?.def?'':`<label>Retour prévu<input type="date" data-f="tir.au" value="${esc(l.tir?.au||'')}"></label>`}
+  <label class="chk" style="grid-column:1/-1"><input type="checkbox" data-f="tir.def" ${l.tir?.def?'checked':''}> Mutation définitive : la famille reste dans le tiroir et ne revient pas</label>
+ </div>${l.tir?.def?`<div class="note" style="margin:10px 0 0">Après les travaux, ce logement sera vide.${Object.values(S.tirs).some(t=>t.from===id)?' Il est déjà dans la liste des tiroirs.':` <button class="b" data-act="log2tir" style="min-height:36px;margin-left:6px">L'ajouter aux tiroirs</button>`}</div>`:''}${(()=>{const c=rotConflit(l,id);return c?`<p class="note warn" style="margin:10px 0 0">Chevauchement : ce tiroir est aussi prévu pour ${esc(lname(c))} (${c.tir.du?fdate(c.tir.du):'?'} → ${c.tir.au?fdate(c.tir.au):'?'}). Décalez les dates de l'une des rotations.</p>`:''})()}${tiroirs.length?'':'<p class="note" style="margin:10px 0 0">Ajoutez d\'abord les logements tiroirs dans l\'onglet Tiroirs.</p>'}</div>`:''}
  <div class="sec"><h3>Étapes · ${esc(p.nom)}</h3><ol class="steps">${p.etapes.map((e,i)=>`<li class="${l.et&&l.et[i]?'done':''} ${i===ci?'cur':''}"><button class="ck" data-step="${i}" aria-label="${esc(e)}">${l.et&&l.et[i]?'✓':''}</button><span>${esc(e)}</span><input type="date" data-sd="${i}" value="${esc(l.et&&l.et[i]||'')}" aria-label="Date ${esc(e)}"></li>`).join('')}</ol></div>
  <div class="sec"><h3>${l.parcours==='GR'?'Prestations':'Corps d\'état'}</h3><p style="margin:0 0 8px;font-size:13px;color:var(--mute)">Touchez un lot pour le faire passer : à faire → en cours → fait → non prévu.</p><div class="lots">${p.lots.map(n=>{const s=(l.lots||{})[n]||0;return `<button class="lot s${s}" data-lot="${esc(n)}"><span>${esc(n)}</span><em>${LOTST[s]}</em></button>`}).join('')}</div></div>
- <div class="sec" id="vte"><h3>VTE · provisions ${l.vte?.ok?'<span class="badge ok" style="vertical-align:2px">VTE validée</span>':''}</h3>
+ ${prestBlock(l)}
+ ${mxBlock(l)}
+ <div class="sec" id="vte"><h3>Visite technique (VTE) ${l.vte?.ok?'<span class="badge ok" style="vertical-align:2px">VTE validée</span>':''}</h3>
   <div class="grid">
    <label>Date de la VTE<input type="date" data-f="vte.date" value="${esc(l.vte?.date||'')}"></label>
-   <label>Faite par<input data-f="vte.par" value="${esc(l.vte?.par||'')}"></label>
+   <label>Réalisée par<input data-f="vte.par" value="${esc(l.vte?.par||'')}"></label>
+   <label>VT faite par BBNE<select data-f="vte.bbne"><option value="">—</option>${['Oui','Non'].map(o=>`<option ${l.vte?.bbne===o?'selected':''}>${o}</option>`).join('')}</select></label>
+   <label>Type de logement<input data-f="vte.tl" value="${esc(l.vte?.tl||'')}" placeholder="Ex. OT"></label>
+   <label>Position<select data-f="vte.pos"><option value="">—</option>${['Gauche','Droite','Milieu','Isolée'].map(o=>`<option ${l.vte?.pos===o?'selected':''}>${o}</option>`).join('')}</select></label>
    <label>Typologie<input data-f="vte.typo" value="${esc(l.vte?.typo||'')}" placeholder="Ex. C310XZ"></label>
    <label>Variante<input data-f="vte.var" value="${esc(l.vte?.var||'')}" placeholder="Ex. C1A'"></label>
-   <label>Diag amiante<select data-f="vte.am"><option value="">—</option>${['Pas d\'amiante','Présence d\'amiante','En attente du diag'].map(o=>`<option ${l.vte?.am===o?'selected':''}>${o}</option>`).join('')}</select></label>
-   <label>Diag plomb<select data-f="vte.pb"><option value="">—</option>${['Pas de plomb','Présence de plomb','En attente du diag'].map(o=>`<option ${l.vte?.pb===o?'selected':''}>${o}</option>`).join('')}</select></label>
+
+   <label>Plomb vérifié<select data-f="vte.pb"><option value="">—</option>${['Pas de plomb','Présence de plomb','En attente du diag'].map(o=>`<option ${l.vte?.pb===o?'selected':''}>${o}</option>`).join('')}</select></label>
   </div>
-  ${(()=>{const M=modele(),g={};M.forEach(it=>(g[it.lot]??=[]).push(it));return Object.entries(g).map(([lot,its])=>`<h3 class="cklot">${esc(lot)}</h3>${its.map(it=>{const v=(l.chk||{})[it.id]||{};const on=v.on===true,off=v.on===false;return `<div class="ck ${on?'on':''}"><div class="ckh"><span>${esc(it.lib)}</span>${it.choix?`<select data-ck="${it.id}|choix" style="width:auto;min-height:38px;padding:4px 8px"><option value="">—</option>${it.choix.map(o=>`<option ${v.choix===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`:`<span class="yn"><button class="${on?'sel':''}" data-ckon="${it.id}|1">Oui</button><button class="${off?'sel':''}" data-ckon="${it.id}|0">Non</button></span>`}</div>
-   ${on||(it.choix&&(it.photo||v.choix))?`<div class="ckb">${it.q?`<label>Quantité<input type="number" step="any" min="0" data-ck="${it.id}|q" value="${esc(v.q||'')}"></label>`:''}${it.loc?`<label>Localisation<input data-ck="${it.id}|loc" value="${esc(v.loc||'')}"></label>`:''}${it.dim?`<label>Dimensions<input data-ck="${it.id}|dim" value="${esc(v.dim||'')}" placeholder="Ex. 73 x 204"></label>`:''}<label>Code BPU<input data-ck="${it.id}|c" list="bpulist" value="${esc(v.c||'')}" placeholder="${esc(chkCode(it,{choix:v.choix})||'—')}" autocomplete="off"></label>${assets?`<label>Photo<input type="file" accept="image/*" data-ckph="${it.id}"></label>`:''}</div>${(v.photos||[]).map(ph=>`<img src="${esc(blob(ph))}" alt="" class="ckimg">`).join('')}`:''}</div>`}).join('')}`).join('')})()}
+  ${vteBlock(l)}
   <p style="margin:14px 0 6px;font-size:14px;color:var(--mute)">Autres provisions relevées sur place, hors fiche. Validées : ${eur(provMt(l))} · à valider : ${eur(provAv(l))}</p>
   ${(l.prov||[]).map((x,i)=>`<div class="res pv ${x.st==='ko'?'lev':''}"><span><b>${esc(x.type)}</b>${x.piece?' · '+esc(x.piece):''}<br><span style="font-size:13px;color:var(--mute)">${x.c?esc(x.c)+' · ':''}${esc(x.d||'')}${x.u?' · '+esc(x.u):''}${x.p?' · '+eur(+x.p):''}</span>${x.com?`<br><span style="font-size:14px">${esc(x.com)}</span>`:''}</span>
    <span class="pvc"><input type="number" step="any" min="0" data-pvq="${i}" value="${esc(x.q)}" aria-label="Quantité" style="width:80px;min-height:38px;padding:6px"><b class="num" style="white-space:nowrap">${eur(ligneMt(x))}</b>${lotSel('data-pvlot',i,lotOf(x))}<select data-pvst="${i}" style="width:auto;min-height:38px;padding:4px 8px" aria-label="Statut">${Object.entries(PST).map(([k,v])=>`<option value="${k}" ${(x.st||'av')===k?'selected':''}>${v}</option>`).join('')}</select><button class="b d" data-pvdel="${i}" aria-label="Supprimer" style="min-height:38px">✕</button></span>
@@ -463,14 +982,15 @@ function renderPanel(){
    ${assets?'<label style="grid-column:1/-1">Photos<input type="file" id="pvph" accept="image/*" multiple></label>':''}
    <div style="grid-column:1/-1"><button class="b p" data-act="addprov">Ajouter la provision</button></div>
   </div>
-  <div class="tools"><button class="b ${l.vte?.ok?'':'p'}" data-act="vteok">${l.vte?.ok?'Rouvrir la VTE':'Valider la VTE'}</button></div></div>
-<div class="sec" id="tech"><h3>Plan & choix techniques ${l.tech?.planSt==='valide'?'<span class="badge ok" style="vertical-align:2px">Plan validé</span>':''}</h3>
+  <div class="tools"><button class="b ${l.vte?.ok?'':'p'}" data-act="vteok">${l.vte?.ok?'Rouvrir la VTE':'Valider la VTE'}</button><button class="b" data-act="vtepdf">Rapport VTE (PDF)</button></div></div>
+<div class="sec" id="tech">${!l.tech?.planId?(l.tp?(tpPlan(l.tp)?.id?`<div style="margin-bottom:12px"><p style="margin:0 0 6px;font-size:14px">Plan du type <b>${esc(l.tp)}</b> : ${valChips(l.tp)}</p><a href="${esc(driveLink(tpPlan(l.tp).id))}" target="_blank" rel="noopener"><img src="${esc(blob(tpPlan(l.tp).id))}" alt="Plan ${esc(l.tp)}" style="max-width:100%;border:1px solid var(--line);border-radius:10px"></a></div>`:`<p class="note warn" style="margin:0 0 12px">Pas encore de plan pour le type ${esc(l.tp)} : joignez-le dans Logements → Plans types.</p>`):'<p class="note" style="margin:0 0 12px">Renseignez le « Type de plan » en haut de la fiche pour reprendre automatiquement le plan du type.</p>'):''}<h3>Plan & choix techniques ${l.tech?.planSt==='valide'?'<span class="badge ok" style="vertical-align:2px">Plan validé</span>':''}</h3>
   <div class="grid">
    <label>Salle d'eau<select data-f="tech.sde"><option value="">— à décider —</option>${['Douche 90x90','Baignoire','Douche extra-plate (PMR)'].map(o=>`<option ${l.tech?.sde===o?'selected':''}>${o}</option>`).join('')}</select></label>
    <label style="grid-column:span 2">Consignes pour les techniciens<input data-f="tech.note" value="${esc(l.tech?.note||'')}" placeholder="Ex. cuisine côté jardin, tableau électrique dans l'entrée"></label>
   </div>
   <div style="margin-top:12px">${l.tech?.planId?(l.tech.planKind==='pdf'?`<p><a href="${esc(driveLink(l.tech.planId))}" target="_blank" rel="noopener">Ouvrir le plan (PDF)</a></p>`:`<img src="${esc(blob(l.tech.planId))}" alt="Plan du logement" style="max-width:100%;border:1px solid var(--line);border-radius:10px">`)+`<p style="font-size:13px;color:var(--mute);margin:6px 0">${l.tech.planSt==='valide'?'Validé le '+esc(fdate(l.tech.planDate)):'Plan non validé'}</p>`:'<p class="note" style="margin:0">Aucun plan joint.</p>'}</div>
-  <div class="tools">${assets?`<label class="b" style="display:inline-flex;align-items:center;cursor:pointer;color:var(--ink);font-size:15px;font-weight:600">${l.tech?.planId?'Remplacer le plan':'Joindre le plan'}<input type="file" id="planfile" accept="image/*" style="display:none"></label>`:'<span class="note" style="margin:0">Ajout de plan indisponible dans cet affichage.</span>'}${l.tech?.planId?`<button class="b ${l.tech.planSt==='valide'?'':'p'}" data-act="planok">${l.tech.planSt==='valide'?'Repasser en brouillon':'Valider le plan'}</button>`:''}</div></div>
+  <div class="tools">${assets?`<label class="b" style="display:inline-flex;align-items:center;cursor:pointer;color:var(--ink);font-size:15px;font-weight:600">${l.tech?.planId?'Remplacer le plan':'Joindre le plan'}<input type="file" id="planfile" accept="image/*,application/pdf" style="display:none"></label>`:'<span class="note" style="margin:0">Ajout de plan indisponible dans cet affichage.</span>'}${l.tech?.planId?`<button class="b ${l.tech.planSt==='valide'?'':'p'}" data-act="planok">${l.tech.planSt==='valide'?'Repasser en brouillon':'Valider le plan'}</button>`:''}</div></div>
+ ${amBlock(l)}
  <div class="sec"><h3>Consignes de curage</h3>
   <div class="grid"><label class="chk"><input type="checkbox" data-f="tech.souche" ${l.tech?.souche?'checked':''}> Souche de cheminée à casser</label>${l.tech?.souche?`<label>Où ?<input data-f="tech.soucheLoc" value="${esc(l.tech?.soucheLoc||'')}" placeholder="Ex. toiture côté rue, jusqu'au plancher R+1"></label>`:''}</div>
   ${(l.cur||[]).map((x,i)=>`<div class="res"><span><b>${esc(x.act)}</b> · ${esc(x.el)}${x.loc?' · '+esc(x.loc):''}${x.note?`<br><span style="font-size:14px;color:var(--mute)">${esc(x.note)}</span>`:''}</span><button class="b d" data-curdel="${i}" aria-label="Supprimer" style="min-height:38px">✕</button></div>`).join('')}
@@ -500,6 +1020,8 @@ function renderPanel(){
   ${(l.res||[]).map(r=>`<div class="res ${r.etat==='levée'?'lev':''}"><span><b>${esc(r.txt)}</b><br><span style="font-size:13px;color:var(--mute)">${esc(r.lot||'')} · ${esc(fdate(r.date))}${r.etat==='levée'?' · levée le '+esc(fdate(r.lev)):''}</span></span><span style="display:flex;gap:6px"><button class="b" data-rlev="${r.id}">${r.etat==='levée'?'Rouvrir':'Lever'}</button><button class="b d" data-rdel="${r.id}" aria-label="Supprimer">✕</button></span>${r.photo?`<img src="${esc(blob(r.photo))}" alt="Photo de la réserve">`:''}</div>`).join('')}
   <div class="grid" style="margin-top:8px"><label>Nouvelle réserve<input id="rtxt" placeholder="Ex. joint silicone baignoire à reprendre"></label><label>Lot<select id="rlot"><option value="">—</option>${p.lots.map(n=>`<option>${esc(n)}</option>`).join('')}</select></label>${assets?'<label>Photo<input type="file" id="rph" accept="image/*"></label>':''}</div>
   <div class="tools"><button class="b p" data-act="addres">Ajouter la réserve</button></div></div>
+ ${suiviBlock(l)}
+ ${dpeBlock(l)}
  <div class="sec"><h3>Journal</h3>
   <div class="tools" style="margin-top:0"><input id="jtxt" placeholder="Ex. RDV calé avec la locataire jeudi 9 h"><button class="b p" data-act="addj">Noter</button></div>
   ${(l.journal||[]).slice().reverse().map(j=>`<p style="margin:6px 0;font-size:15px"><b style="font-variant-numeric:tabular-nums">${esc(fdate(j.d))}</b> · ${esc(j.t)}</p>`).join('')||'<p style="color:var(--mute);font-size:14px">Rien de noté.</p>'}</div>
@@ -508,7 +1030,7 @@ function renderPanel(){
 function ficheData(l,who){
  const lines=[...(l.ft||[]).map(x=>({...x,src:'Base'})),...chkLines(l),...(l.prov||[]).filter(x=>x.st==='ok').map(x=>({...x,src:'Provision'}))].map(x=>({...x,lot:lotOf(x)})).filter(x=>!who||x.lot===who);
  const groups={};lines.forEach(x=>(groups[x.lot]??=[]).push(x));
- const warn=[];if(!l.vte?.ok)warn.push('VTE non validée');if(l.tech?.planSt!=='valide')warn.push('Plan non validé');if(!l.tech?.sde)warn.push("Choix douche / baignoire non fait");const pa=(l.prov||[]).filter(x=>x.st!=='ok'&&x.st!=='ko').length;if(pa)warn.push(pa+' autre(s) provision(s) encore à valider, non reprises');if(l.esc?.prevu&&!l.esc.cmd)warn.push('Escalier pas encore commandé');
+ const warn=[];if(!l.vte?.ok)warn.push('VTE non validée');if(l.tech?.planId?l.tech?.planSt!=='valide':!(l.tp&&tpValide(l.tp)))warn.push(l.tp&&tpPlan(l.tp)?.id?'Plan du type '+l.tp+' pas encore validé plaquiste + plombier':'Plan non validé');if(amBloque(l))warn.push('Amiante : '+amSt(l));if(!l.tech?.sde)warn.push("Choix douche / baignoire non fait");const pa=(l.prov||[]).filter(x=>x.st!=='ok'&&x.st!=='ko').length;if(pa)warn.push(pa+' autre(s) provision(s) encore à valider, non reprises');if(l.esc?.prevu&&!l.esc.cmd)warn.push('Escalier pas encore commandé');
  const choix=modele().filter(it=>it.choix&&(l.chk||{})[it.id]?.choix).map(it=>it.lib+' : '+l.chk[it.id].choix);
  return {lines,groups,warn,prix:!who,choix};
 }
@@ -520,10 +1042,107 @@ function renderFiche(l){
  <div class="sec"><h3>${esc(lname(l))}</h3><p style="margin:4px 0 0;color:var(--mute)">${esc(l.cite||'')} · ${esc(P[l.parcours]?.nom||'')}${l.vte?.typo?' · Typo '+esc(l.vte.typo):''}${l.vte?.var?' · '+esc(l.vte.var):''}${l.loc?.nom?' · Locataire : '+esc(l.loc.nom)+(l.loc.tel?' ('+esc(l.loc.tel)+')':''):''}</p>${l.loc?.note?`<p style="margin:4px 0 0">Accès : ${esc(l.loc.note)}</p>`:''}<p style="margin:4px 0 0">Amiante : <b>${esc(l.vte?.am||'non renseigné')}</b> · Plomb : <b>${esc(l.vte?.pb||'non renseigné')}</b></p>
  ${F.warn.length?`<div class="note warn" style="margin:10px 0 0">${F.warn.map(esc).join(' · ')}</div>`:''}</div>
  <div class="sec"><h3>Choix techniques</h3><p style="margin:0">Salle d'eau : <b>${esc(l.tech?.sde||'à décider')}</b>${F.choix.length?'<br>'+F.choix.map(esc).join('<br>'):''}${l.tech?.note?'<br>'+esc(l.tech.note):''}</p>
- ${l.tech?.planId?(l.tech.planKind==='pdf'?`<p><a href="${esc(driveLink(l.tech.planId))}" target="_blank" rel="noopener">Ouvrir le plan (PDF)</a></p>`:`<img src="${esc(blob(l.tech.planId))}" alt="Plan" style="max-width:100%;margin-top:10px;border:1px solid var(--line);border-radius:10px">`):''}</div>
+ ${planOf(l)?(planOf(l).kind==='pdf'?`<p><a href="${esc(driveLink(planOf(l).id))}" target="_blank" rel="noopener">Ouvrir le plan (PDF)</a></p>`:`<p style="margin:10px 0 0">${planOf(l).src==='type'?'Plan du type '+esc(planOf(l).tp)+' · '+valChips(planOf(l).tp):''}</p><img src="${esc(blob(planOf(l).id))}" alt="Plan" style="max-width:100%;margin-top:10px;border:1px solid var(--line);border-radius:10px">`):''}</div>
  ${(!who||who==='Cureur'||who==='Maçon'||who==='Couvreur')?`<div class="sec"><h3>Curage</h3>${l.tech?.souche?`<p style="margin:0 0 6px"><b>Souche de cheminée à casser</b>${l.tech.soucheLoc?' : '+esc(l.tech.soucheLoc):''}</p>`:'<p style="margin:0 0 6px">Souche de cheminée : à conserver.</p>'}${(l.cur||[]).length?`<ul style="margin:0;padding-left:20px">${l.cur.map(x=>`<li><b>${esc(x.act)}</b> ${esc(x.el.toLowerCase())}${x.loc?' – '+esc(x.loc):''}${x.note?' ('+esc(x.note)+')':''}</li>`).join('')}</ul>`:'<p style="margin:0;color:var(--mute)">Pas de consigne particulière.</p>'}</div>`:''}
  ${l.esc?.prevu&&(!who||who==='Escalier (fabricant)'||who==='Cureur'||who==='Menuisier int.')?`<div class="sec"><h3>Escalier · ${esc(escSt(l.esc))}</h3><p style="margin:0">${[l.esc.fab&&'Fabricant : '+esc(l.esc.fab)+(l.esc.tel?' ('+esc(l.esc.tel)+')':''),l.esc.cotes&&'Cotes : '+esc(fdate(l.esc.cotes)),l.esc.cmd&&'Commandé : '+esc(fdate(l.esc.cmd)),l.esc.liv&&'Livraison : '+esc(fdate(l.esc.liv)),l.esc.note&&esc(l.esc.note)].filter(Boolean).join('<br>')||'À commander'}</p></div>`:''}
  <div class="sec"><h3>Travaux${who?'':' · '+eur(F.lines.reduce((s,x)=>s+ligneMt(x),0))+' HT'}</h3>${order.length?order.map(g=>`<h3 style="font-size:15px;margin:14px 0 4px;color:var(--brick)">${esc(g)}</h3><div class="scroll"><table class="ft"><thead><tr><th>Code</th><th>Désignation</th><th>Qté</th><th>U</th>${F.prix?'<th>Montant</th>':''}</tr></thead><tbody>${F.groups[g].map(x=>`<tr><td>${esc(x.c||'')}</td><td>${srcLbl(x)}${esc(x.d||'')}${x.com?'<br><span style="color:var(--mute)">'+esc(x.com)+'</span>':''}</td><td class="num">${esc(x.q)}</td><td>${esc(x.u||'')}</td>${F.prix?`<td class="num">${eur(ligneMt(x))}</td>`:''}</tr>`).join('')}</tbody></table></div>`).join(''):'<p style="color:var(--mute)">Aucune ligne pour ce corps d\'état.</p>'}</div>`;
+}
+
+/* --- VTE : bloc pro par sections --- */
+const vteVal=(l,it)=>(l.chk||{})[it.id]||{};
+const vteDone=(l,it)=>{const v=vteVal(l,it);return it.choix?!!v.choix:(v.on===true||v.on===false)};
+const vteOui=(l,it)=>{const v=vteVal(l,it);return it.choix?!!v.choix:v.on===true};
+const secName=k=>{const m=/^(INT|EXT)\s*·\s*(.+)$/i.exec(k);return m?{z:m[1].toUpperCase(),n:m[2]}:{z:'',n:k}};
+function vteBlock(l){
+ const M=modele(),g={};M.forEach(it=>(g[it.lot]??=[]).push(it));
+ const tot=M.length,nd=M.filter(it=>vteDone(l,it)).length,lines=chkLines(l),mt=lines.reduce((s,x)=>s+ligneMt(x),0);
+ const bm=bpuMap();let zone='';
+ S.vo=S.vo||{};
+ const head=`<div class="vprog"><div class="vbar"><i style="width:${tot?nd/tot*100:0}%"></i></div><span><b>${nd}/${tot}</b> points vérifiés · <b>${lines.length}</b> provision${lines.length>1?'s':''}${mt?' · <b>'+eur(mt)+'</b> HT':''}</span>${nd<tot?'<button class="b" data-act="vtenon" style="min-height:34px;padding:0 10px;font-size:13px">Tout le reste à « Non »</button>':''}</div>`;
+ return head+Object.entries(g).map(([sec,its])=>{
+  const sn=secName(sec),d=its.filter(it=>vteDone(l,it)).length,o=its.filter(it=>vteOui(l,it)).length,full=d===its.length;
+  const open=S.vo[sec]!==undefined?S.vo[sec]:!full;
+  const zh=sn.z&&sn.z!==zone?`<h3 class="vzone">${sn.z==='INT'?'Provisions intérieures':'Provisions extérieures'}</h3>`:'';if(sn.z)zone=sn.z;
+  return `${zh}<details class="vsec ${full?'full':''}" data-vsec="${esc(sec)}" ${open?'open':''}><summary><span class="vt">${esc(sn.n)}</span><span class="vc">${o?`<em>${o} oui</em>`:''}${full?'✓':d+'/'+its.length}</span></summary>${its.map(it=>{
+   const v=vteVal(l,it),on=v.on===true,off=v.on===false,act=it.choix?!!v.choix:on;
+   const cd=chkCode(it,v),b=cd?bm[cd]:null;
+   const qq=(v.q===undefined||v.q===null||v.q==='')?((b?.u||'').toUpperCase()==='UN'||!it.q?1:0):(+v.q||0);
+   const lm=b?((it.q?qq:1)*(+b.p||0)):0;
+   return `<div class="ck ${act?'on':''} ${off?'no':''}"><div class="ckh"><span>${esc(it.lib)}${act&&lm?`<small class="vmt">${eur(lm)}</small>`:''}</span>${it.choix?`<select data-ck="${it.id}|choix" style="width:auto;min-height:38px;padding:4px 8px"><option value="">—</option>${it.choix.map(c=>`<option ${v.choix===c?'selected':''}>${esc(c)}</option>`).join('')}</select>`:`<span class="yn"><button class="${on?'sel':''}" data-ckon="${it.id}|1">Oui</button><button class="${off?'sel':''}" data-ckon="${it.id}|0">Non</button></span>`}</div>
+   ${act?`<div class="ckb">${it.q?`<label>Quantité${b?.u?' ('+esc(b.u)+')':''}<input type="number" step="any" min="0" inputmode="decimal" data-ck="${it.id}|q" value="${esc(v.q||'')}"></label>`:''}${it.loc?`<label>Localisation<input data-ck="${it.id}|loc" value="${esc(v.loc||'')}" placeholder="Ex. séjour, cave, R+1"></label>`:''}${it.dim?`<label>Dimensions<input data-ck="${it.id}|dim" value="${esc(v.dim||'')}" placeholder="Ex. 73 x 204"></label>`:''}<label>Code BPU<input data-ck="${it.id}|c" list="bpulist" value="${esc(v.c||'')}" placeholder="${esc(chkCode(it,{choix:v.choix})||'—')}" autocomplete="off"></label><label class="wide">Observation<input data-ck="${it.id}|obs" value="${esc(v.obs||'')}" placeholder="Constat, précision pour le chiffrage"></label>${assets?`<label class="phl">📷 Ajouter une photo<input type="file" accept="image/*" capture="environment" data-ckph="${it.id}" hidden></label>`:''}</div>${(v.photos||[]).length?`<div class="ckph">${v.photos.map(ph=>`<a href="${esc(driveLink(ph))}" target="_blank" rel="noopener"><img src="${esc(blob(ph))}" alt="" class="ckimg"></a>`).join('')}</div>`:''}`:''}</div>`}).join('')}</details>`}).join('');
+}
+async function vtePdf(l){
+ if(!downloads)return toast('Téléchargement indisponible ici');
+ toast('Préparation du rapport…');
+ try{
+  if(!window.jspdf)await new Promise((ok,ko)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';sc.onload=ok;sc.onerror=ko;document.head.appendChild(sc)});
+  const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4'});
+  const clean=t=>String(t??'').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').replace(/·/g,'-').replace(/\u202f|\u00a0/g,' ').replace(/[^\x00-\xFF€]/g,'-');
+  const NAVY=[15,42,68],BRICK=[201,95,18],GREY=[104,106,112],LINE=[226,223,218],PALE=[244,242,239];
+  const X=14,W=182,BOT=280;let y=0;
+  const v=l.vte||{},M=modele(),bm=bpuMap();
+  const newPage=()=>{doc.addPage();y=16};
+  const need=h=>{if(y+h>BOT)newPage()};
+  const txt=(t,x,yy,o={})=>{doc.setFont('helvetica',o.b?'bold':'normal');doc.setFontSize(o.s||9);doc.setTextColor(...(o.c||[27,29,34]));doc.text(clean(t),x,yy,o.a?{align:o.a}:undefined)};
+  const wrap=(t,w,s)=>{doc.setFontSize(s||9);return doc.splitTextToSize(clean(t),w)};
+  // en-tête
+  doc.setFillColor(...NAVY);doc.rect(0,0,210,30,'F');doc.setFillColor(...BRICK);doc.rect(0,30,210,1.6,'F');
+  txt('VISITE TECHNIQUE INTÉRIEURE',X,13,{s:16,b:true,c:[255,255,255]});
+  txt([S.cfg.nom||'Chantier ERBM',S.cfg.entreprise].filter(Boolean).join('  -  '),X,21,{s:10,c:[200,214,230]});
+  txt('ERBM',196,13,{s:16,b:true,c:[240,138,60],a:'right'});
+  txt(v.ok?'VTE validée':'VTE en cours',196,21,{s:9,c:[200,214,230],a:'right'});
+  y=40;
+  // tableau d'informations
+  const info=[['Code UG',l.ug],['N°',l.num],['Adresse',l.adresse],['Cité',l.cite],['Parcours',l.parcours==='TIR'?'ATH - opération tiroir':'GR - site occupé'],['Type de logement',v.tl],['Position',v.pos],['Typologie / variante',[v.typo,v.var].filter(Boolean).join(' / ')],['Date de la VTE',v.date?new Date(v.date+'T12:00').toLocaleDateString('fr-FR'):''],['Réalisée par',v.par],['VT faite par BBNE',v.bbne],['Bailleur',S.cfg.bailleur],['Amiante',v.am||'Non renseigné'],['Plomb',v.pb||'Non renseigné'],['Locataire',[l.loc?.nom,l.loc?.tel].filter(Boolean).join(' - ')],['Tranche',l.tranche]];
+  const cw=W/2,rh=7;
+  info.forEach(([k,val],i)=>{const cx=X+(i%2)*cw,cy=y+Math.floor(i/2)*rh;doc.setFillColor(...(Math.floor(i/2)%2?[255,255,255]:PALE));doc.rect(cx,cy,cw,rh,'F');txt(k,cx+2,cy+4.7,{s:8,c:GREY});const vv=wrap(val||'-',cw-42,9)[0];txt(vv,cx+40,cy+4.7,{s:9,b:/Amiante|Plomb/.test(k)&&/Présence/.test(val||'')})});
+  y+=Math.ceil(info.length/2)*rh;doc.setDrawColor(...LINE);doc.rect(X,40,W,y-40);y+=6;
+  // synthèse
+  const lines=chkLines(l),mt=lines.reduce((s,x)=>s+ligneMt(x),0),nd=M.filter(it=>vteDone(l,it)).length;
+  doc.setFillColor(...PALE);doc.roundedRect(X,y,W,12,2,2,'F');
+  txt(`${nd}/${M.length} points vérifiés`,X+4,y+7.6,{s:10,b:true});txt(`${lines.length} provision(s) relevée(s)`,X+70,y+7.6,{s:10,b:true,c:BRICK});
+  if(mt)txt('Montant estimé : '+eur(mt)+' HT',196-4,y+7.6,{s:10,b:true,a:'right'});
+  y+=18;
+  // photos
+  const imgCache={};
+  const loadImg=async id=>{if(id in imgCache)return imgCache[id];try{const bl=await (await fetch(blob(id))).blob();const du=await new Promise(ok=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.readAsDataURL(bl)});const im=await new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=du});return imgCache[id]={du,w:im.width,h:im.height,t:/png/i.test(bl.type)?'PNG':'JPEG'}}catch(e){return imgCache[id]=null}};
+  const photos=async ids=>{let px=X+4;const PW=42,PH=32;let rowH=0;for(const id of ids){const im=await loadImg(id);if(!im)continue;const r=Math.min(PW/im.w,PH/im.h),w=im.w*r,h=im.h*r;if(px+w>X+W){px=X+4;y+=rowH+2;rowH=0}need(h+2);doc.addImage(im.du,im.t,px,y,w,h);px+=w+3;rowH=Math.max(rowH,h)}if(rowH)y+=rowH+3};
+  // sections
+  const g={};M.forEach(it=>(g[it.lot]??=[]).push(it));let zone='';
+  for(const [sec,its] of Object.entries(g)){
+   const sn=secName(sec);
+   if(sn.z&&sn.z!==zone){need(14);zone=sn.z;txt(sn.z==='INT'?'PROVISIONS INTÉRIEURES':'PROVISIONS EXTÉRIEURES',X,y+5,{s:11,b:true,c:NAVY});doc.setDrawColor(...BRICK);doc.setLineWidth(.6);doc.line(X,y+7,X+W,y+7);doc.setLineWidth(.2);y+=11}
+   need(16);doc.setFillColor(...NAVY);doc.rect(X,y,W,7,'F');txt(sn.n.toUpperCase(),X+2,y+4.8,{s:9,b:true,c:[255,255,255]});y+=7;
+   for(const it of its){
+    const val=vteVal(l,it),oui=vteOui(l,it),done=vteDone(l,it);
+    const rep=it.choix?(val.choix||'-'):(val.on===true?'OUI':val.on===false?'Non':'-');
+    const cd=oui?chkCode(it,val):'',b=cd?bm[cd]:null;
+    const det=oui?[it.q&&val.q?'Qté : '+val.q+(b?.u?' '+b.u:''):'',val.loc&&'Loc. : '+val.loc,val.dim&&'Dim. : '+val.dim,cd&&'BPU '+cd,val.obs].filter(Boolean).join('   ·   '):'';
+    const L1=wrap(it.lib,120,9),L2=det?wrap(det,170,8):[];
+    const h=Math.max(7,L1.length*4+3)+(L2.length?L2.length*3.6+1.5:0);
+    need(h);
+    if(oui){doc.setFillColor(253,240,230);doc.rect(X,y,W,h,'F');doc.setFillColor(...BRICK);doc.rect(X,y,1.2,h,'F')}
+    L1.forEach((t,i)=>txt(t,X+4,y+4.8+i*4,{s:9,b:oui}));
+    txt(rep,X+W-3,y+4.8,{s:9,b:true,c:oui?BRICK:done?GREY:[180,180,180],a:'right'});
+    L2.forEach((t,i)=>txt(t,X+4,y+L1.length*4+3.6+i*3.6,{s:8,c:GREY}));
+    y+=h;doc.setDrawColor(...LINE);doc.line(X,y,X+W,y);
+    if(oui&&(val.photos||[]).length){y+=2;await photos(val.photos)}
+   }
+   y+=4;
+  }
+  // provisions hors fiche
+  const pv=l.prov||[];
+  if(pv.length){need(20);txt('AUTRES PROVISIONS RELEVÉES',X,y+5,{s:11,b:true,c:NAVY});doc.setDrawColor(...BRICK);doc.setLineWidth(.6);doc.line(X,y+7,X+W,y+7);doc.setLineWidth(.2);y+=11;
+   for(const x of pv){const t=[x.type,x.piece].filter(Boolean).join(' - '),d=[x.c&&'BPU '+x.c,x.q&&'Qté : '+x.q+(x.u?' '+x.u:''),x.com].filter(Boolean).join('   ·   ');const L1=wrap(t,130,9),L2=d?wrap(d,170,8):[];const h=Math.max(7,L1.length*4+3)+(L2.length?L2.length*3.6+1.5:0);need(h);L1.forEach((s2,i)=>txt(s2,X+4,y+4.8+i*4,{s:9,b:true}));txt(PST[x.st||'av'],X+W-3,y+4.8,{s:9,b:true,c:x.st==='ok'?BRICK:GREY,a:'right'});L2.forEach((s2,i)=>txt(s2,X+4,y+L1.length*4+3.6+i*3.6,{s:8,c:GREY}));y+=h;doc.setDrawColor(...LINE);doc.line(X,y,X+W,y);if((x.photos||[]).length){y+=2;await photos(x.photos)}}
+   y+=4}
+  // observations générales + signatures
+  if(l.tech?.note){need(16);txt('OBSERVATIONS',X,y+5,{s:11,b:true,c:NAVY});y+=9;wrap(l.tech.note,W,9).forEach(t=>{need(5);txt(t,X,y,{s:9});y+=4.5});y+=4}
+  need(36);txt('SIGNATURES',X,y+5,{s:11,b:true,c:NAVY});y+=9;
+  ['Réalisée par','Conducteur de travaux','Représentant du bailleur'].forEach((k,i)=>{const sx=X+i*(W/3);doc.setDrawColor(...LINE);doc.roundedRect(sx+1,y,W/3-2,24,1.5,1.5);txt(k,sx+3,y+4.5,{s:8,c:GREY})});
+  // pied de page
+  const n=doc.getNumberOfPages();for(let i=1;i<=n;i++){doc.setPage(i);doc.setDrawColor(...LINE);doc.line(X,288,X+W,288);txt(`ERBM - VTE ${l.ug?'UG '+l.ug:''} ${l.adresse||''}`,X,292.5,{s:7.5,c:GREY});txt(`Page ${i} / ${n}`,X+W,292.5,{s:7.5,c:GREY,a:'right'})}
+  await downloads.save({filename:`VTE-${l.ug||l.num||'logement'}${v.date?'-'+v.date:''}.pdf`,data:doc.output('blob')});toast('Rapport VTE prêt');
+ }catch(e){toast(e&&e.code==='declined'?'Téléchargement annulé':'Rapport impossible pour le moment')}
 }
 async function fichePdf(l,who){
  if(!downloads)return toast('Téléchargement indisponible ici');
@@ -544,15 +1163,15 @@ async function fichePdf(l,who){
   if(l.esc?.prevu&&(!who||['Escalier (fabricant)','Cureur','Menuisier int.'].includes(who))){y+=2;line('Escalier - '+escSt(l.esc),{s:12,b:true});[l.esc.fab&&'Fabricant : '+l.esc.fab+(l.esc.tel?' ('+l.esc.tel+')':''),l.esc.cotes&&'Cotes : '+fdate(l.esc.cotes),l.esc.cmd&&'Commandé : '+fdate(l.esc.cmd),l.esc.liv&&'Livraison : '+fdate(l.esc.liv),l.esc.note].filter(Boolean).forEach(t=>line(t))}
   y+=2;line('Travaux'+(F.prix?' - '+eur(F.lines.reduce((s,x)=>s+ligneMt(x),0))+' HT':''),{s:12,b:true});
   INTERV.filter(v=>F.groups[v]).forEach(g=>{y+=1;line(g,{b:true,s:11});F.groups[g].forEach(x=>{const t=(x.c?x.c+'  ':'')+(x.src==='VTE'?'[VTE '+x.type+(x.piece?' - '+x.piece:'')+'] ':x.src==='Provision'?'[Provision '+x.type+(x.piece?' - '+x.piece:'')+'] ':'')+(x.d||'')+'  -  '+x.q+' '+(x.u||'')+(F.prix?'  -  '+eur(ligneMt(x)):'')+(x.com?'  ('+x.com+')':'');line('- '+t,{gap:.8})})});
-  if(l.tech?.planId&&l.tech.planKind!=='pdf'){try{const bl=await (await fetch(blob(l.tech.planId))).blob();const du=await new Promise(ok=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.readAsDataURL(bl)});const im=await new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=du});doc.addPage();doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text('Plan'+(l.tech.planSt==='valide'?' validé':' (non validé)'),X,16);const r=Math.min(W/im.width,255/im.height);doc.addImage(du,/png/i.test(bl.type)?'PNG':'JPEG',X,22,im.width*r,im.height*r)}catch(e){line('Plan : à consulter dans l\'appli')}}
-  else if(l.tech?.planId)line('Plan joint séparément (PDF), à consulter dans l\'appli');
+  const PL=planOf(l);if(PL&&PL.kind!=='pdf'){try{const bl=await (await fetch(blob(PL.id))).blob();const du=await new Promise(ok=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.readAsDataURL(bl)});const im=await new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=du});doc.addPage();doc.setFont('helvetica','bold');doc.setFontSize(12);doc.text(PL.src==='type'?'Plan du type '+PL.tp+(tpValide(PL.tp)?' (validé plaquiste + plombier)':' (validation en cours)'):'Plan'+(l.tech?.planSt==='valide'?' validé':' (non validé)'),X,16);const r=Math.min(W/im.width,255/im.height);doc.addImage(du,/png/i.test(bl.type)?'PNG':'JPEG',X,22,im.width*r,im.height*r)}catch(e){line('Plan : à consulter dans l\'appli')}}
+  else if(PL)line('Plan joint séparément (PDF), à consulter dans l\'appli');
   await downloads.save({filename:`fiche-travaux-${l.ug||l.num||'logement'}${who?'-'+who.replace(/[^\w]+/g,'-'):''}.pdf`,data:doc.output('blob')});toast('PDF prêt');
  }catch(e){toast(e&&e.code==='declined'?'Téléchargement annulé':'PDF impossible pour le moment')}
 }
-async function uploadPlan(input){const f=input.files?.[0];if(!f||!assets)return;if(readonly)return toast('Lecture seule');toast('Envoi du plan…');try{const a=await assets.upload(f);upd(l=>{l.tech={...(l.tech||{}),planId:a.id,planKind:'img',planSt:'brouillon',planDate:''}});toast('Plan joint')}catch(e){toast('Plan non envoyé')}}
+async function uploadPlan(input){const f=input.files?.[0];if(!f||!assets)return;if(readonly)return toast('Lecture seule');toast('Envoi du plan…');try{const a=await assets.upload(f,2400);upd(l=>{l.tech={...(l.tech||{}),planId:a.id,planKind:'img',planSt:'brouillon',planDate:''}});toast('Plan joint')}catch(e){toast('Plan non envoyé')}}
 async function uploadChkPhoto(input){const f=input.files?.[0],id=input.dataset.ckph;if(!f||!assets)return;toast('Envoi de la photo…');try{const a=await assets.upload(f);upd(l=>{l.chk={...(l.chk||{})};l.chk[id]={...(l.chk[id]||{}),photos:[...((l.chk[id]||{}).photos||[]),a.id]}});toast('Photo ajoutée')}catch(e){toast('Photo non envoyée')}}
-function openPanel(id){S.fiche=null;S.open=id;$('sheet').classList.add('on');renderPanel();$('panel').scrollTop=0}
-function closePanel(){S.open=null;S.fiche=null;$('sheet').classList.remove('on');render()}
+function openPanel(id){micStop();S.cr=null;S.fiche=null;S.open=id;$('sheet').classList.add('on');renderPanel();$('panel').scrollTop=0}
+function closePanel(){micStop();S.open=null;S.fiche=null;S.cr=null;$('sheet').classList.remove('on');render()}
 function setPath(o,path,v){const k=path.split('.');let t=o;for(let i=0;i<k.length-1;i++){t[k[i]]={...(t[k[i]]||{})};t=t[k[i]]}t[k.at(-1)]=v}
 function upd(fn,rerender=true){const id=S.open;const l=JSON.parse(JSON.stringify(S.logs[id]));fn(l);l.maj=today();save('logements',id,l);if(rerender)renderPanel()}
 
@@ -612,6 +1231,21 @@ async function act(a){
  if(a==='fview'){S.fiche={who:$('fwho').value};renderPanel();$('panel').scrollTop=0}
  if(a==='fback'){S.fiche=null;renderPanel()}
  if(a==='fpdf'){fichePdf(S.logs[S.open],$('fwho').value)}
+ if(a==='tpadd'){const v=($('tpnew')?.value||'').trim();if(!v)return toast('Nommez le type');S.cfg.plans={...(S.cfg.plans||{})};if(!S.cfg.plans[v])S.cfg.plans[v]={vals:{}};await saveCfg();render();return}
+ if(a==='addsuivi'){const t=($('sux')?.value||'').trim();if(!t)return toast('Décrivez l\'échange');const ty=$('sut').value;upd(l=>{l.suivi=[...(l.suivi||[]),{d:today(),type:ty,t,clos:false}]});return}
+ if(a==='addins'){const m=$('inm').value,e=$('ine').value,h=parseFloat(String($('inh').value).replace(',','.'));if(!m||isNaN(h))return toast('Mois et heures');S.cfg.ins=[...(S.cfg.ins||[]).filter(x=>!(x.m===m&&x.ent===e)),{m,ent:e,h}];await saveCfg();render();toast('Heures enregistrées');return}
+ if(a==='log2tir'){const l=S.logs[S.open];if(!l)return;const tid=uid();save('tiroirs',tid,{num:l.num||'',adresse:l.adresse||'',type:l.type||'',note:'Libéré par mutation définitive ('+(l.loc?.nom||'famille')+')',from:S.open,dispo:'non'});toast('Ajouté aux tiroirs (indisponible tant que les travaux ne sont pas finis)');renderPanel();return}
+ if(a==='newcr'){if(readonly)return toast('Lecture seule');const id=uid();save('crs',id,{titre:'',date:today(),type:'Visite de logement',pres:conf().n||'',transcript:'',avancement:[],problemes:[],securite:[],decisions:[],actions:[]});render();openCr(id);setTimeout(micStart,300);return}
+ if(a==='mic'){if(REC){micStop()}else micStart();return}
+ if(a==='crfmt'){const t=$('crt')?.value||'';if(!t.trim())return toast('Dictez ou écrivez d\'abord le compte rendu');const o=crStruct(t);updCr(c=>{c.transcript=t;CRSEC.forEach(([k])=>{c[k]=[...(c[k]||[]),...o[k].filter(x=>!(c[k]||[]).includes(x))]});const have=new Set((c.actions||[]).map(a=>a.txt));c.actions=[...(c.actions||[]),...o.actions.filter(a=>!have.has(a.txt))];if(!c.titre){const lg=c.log&&S.logs[c.log];c.titre=lg?'Visite '+lname(lg):'Visite du '+fdate(c.date)}});toast('CR mis en forme : relisez-le');return}
+ if(a==='craadd'){updCr(c=>{c.actions=[...(c.actions||[]),{txt:'',qui:'',quand:'',fait:false}]});return}
+ if(a==='crpdf'){crPdf(S.crs[S.cr]);return}
+ if(a==='crdel'){if(!(await ask('Supprimer ce compte rendu ?')))return;const id=S.cr;closePanel();await del('crs',id);render();return}
+ if(a==='addprest'){if(readonly)return toast('Lecture seule');const lib=$('prl').value.trim();if(!lib)return toast('Nommez la prestation');const ent=$('pre').value;upd(l=>{l.prest=[...(l.prest||[]),{id:uid(),lib,ent,st:'a_planifier',rdv:'',note:''}]});toast('Prestation ajoutée');return}
+ if(a==='genprest'){if(readonly)return toast('Lecture seule');const l0=S.logs[S.open];const add=genPrest(l0);if(!add.length)return toast('Rien à ajouter : remplissez la VTE ou la fiche travaux');upd(l=>{l.prest=[...(l.prest||[]),...add]});toast(add.length+' prestation(s) ajoutée(s)');return}
+ if(a==='genall'){if(readonly)return toast('Lecture seule');let n=0;for(const [id,l] of Object.entries(S.logs)){const add=genPrest(l);if(add.length){const c=JSON.parse(JSON.stringify(l));c.prest=[...(c.prest||[]),...add];save('logements',id,c);n+=add.length}}toast(n+' prestation(s) créée(s)');render();return}
+ if(a==='vtepdf'){vtePdf(S.logs[S.open]);return}
+ if(a==='vtenon'){if(readonly)return toast('Lecture seule');if(!(await ask('Mettre « Non » sur tous les points pas encore renseignés ?')))return;upd(l=>{l.chk={...(l.chk||{})};modele().forEach(it=>{if(it.choix)return;const v=l.chk[it.id]||{};if(v.on!==true&&v.on!==false)l.chk[it.id]={...v,on:false}})});return}
  if(a==='vteok'){if(readonly)return toast('Lecture seule');upd(l=>{const ok=!l.vte?.ok;l.vte={...(l.vte||{}),ok};l.et={...(l.et||{})};if(ok){if(!l.et[0])l.et[0]=l.vte.date||today();if(!l.vte.date)l.vte.date=l.et[0]}else delete l.et[0]});toast('VTE mise à jour')}
  if(a==='addft'){const v=$('ftc').value.trim(),q=parseFloat(String($('ftq').value).replace(',','.'))||0;if(!v)return toast('Choisissez un code BPU');const m=bpuMap();let b=m[v]||S.bpu.find(x=>x.c.toLowerCase()===v.toLowerCase())||S.bpu.find(x=>(x.c+' '+x.d).toLowerCase().includes(v.toLowerCase()));if(!b){if(S.bpu.length)return toast('Code introuvable dans le BPU');b={c:v,d:'',u:'',p:0}}upd(l=>{l.ft=[...(l.ft||[]),{c:b.c,d:b.d,u:b.u,p:+b.p||0,q,lot:b.lot||guessLot(b.c+' '+b.d)}]})}
  if(a==='addj'){const t=$('jtxt').value.trim();if(!t)return;upd(l=>{l.journal=[...(l.journal||[]),{d:today(),t}]})}
@@ -621,39 +1255,61 @@ function editTir(id,isNew){
  const t=S.tirs[id]||{};S.open=null;$('sheet').classList.add('on');
  $('panel').innerHTML=`<div class="top"><h2>${isNew?'Nouveau logement tiroir':'Logement tiroir'}</h2><button class="b" data-act="close">Fermer</button></div><div class="sec"><div class="grid">
  <label>N°<input id="tn" value="${esc(t.num||'')}"></label><label>Adresse<input id="ta" value="${esc(t.adresse||'')}"></label><label>Type<input id="tt" value="${esc(t.type||'')}" placeholder="T3, T4…"></label>
+ <label>Rôle<select id="tr"><option value="">Tiroir (logement vide)</option><option value="tampon" ${t.role==='tampon'?'selected':''}>Tampon (accueil temporaire)</option></select></label>
  <label>Disponibilité<select id="td"><option value="">Disponible</option><option value="non" ${t.dispo==='non'?'selected':''}>Indisponible (remise en état…)</option></select></label>
  <label style="grid-column:1/-1">Remarque<input id="to" value="${esc(t.note||'')}"></label></div>
  <div class="tools"><button class="b p" id="tsave">Enregistrer</button>${isNew?'':'<button class="b d" id="tdel">Supprimer</button>'}</div></div>`;
- $('tsave').onclick=()=>{save('tiroirs',id,{...t,num:$('tn').value.trim(),adresse:$('ta').value.trim(),type:$('tt').value.trim(),dispo:$('td').value,note:$('to').value.trim()});$('sheet').classList.remove('on');render();toast('Tiroir enregistré')};
+ $('tsave').onclick=()=>{save('tiroirs',id,{...t,num:$('tn').value.trim(),adresse:$('ta').value.trim(),type:$('tt').value.trim(),dispo:$('td').value,role:$('tr').value,note:$('to').value.trim()});$('sheet').classList.remove('on');render();toast('Tiroir enregistré')};
  if(!isNew)$('tdel').onclick=async()=>{if(occupant(id))return toast('Ce tiroir est occupé');if(await ask('Supprimer ce logement tiroir ?')){await del('tiroirs',id);$('sheet').classList.remove('on');render()}};
 }
 
 document.addEventListener('click',e=>{
- const t=e.target.closest('[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon]');
+ const t=e.target.closest('[data-lv],[data-suclos],[data-tv],[data-rw],[data-pv],[data-gw],[data-opencr],[data-cradel],[data-ps],[data-prdel],[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon]');
  if(e.target===$('sheet')){closePanel();return}
  if(!t)return;
+ if(t.dataset.pv){S.pv=t.dataset.pv;render();return}
+ if(t.dataset.tv){S.tv=t.dataset.tv;render();return}
+ if(t.dataset.lv&&!t.dataset.go){S.lv=t.dataset.lv;render();return}
+ if(t.dataset.suclos!==undefined){const i=+t.dataset.suclos;upd(l=>{l.suivi=(l.suivi||[]).map((x,k)=>k===i?{...x,clos:!x.clos}:x)});return}
+ if(t.dataset.rw!==undefined){const v=+t.dataset.rw;S.rw=v===0?0:(S.rw||0)+v*4;render();return}
+ if(t.dataset.gw!==undefined){const v=+t.dataset.gw;S.gw=v===0?0:(S.gw||0)+v*4;render();return}
+ if(t.dataset.opencr)return openCr(t.dataset.opencr);
+ if(t.dataset.cradel!==undefined){const i=+t.dataset.cradel;updCr(c=>{c.actions=(c.actions||[]).filter((_,k)=>k!==i)});return}
+ if(t.dataset.ps!==undefined){e.preventDefault();S.ps=S.ps===t.dataset.ps?'':t.dataset.ps;render();return}
  if(t.dataset.act)return act(t.dataset.act);
  if(t.dataset.open)return openPanel(t.dataset.open);
- if(t.dataset.go){location.hash=t.dataset.go;return}
+ if(t.dataset.go){if(t.dataset.lv)S.lv=t.dataset.lv;location.hash=t.dataset.go;return}
  if(t.dataset.edittir)return editTir(t.dataset.edittir,false);
  if(readonly&&S.open)return toast('Lecture seule');
  if(t.dataset.step){const i=+t.dataset.step;upd(l=>{l.et={...(l.et||{})};if(l.et[i])delete l.et[i];else l.et[i]=today()})}
  if(t.dataset.lot){const n=t.dataset.lot;upd(l=>{l.lots={...(l.lots||{})};l.lots[n]=(((l.lots[n]||0)+1)%4)})}
  if(t.dataset.ckon){if(readonly)return toast('Lecture seule');const [id,v]=t.dataset.ckon.split('|');const on=v==='1';upd(l=>{l.chk={...(l.chk||{})};const cur=l.chk[id]||{};const it=modele().find(x=>x.id===id);l.chk[id]={...cur,on:cur.on===on?undefined:on,c:cur.c??it?.c??''};if(/remplacement-de-l-escalier/.test(id)&&on&&cur.on!==on)l.esc={...(l.esc||{}),prevu:true}})}
+ if(t.dataset.prdel!==undefined){const i=+t.dataset.prdel;ask('Supprimer cette prestation ?').then(ok=>ok&&upd(l=>{l.prest=(l.prest||[]).filter((_,k)=>k!==i)}));return}
  if(t.dataset.curdel!==undefined){const i=+t.dataset.curdel;upd(l=>{l.cur=(l.cur||[]).filter((_,k)=>k!==i)})}
  if(t.dataset.pvdel!==undefined){const i=+t.dataset.pvdel;ask('Supprimer cette provision ?').then(ok=>ok&&upd(l=>{l.prov=(l.prov||[]).filter((_,k)=>k!==i)}))}
  if(t.dataset.ftdel!==undefined){const i=+t.dataset.ftdel;upd(l=>{l.ft=(l.ft||[]).filter((_,k)=>k!==i)})}
  if(t.dataset.rlev){const r=t.dataset.rlev;upd(l=>{l.res=(l.res||[]).map(x=>x.id===r?{...x,etat:x.etat==='levée'?'ouverte':'levée',lev:x.etat==='levée'?'':today()}:x)})}
  if(t.dataset.rdel){const r=t.dataset.rdel;ask('Supprimer cette réserve ?').then(ok=>ok&&upd(l=>{l.res=(l.res||[]).filter(x=>x.id!==r)}))}
 });
+document.addEventListener('toggle',e=>{const d=e.target;if(d.dataset&&d.dataset.vsec!==undefined){S.vo=S.vo||{};S.vo[d.dataset.vsec]=d.open}},true);
 document.addEventListener('change',e=>{
  const t=e.target;
- if(t.dataset.f&&S.open){if(readonly)return toast('Lecture seule');const v=t.type==='checkbox'?t.checked:t.value;upd(l=>setPath(l,t.dataset.f,v),t.dataset.f==='parcours'||t.dataset.f==='tir.id'||t.tagName==='SELECT'||t.type==='checkbox'||t.type==='date'&&t.dataset.f.startsWith('esc.'))}
+ if(t.dataset.f&&S.open){if(readonly)return toast('Lecture seule');const v=t.type==='checkbox'?t.checked:t.value;upd(l=>setPath(l,t.dataset.f,v),t.dataset.f==='parcours'||t.dataset.f==='tir.id'||t.tagName==='SELECT'||t.type==='checkbox'||t.type==='date'&&/^(esc|mx|am)\./.test(t.dataset.f)||t.dataset.f==='tp')}
  if(t.dataset.ftlot!==undefined&&S.open){const i=+t.dataset.ftlot,v=t.value;upd(l=>{l.ft=(l.ft||[]).map((x,k)=>k===i?{...x,lot:v}:x)})}
  if(t.dataset.pvlot!==undefined&&S.open){const i=+t.dataset.pvlot,v=t.value;upd(l=>{l.prov=(l.prov||[]).map((x,k)=>k===i?{...x,lot:v}:x)})}
  if(t.dataset.ck&&S.open){if(readonly)return toast('Lecture seule');const [id,k]=t.dataset.ck.split('|');const v=t.value;upd(l=>{l.chk={...(l.chk||{})};l.chk[id]={...(l.chk[id]||{}),[k]:v};if(k==='choix'&&/sanitaire/i.test(id))l.tech={...(l.tech||{}),sde:v}},t.tagName==='SELECT')}
  if(t.dataset.ckph&&S.open)uploadChkPhoto(t)
  if(t.id==='planfile'&&S.open)uploadPlan(t)
+ if(t.id==='sitfile')importSituation(t)
+ if(t.id==='pe'){S.pe=t.value;render()}
+ if(t.id==='pp'){S.pp=t.value;render()}
+ if(t.dataset.tpup)uploadTpPlan(t)
+ if(t.dataset.tpv){const [tp,c,k]=t.dataset.tpv.split('|');S.cfg.plans={...(S.cfg.plans||{})};const P2={...(S.cfg.plans[tp]||{})};P2.vals={...(P2.vals||{})};P2.vals[c]={...(P2.vals[c]||{}),[k]:t.value};if(k==='st')P2.vals[c].date=today();S.cfg.plans[tp]=P2;saveCfg();if(k==='st')render()}
+ if(t.dataset.crf&&S.cr){const k=t.dataset.crf,v=t.value;updCr(c=>{c[k]=v},t.tagName==='SELECT'||k==='titre')}
+ if(t.dataset.crs&&S.cr){const k=t.dataset.crs,v=t.value.split(/\n/).map(x=>x.trim()).filter(Boolean);updCr(c=>{c[k]=v},false)}
+ if(t.dataset.cra&&S.cr){const [i,k]=t.dataset.cra.split('|');const v=t.type==='checkbox'?t.checked:t.value;updCr(c=>{c.actions=(c.actions||[]).map((a,j)=>j===+i?{...a,[k]:v}:a)},t.type==='checkbox')}
+ if(t.dataset.crdone){const [cid,i]=t.dataset.crdone.split('|');const c=JSON.parse(JSON.stringify(S.crs[cid]));c.actions[+i].fait=t.checked;save('crs',cid,c);toast('Action faite');setTimeout(render,400)}
+ if(t.dataset.pr&&S.open){if(readonly)return toast('Lecture seule');const [i,k]=t.dataset.pr.split('|');const v=t.value;upd(l=>{l.prest=(l.prest||[]).map((p,j)=>{if(j!==+i)return p;const q={...p,[k]:v};if(k==='rdv'&&v&&(p.st==='a_planifier'||p.st==='affectee'))q.st='rdv';if(k==='ent'&&p.st==='a_planifier')q.st='affectee';if(k==='deb'&&v&&p.st==='a_planifier')q.st='affectee';if(k==='deb'&&v&&(!p.fin||p.fin<v))q.fin=v;return q})},t.tagName==='SELECT'||k==='rdv'||k==='deb'||k==='fin')}
  if(t.dataset.sd&&S.open){const i=t.dataset.sd,v=t.value;upd(l=>{l.et={...(l.et||{})};if(v)l.et[i]=v;else delete l.et[i]})}
  if(t.id==='pvt'){const c=t.selectedOptions[0]?.dataset.c;if(c)$('pvc').value=c}
  if(t.dataset.pvq!==undefined&&S.open){if(readonly)return toast('Lecture seule');const i=+t.dataset.pvq,q=parseFloat(String(t.value).replace(',','.'))||0;upd(l=>{l.prov=(l.prov||[]).map((x,k)=>k===i?{...x,q}:x)})}
@@ -664,7 +1320,7 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=$('q');q.focus();q.setSelectionRange(pos,pos)}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('sheet').classList.contains('on'))closePanel();if(e.key==='Enter'&&e.target.id==='jtxt')act('addj');if(e.key==='Enter'&&e.target.id==='rtxt')act('addres')});
-function route(){const h=location.hash.slice(1);S.view=['tableau','logements','tiroirs','reserves','finances','reglages'].includes(h)?h:'tableau';render()}
+function route(){const h=location.hash.slice(1);S.view=['tableau','logements','planning','cr','tiroirs','reserves','finances','pilotage','reglages'].includes(h)?h:'tableau';render()}
 addEventListener('hashchange',route);
 
 /* --- démarrage --- */
