@@ -384,6 +384,7 @@ const chkCode=(it,v)=>{v=v||{};if(v.c)return v.c;if(it.choix){if(!v.choix)return
 const chkLines=l=>{const m=bpuMap();return modele().filter(it=>{const v=(l.chk||{})[it.id];return v&&(it.choix?!!v.choix:v.on===true)}).map(it=>{const v=l.chk[it.id],cd=chkCode(it,v);const b=cd?m[cd]:null;const qq=(v.q===undefined||v.q===null||v.q==='')?((b?.u||'').toUpperCase()==='UN'||!it.q?1:0):(+v.q||0);return {src:'VTE',type:it.lib+(v.choix?' · '+v.choix:''),piece:v.loc||'',c:cd,d:b?.d||'',u:b?.u||'',p:cd?(+(b?.p)||+v.p||0):0,q:it.q?qq:1,com:[v.dim&&'Dim. '+v.dim,v.obs].filter(Boolean).join(' · '),lot:v.lot||it.ce||LOTMAP[it.lot.toLowerCase()]||guessLot(it.lib),photos:v.photos||[]}})};
 const provMt=l=>(l.prov||[]).filter(x=>x.st==='ok').reduce((s,x)=>s+ligneMt(x),0)+(l.vte?.ok?chkLines(l).reduce((s,x)=>s+ligneMt(x),0):0);
 const provAv=l=>(l.prov||[]).filter(x=>x.st!=='ok'&&x.st!=='ko').reduce((s,x)=>s+ligneMt(x),0)+(l.vte?.ok?0:chkLines(l).reduce((s,x)=>s+ligneMt(x),0));
+const keur=n=>Math.abs(n)>=1e6?(Math.round(n/1e4)/100).toLocaleString('fr-FR',{minimumFractionDigits:2})+' M€':Math.abs(n)>=1e4?Math.round(n/1e3).toLocaleString('fr-FR')+' k€':Math.round(n).toLocaleString('fr-FR')+' €';
 const eur=n=>(Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
 const bpuMap=()=>{const m={};S.bpu.forEach(b=>m[b.c]=b);return m};
 const ligneMt=x=>(+x.q||0)*(+x.p||0);
@@ -402,7 +403,9 @@ function persistLocal(){try{localStorage.setItem(LSK,JSON.stringify({logs:S.logs
 function loadLocal(){try{const d=JSON.parse(localStorage.getItem(LSK)||'null');if(d){S.logs=d.logs||{};S.tirs=d.tirs||{};S.crs=d.crs||{};S.cfg=d.cfg||{};S.bpu=d.bpu||[];SY={...SY,...(d.SY||{})}}}catch(e){}if(!SY.dev){SY.dev='ERBM-'+Math.random().toString(36).slice(2,8).toUpperCase()+Date.now().toString(36).slice(-4).toUpperCase();persistLocal()}}
 
 /* --- vues --- */
-function render(){
+const MDEF={mATH:'11652261,91',mGR:'1390245,51',fATH:'316165,66',fGR:'25431,78',sitN:'3',sitD:'30/11/2026'};
+function ensureMarche(){if(!String(S.cfg.mATH||'').trim()&&!String(S.cfg.mGR||'').trim()){for(const k in MDEF)if(!String(S.cfg[k]||'').trim())S.cfg[k]=MDEF[k];setTimeout(saveCfg,0)}}
+function render(){ensureMarche();
  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===S.view||(a.dataset.v==='plus'&&MOREV.some(m=>m[0]===S.view))));
  $('titre').textContent=S.cfg.nom||'ERBM';
  $('soustitre').textContent=[S.cfg.bailleur&&'Bailleur : '+S.cfg.bailleur,S.cfg.entreprise].filter(Boolean).join(' · ')||'Réhabilitation de cités minières';
@@ -910,6 +913,33 @@ function vDechets(){
  <h2 style="margin:24px 0 8px">Prestataire déchets</h2><div class="grid"><label>Nom<input data-cfg="dPresta" value="${esc(S.cfg.dPresta||'')}"></label><label>Téléphone (SMS de demande)<input data-cfg="dTel" value="${esc(S.cfg.dTel||'')}" inputmode="tel"></label><label>E-mail<input data-cfg="dMail" value="${esc(S.cfg.dMail||'')}" inputmode="email"></label></div>`;
 }
 
+
+/* --- balance des plus et moins (TS / TM) --- */
+const PMST={dev:'Devis à faire',env:'Devis envoyé',acc:'Accepté (OS)',ref:'Refusé'},PMC={dev:'#8a8d93',env:'#E26B0A',acc:'#2e7d32',ref:'#C00000'};
+const pmMt=x=>(x.sens==='moins'?-1:1)*(+x.q||0)*(+x.p||0);
+const pmArr=()=>{const o=[];logArr().forEach(l=>(l.pm||[]).forEach((x,i)=>o.push({l,x,i})));return o};
+function pmBlock(l){const PM=l.pm||[],acc=PM.filter(x=>x.st==='acc'),pl=acc.filter(x=>x.sens!=='moins').reduce((a,x)=>a+pmMt(x),0),mo=acc.filter(x=>x.sens==='moins').reduce((a,x)=>a+pmMt(x),0);
+ return `<div class="sec" id="pm"><h3>Travaux en plus / en moins (TS / TM) ${PM.length?`<span class="pchip" style="--pc:${pl+mo>=0?'#2e7d32':'#C00000'};vertical-align:2px">Solde accepté ${pl+mo>=0?'+':''}${eur(pl+mo)}</span>`:''}</h3>
+ ${PM.map((x,i)=>`<div class="res pv" style="border-left:5px solid ${x.sens==='moins'?'#C00000':'#2e7d32'}"><span><b>${x.sens==='moins'?'TM':'TS'} · ${esc(x.lib)}</b><br><span style="font-size:13px;color:var(--mute)">${x.c?esc(x.c)+' · ':''}${esc(String(x.q))} ${esc(x.u||'')} × ${eur(+x.p||0)} = <b>${eur(pmMt(x))}</b>${x.ref?' · '+esc(x.ref):''}${x.motif?' · '+esc(x.motif):''}</span></span>
+  <span class="pvc"><select data-pm="${i}|st" style="width:auto;min-height:38px;padding:4px 8px;border-left:4px solid ${PMC[x.st||'dev']}">${Object.entries(PMST).map(([k,t])=>`<option value="${k}" ${(x.st||'dev')===k?'selected':''}>${t}</option>`).join('')}</select><input data-pm="${i}|ref" value="${esc(x.ref||'')}" placeholder="N° devis / OS" style="width:120px;min-height:38px;padding:4px 8px"><button class="b d" data-pmdel="${i}" style="min-height:38px">✕</button></span></div>`).join('')||'<p class="note" style="margin:0 0 8px">Aucun travail en plus ou en moins.</p>'}
+ <div class="grid" style="margin-top:8px;background:var(--bg2);padding:12px;border-radius:12px">
+  <label>Sens<select id="pms"><option value="plus">En plus (TS)</option><option value="moins">En moins (TM)</option></select></label>
+  <label style="grid-column:span 2">Désignation<input id="pml" placeholder="Ex. reprise plancher bois chambre 2"></label>
+  <label>Code BPU (facultatif)<input id="pmc" list="bpulist" autocomplete="off"></label><label>Quantité<input id="pmq" type="number" step="any" value="1"></label><label>Unité<input id="pmu" placeholder="m², U, ml…"></label><label>Prix unitaire HT<input id="pmp" inputmode="decimal" placeholder="Repris du BPU si code"></label>
+  <label style="grid-column:1/-1">Motif<input id="pmm" placeholder="Ex. demande du bailleur, découverte en curage, prestation supprimée"></label>
+  <div style="grid-column:1/-1"><button class="b p" data-act="addpm">Ajouter</button></div></div></div>`}
+function pmFin(){const A=pmArr();if(!A.length)return '<h3 style="margin:22px 0 8px">Balance des plus et moins (TS / TM)</h3><p class="note">Aucun TS ni TM saisi. Ajoutez-les dans la fiche du logement, section « Travaux en plus / en moins ».</p>';
+ const sum=(f)=>A.filter(f).reduce((a,y)=>a+pmMt(y.x),0);
+ const row=(t,st)=>{const p2=sum(y=>y.x.sens!=='moins'&&(y.x.st||'dev')===st),m2=sum(y=>y.x.sens==='moins'&&(y.x.st||'dev')===st);return `<tr><td><span class="pchip" style="--pc:${PMC[st]}">${t}</span></td><td class="num">${eur(p2)}</td><td class="num">${eur(m2)}</td><td class="num"><b>${p2+m2>=0?'+':''}${eur(p2+m2)}</b></td><td class="num">${A.filter(y=>(y.x.st||'dev')===st).length}</td></tr>`};
+ const accP=sum(y=>y.x.st==='acc'&&y.x.sens!=='moins'),accM=sum(y=>y.x.st==='acc'&&y.x.sens==='moins'),pend=sum(y=>y.x.st==='dev'||y.x.st==='env');
+ const num=k=>parseFloat(String(S.cfg[k]||'').replace(/\s|€/g,'').replace(',','.'))||0,mk=num('mATH')+num('mGR');
+ const byL={};A.forEach(y=>{(byL[y.l.id]??={l:y.l,p:0,m:0,n:0});if(y.x.st!=='ref'){if(y.x.sens==='moins')byL[y.l.id].m+=pmMt(y.x);else byL[y.l.id].p+=pmMt(y.x)}byL[y.l.id].n++});
+ return `<h3 style="margin:22px 0 8px">Balance des plus et moins (TS / TM)</h3>
+ <div class="hero" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr))"><div class="hk hg"><b>+${keur(accP)}</b><span>TS acceptés</span></div><div class="hk hr"><b>${keur(accM)}</b><span>TM acceptés</span></div><div class="hk ${accP+accM>=0?'hg':'hr'}"><b>${accP+accM>=0?'+':''}${keur(accP+accM)}</b><span>solde accepté${mk?' · '+((accP+accM)/mk*100).toLocaleString('fr-FR',{maximumFractionDigits:2})+' % du marché':''}</span></div><div class="hk"><b>${pend>=0?'+':''}${keur(pend)}</b><span>en attente (devis à faire / envoyés)</span></div></div>
+ <div class="scroll"><table class="ft"><thead><tr><th>Statut</th><th class="num">Plus HT</th><th class="num">Moins HT</th><th class="num">Solde HT</th><th class="num">Lignes</th></tr></thead><tbody>${Object.entries(PMST).map(([k,t])=>row(t,k)).join('')}</tbody></table></div>
+ <h3 style="margin:16px 0 8px">Par logement (hors refusés)</h3><div class="list">${Object.values(byL).sort((a,b)=>Math.abs(b.p+b.m)-Math.abs(a.p+a.m)).map(o=>`<button class="item" data-open="${o.l.id}"><span class="badge ${o.l.parcours==='GR'?'gr':''}">${P[o.l.parcours]?.court||''}</span><span><span class="t">${esc(lname(o.l))}</span><br><span class="s">Plus ${eur(o.p)} · Moins ${eur(o.m)} · ${o.n} ligne(s)</span></span><span><b style="color:${o.p+o.m>=0?'#2e7d32':'#C00000'}">${o.p+o.m>=0?'+':''}${eur(o.p+o.m)}</b></span></button>`).join('')}</div>
+ <div class="tools"><button class="b" data-act="csvpm">Export TS / TM (CSV)</button></div>`}
+
 /* --- vue Finances --- */
 const finLines=l=>[...(l.ft||[]),...(l.vte?.ok?chkLines(l):[]),...(l.prov||[]).filter(x=>x.st==='ok')];
 function finStats(arr){const o={n:arr.length,ch:0,eng:0,av:0,rec:0,vte:0};arr.forEach(l=>{const m=montant(l);if(m>0)o.ch++;o.eng+=m;o.av+=provAv(l);if(recu(l))o.rec+=m;if(l.vte?.ok||(l.et&&l.et[0]))o.vte++});o.moy=o.ch?o.eng/o.ch:0;return o}
@@ -921,7 +951,7 @@ function vFinances(){
  const pcs=(v,b)=>b?(Math.round(v/b*1000)/10).toLocaleString('fr-FR')+' %':'—';
  const mrow=(nom,m,f,St)=>`<tr><td><b>${nom}</b></td><td>${St.n}</td><td class="num">${eur(m)}</td><td class="num">${St.n&&m?eur(m/St.n):'—'}</td><td class="num">${eur(St.eng)}</td><td class="num">${St.ch?eur(St.moy):'—'}</td><td class="num">${St.ch&&m&&St.n?pcs(St.moy-m/St.n,m/St.n).replace(/^(?!-)/,'+'):'—'}</td><td class="num">${eur(f)}</td><td class="num">${pcs(f,m)}</td><td class="num">${eur(m-f)}</td></tr>`;
  const marche=`<div class="tools" style="margin:0 0 6px"><label style="display:inline-flex;align-items:center;cursor:pointer;color:#fff;background:var(--brick);border-radius:10px;min-height:44px;padding:0 16px;font:600 15px Inter,sans-serif">Importer la demande d'acompte (Excel)<input type="file" id="sitfile" accept=".xlsx,.xls" hidden></label></div><p class="note" style="margin:0 0 12px">Chaque mois, importez le fichier Excel de la demande d'acompte du groupement : seuls le marché et le cumul facturé de BBNE (ATH et GR), le n° et la date de situation sont repris.</p><h3 style="margin:8px 0 8px">Marché ${esc(S.cfg.mNom||'')}</h3><div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px">
- <label>Marché HT tiroirs (ATH)<input data-cfg="mATH" value="${esc(S.cfg.mATH||'')}" inputmode="decimal"></label>
+ <label>Marché HT ATH<input data-cfg="mATH" value="${esc(S.cfg.mATH||'')}" inputmode="decimal"></label>
  <label>Marché HT GR<input data-cfg="mGR" value="${esc(S.cfg.mGR||'')}" inputmode="decimal"></label>
  <label>Facturé cumulé HT ATH<input data-cfg="fATH" value="${esc(S.cfg.fATH||'')}" inputmode="decimal"></label>
  <label>Facturé cumulé HT GR<input data-cfg="fGR" value="${esc(S.cfg.fGR||'')}" inputmode="decimal"></label>
@@ -935,7 +965,7 @@ function vFinances(){
  const lots={};L.forEach(l=>finLines(l).forEach(x=>{const k=lotOf(x);lots[k]=(lots[k]||0)+ligneMt(x)}));
  const lotE=Object.entries(lots).filter(e=>e[1]>0).sort((a,b)=>b[1]-a[1]),lmax=lotE.length?lotE[0][1]:1;
  const top=L.filter(l=>montant(l)>0).sort((a,b)=>montant(b)-montant(a)).slice(0,10);
- return `${marche}<div class="tools" style="margin-top:12px"><button class="b" data-act="csvfin">Export finances (CSV)</button></div>
+ return `${marche}${pmFin()}<div class="tools" style="margin-top:12px"><button class="b" data-act="csvfin">Export finances (CSV)</button></div>
  <div class="kpis">
  <div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(T.eng)}</b><span>engagé HT (fiches + provisions validées)${bud?' · '+pc(T.eng)+' du budget':''}</span></div>
  <div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(T.av)}</b><span>provisions à valider</span></div>
@@ -968,7 +998,7 @@ function vTableau(){
  const cites={};L.forEach(l=>(cites[l.cite||'Sans cité']??=[]).push(l));
  const bars=(arr,p)=>P[p].etapes.map((e,i)=>{const n=arr.filter(l=>curIdx(l)===i).length;return `<div class="row"><span>${esc(e)}</span><div class="track"><div class="fill" style="width:${arr.length?n/arr.length*100:0}%"></div></div><span class="n">${n}</span></div>`}).join('')+`<div class="row"><span><b>Terminés</b></span><div class="track"><div class="fill" style="background:var(--slate);width:${arr.length?arr.filter(l=>curIdx(l)>=P[p].etapes.length).length/arr.length*100:0}%"></div></div><span class="n">${arr.filter(l=>curIdx(l)>=P[p].etapes.length).length}</span></div>`;
  const CMD=vCommande(),num=k=>parseFloat(String(S.cfg[k]||'').replace(/\s|€/g,'').replace(',','.'))||0,mk=num('mATH')+num('mGR'),fk=num('fATH')+num('fGR');
- const hero=`<div class="hero"><a class="hk" href="#logements"><b>${rec}<small>/${L.length}</small></b><span>logements réceptionnés</span><i style="width:${L.length?rec/L.length*100:0}%"></i></a><a class="hk" href="#logements"><b>${vteN}<small>/${L.length}</small></b><span>VTE faites</span><i style="width:${L.length?vteN/L.length*100:0}%"></i></a><a class="hk ${S._late?'hr':'hg'}" href="#tableau"><b>${S._late||0}</b><span>en retard aujourd'hui</span></a><a class="hk" href="#planning"><b>${S._rdv||0}</b><span>RDV et démarrages du jour</span></a><a class="hk" href="#finances"><b>${mk?(Math.round(fk/mk*1000)/10).toLocaleString('fr-FR')+' %':'—'}</b><span>du marché facturé${S.cfg.sitN?' (situation '+esc(S.cfg.sitN)+')':''}</span>${mk?`<i style="width:${Math.min(100,fk/mk*100)}%"></i>`:''}</a><a class="hk" href="#finances"><b>${eur(mtot).replace(/,\d\d\s€/,' €')}</b><span>engagé HT (fiches BPU)</span></a></div>`;
+ const hero=`<div class="hero"><a class="hk" href="#logements"><b>${rec}<small>/${L.length}</small></b><span>logements réceptionnés</span><i style="width:${L.length?rec/L.length*100:0}%"></i></a><a class="hk" href="#logements"><b>${vteN}<small>/${L.length}</small></b><span>VTE faites</span><i style="width:${L.length?vteN/L.length*100:0}%"></i></a><a class="hk ${S._late?'hr':'hg'}" href="#tableau"><b>${S._late||0}</b><span>en retard aujourd'hui</span></a><a class="hk" href="#planning"><b>${S._rdv||0}</b><span>RDV et démarrages du jour</span></a><a class="hk" href="#finances"><b>${mk?keur(mk):'À saisir'}</b><span>${mk?'marché HT · ATH '+keur(num('mATH'))+' · GR '+keur(num('mGR')):'marché HT : touchez pour le renseigner'}</span></a><a class="hk" href="#finances"><b>${mk?(Math.round(fk/mk*1000)/10).toLocaleString('fr-FR')+' %':'—'}</b><span>du marché facturé${S.cfg.sitN?' (situation '+esc(S.cfg.sitN)+')':''}</span>${mk?`<i style="width:${Math.min(100,fk/mk*100)}%"></i>`:''}</a><a class="hk" href="#finances"><b>${keur(mtot)}</b><span>engagé HT (fiches BPU)</span></a></div>`;
  return `${hero}${CMD}<h2>${rec} logement${rec>1?'s':''} réceptionné${rec>1?'s':''} sur ${L.length}</h2>
  <div class="kpis"><div class="kpi"><b>${gr.length}</b><span>en GR · site occupé</span></div><div class="kpi"><b>${ti.length}</b><span>en ATH · curage complet + TCE</span></div><div class="kpi"><b>${ro}</b><span>réserves ouvertes</span></div><div class="kpi"><b>${libres}</b><span>tiroirs libres sur ${tirArr().length}</span></div></div>
  <div class="kpis" style="margin-top:-12px"><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mtot)}</b><span>montant HT des fiches travaux (BPU)</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mrec)}</b><span>dont logements en VTS / réceptionnés</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mgr)}</b><span>GR · site occupé</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mti)}</b><span>ATH · curage complet + TCE</span></div></div>
@@ -1146,6 +1176,7 @@ function renderPanel(){
   <div class="grid" style="margin-top:10px"><label style="grid-column:span 2">Code BPU ou mot-clé<input id="ftc" list="bpulist" placeholder="Ex. MEXT, VMC, trappe…" autocomplete="off"></label><label>Quantité<input id="ftq" type="number" step="any" min="0" value="1"></label></div>
   <datalist id="bpulist">${S.bpu.map(b=>`<option value="${esc(b.c)}">${esc(b.d)} · ${esc(b.u)} · ${eur(+b.p||0)}</option>`).join('')}</datalist>
   <div class="tools"><button class="b p" data-act="addft">Ajouter la ligne</button></div></div>
+ ${pmBlock(l)}
  <div class="sec"><h3>Réserves (${resOuv(l).length} ouverte${resOuv(l).length>1?'s':''})</h3>
   ${(l.res||[]).map(r=>`<div class="res ${r.etat==='levée'?'lev':''}"><span><b>${esc(r.txt)}</b><br><span style="font-size:13px;color:var(--mute)">${esc(r.lot||'')} · ${esc(fdate(r.date))}${r.etat==='levée'?' · levée le '+esc(fdate(r.lev)):''}</span></span><span style="display:flex;gap:6px"><button class="b" data-rlev="${r.id}">${r.etat==='levée'?'Rouvrir':'Lever'}</button><button class="b d" data-rdel="${r.id}" aria-label="Supprimer">✕</button></span>${r.photo?`<img src="${esc(blob(r.photo))}" alt="Photo de la réserve">`:''}</div>`).join('')}
   <div class="grid" style="margin-top:8px"><label>Nouvelle réserve<input id="rtxt" placeholder="Ex. joint silicone baignoire à reprendre"></label><label>Lot<select id="rlot"><option value="">—</option>${p.lots.map(n=>`<option>${esc(n)}</option>`).join('')}</select></label>${assets?'<label>Photo<input type="file" id="rph" accept="image/*"></label>':''}</div>
@@ -1362,6 +1393,9 @@ async function act(a){
  if(a==='fback'){S.fiche=null;renderPanel()}
  if(a==='fpdf'){fichePdf(S.logs[S.open],$('fwho').value)}
  if(a==='addbenne'){if(readonly)return toast('Lecture seule');const b={id:uid(),type:$('dt').value,cont:$('dc').value,lieu:$('dl').value.trim(),presta:$('dp').value.trim(),pose:$('dd').value||today()};await saveBennes([...bennes(),b]);toast('Posée');return}
+ if(a==='addpm'){if(readonly)return toast('Lecture seule');const lib=$('pml').value.trim();if(!lib)return toast('Désignation ?');const c=$('pmc').value.trim(),b=c?(bpuMap()[c]||S.bpu.find(x=>x.c.toLowerCase()===c.toLowerCase())):null;const pr=parseFloat(String($('pmp').value).replace(/\s|€/g,'').replace(',','.'));
+  upd(l=>{l.pm=[...(l.pm||[]),{id:uid(),sens:$('pms').value,lib,c:b?.c||c,u:$('pmu').value.trim()||b?.u||'',p:isNaN(pr)?(+b?.p||0):pr,q:parseFloat(String($('pmq').value).replace(',','.'))||0,motif:$('pmm').value.trim(),st:'dev',date:today()}]});toast('Ajouté');return}
+ if(a==='csvpm'){const rows=[['Code UG','Adresse','Parcours','Sens','Désignation','Code BPU','Quantité','Unité','PU HT','Montant HT','Statut','N° devis / OS','Motif','Date']];const f=n=>String(Math.round(n*100)/100).replace('.',',');pmArr().forEach(({l,x})=>rows.push([l.ug,l.adresse,P[l.parcours]?.court,x.sens==='moins'?'TM':'TS',x.lib,x.c,f(+x.q||0),x.u,f(+x.p||0),f(pmMt(x)),PMST[x.st||'dev'],x.ref,x.motif,x.date]));const csv='\ufeff'+rows.map(r=>r.map(v=>{v=String(v??'');return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(';')).join('\r\n');dl('ts-tm-erbm-'+today()+'.csv',csv);return}
  if(a==='bpfon'){upd(l=>{l.rzo={...(l.rzo||{})};l.rzo.bpf={d:today(),par:conf().n||''}});toast('Bon pour fermeture donné');return}
  if(a==='bpfoff'){if(!(await ask('Retirer le bon pour fermeture ?')))return;upd(l=>{l.rzo={...(l.rzo||{})};delete l.rzo.bpf});return}
  if(a==='tpadd'){const v=($('tpnew')?.value||'').trim();if(!v)return toast('Nommez le type');S.cfg.plans={...(S.cfg.plans||{})};if(!S.cfg.plans[v])S.cfg.plans[v]={vals:{}};await saveCfg();render();return}
@@ -1397,7 +1431,7 @@ function editTir(id,isNew){
 }
 
 document.addEventListener('click',e=>{
- const t=e.target.closest('[data-bk],[data-rz],[data-qdone],[data-qplus],[data-qcr],[data-more],[data-lv],[data-suclos],[data-tv],[data-rw],[data-pv],[data-gw],[data-opencr],[data-cradel],[data-ps],[data-prdel],[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon]');
+ const t=e.target.closest('[data-pmdel],[data-bk],[data-rz],[data-qdone],[data-qplus],[data-qcr],[data-more],[data-lv],[data-suclos],[data-tv],[data-rw],[data-pv],[data-gw],[data-opencr],[data-cradel],[data-ps],[data-prdel],[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon]');
  if(e.target===$('sheet')){closePanel();return}
  if(!t)return;
  if(t.dataset.pv){S.pv=t.dataset.pv;render();return}
@@ -1420,6 +1454,7 @@ document.addEventListener('click',e=>{
  if(readonly&&S.open)return toast('Lecture seule');
  if(t.dataset.step){const i=+t.dataset.step;upd(l=>{l.et={...(l.et||{})};if(l.et[i])delete l.et[i];else l.et[i]=today()})}
  if(t.dataset.lot){const n=t.dataset.lot;upd(l=>{l.lots={...(l.lots||{})};l.lots[n]=(((l.lots[n]||0)+1)%4)})}
+ if(t.dataset.pmdel!==undefined){const i=+t.dataset.pmdel;ask('Supprimer cette ligne ?').then(ok=>ok&&upd(l=>{l.pm=(l.pm||[]).filter((_,k)=>k!==i)}));return}
  if(t.dataset.bk){(async()=>{const [i,k]=t.dataset.bk.split('|'),B=JSON.parse(JSON.stringify(bennes())),b=B[+i];if(!b)return;const td=today();
   if(k==='pleine')b.pleine=td;
   if(k==='dem'){b.dem=td;const msg=demandeMsg(b),tel=String(S.cfg.dTel||'').replace(/[^\d+]/g,'');if(tel)location.href='sms:'+tel+(/iPhone|iPad|Mac/.test(navigator.userAgent)?'&':'?')+'body='+encodeURIComponent(msg);else if(S.cfg.dMail)location.href='mailto:'+S.cfg.dMail+'?subject='+encodeURIComponent('Demande d\'enlèvement - '+(S.cfg.nom||'ERBM'))+'&body='+encodeURIComponent(msg);else toast('Renseignez le téléphone ou l\'e-mail du prestataire en bas de page')}
@@ -1449,6 +1484,7 @@ document.addEventListener('change',e=>{
  if(t.id==='pe'){S.pe=t.value;render()}
  if(t.id==='pp'){S.pp=t.value;render()}
  if(t.dataset.tpup)uploadTpPlan(t)
+ if(t.dataset.pm&&S.open){const [i,k]=t.dataset.pm.split('|'),v=t.value;upd(l=>{l.pm=(l.pm||[]).map((x,j)=>j===+i?{...x,[k]:v}:x)},k==='st')}
  if(t.dataset.bf){const [i,k]=t.dataset.bf.split('|'),B=JSON.parse(JSON.stringify(bennes()));if(B[+i]){B[+i][k]=t.value.trim();S.cfg.bennes=B;saveCfg()}}
  if(t.dataset.rzph&&S.open)uploadRzPhoto(t)
  if(t.dataset.rzeq&&S.open){const e2=t.dataset.rzeq,v=t.value;upd(l=>{l.rzo={...(l.rzo||{})};l.rzo.eq={...(l.rzo.eq||{})};l.rzo.eq[e2]={...(l.rzo.eq[e2]||{}),st:v,d:today()}})}
@@ -1460,6 +1496,7 @@ document.addEventListener('change',e=>{
  if(t.dataset.crdone){const [cid,i]=t.dataset.crdone.split('|');const c=JSON.parse(JSON.stringify(S.crs[cid]));c.actions[+i].fait=t.checked;save('crs',cid,c);toast('Action faite');setTimeout(render,400)}
  if(t.dataset.pr&&S.open){if(readonly)return toast('Lecture seule');const [i,k]=t.dataset.pr.split('|');const v=t.value;upd(l=>{l.prest=(l.prest||[]).map((p,j)=>{if(j!==+i)return p;const q={...p,[k]:v};if(k==='rdv'&&v&&(p.st==='a_planifier'||p.st==='affectee'))q.st='rdv';if(k==='ent'&&p.st==='a_planifier')q.st='affectee';if(k==='deb'&&v&&p.st==='a_planifier')q.st='affectee';if(k==='deb'&&v&&(!p.fin||p.fin<v))q.fin=v;return q})},t.tagName==='SELECT'||k==='rdv'||k==='deb'||k==='fin')}
  if(t.dataset.sd&&S.open){const i=t.dataset.sd,v=t.value;upd(l=>{l.et={...(l.et||{})};if(v)l.et[i]=v;else delete l.et[i]})}
+ if(t.id==='pmc'){const b=bpuMap()[t.value.trim()];if(b){$('pmu').value=b.u||'';$('pmp').value=String(b.p).replace('.',',');if(!$('pml').value)$('pml').value=b.d||''}}
  if(t.id==='pvt'){const c=t.selectedOptions[0]?.dataset.c;if(c)$('pvc').value=c}
  if(t.dataset.pvq!==undefined&&S.open){if(readonly)return toast('Lecture seule');const i=+t.dataset.pvq,q=parseFloat(String(t.value).replace(',','.'))||0;upd(l=>{l.prov=(l.prov||[]).map((x,k)=>k===i?{...x,q}:x)})}
  if(t.dataset.pvst!==undefined&&S.open){if(readonly)return toast('Lecture seule');const i=+t.dataset.pvst,st=t.value;upd(l=>{l.prov=(l.prov||[]).map((x,k)=>k===i?{...x,st}:x)})}
