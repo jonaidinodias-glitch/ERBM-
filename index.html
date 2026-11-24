@@ -20,8 +20,8 @@
    PICTURE: la carte de la cité en haut du tableau de bord, une tuile par logement
    COLOUR and TYPE: blanc, encre charbon, brique rouge du bassin minier, ardoise pour le terminé ; Archivo + Inter
    LAYOUT: barre d'onglets (en bas sur téléphone), listes en une colonne, fiche logement en panneau plein écran */
-:root{color-scheme:light dark;--bg:light-dark(#ffffff,#141518);--bg2:light-dark(#f4f2ef,#1d1f23);--ink:light-dark(#1b1d22,#eceae6);--mute:light-dark(#686a70,#a3a4a8);--line:light-dark(#e2dfda,#2e3036);--brick:light-dark(#c95f12,#f08a3c);--brick2:light-dark(#fbe3d0,#4a2c18);--slate:light-dark(#0f2a44,#7fa6cf);--warn:light-dark(#9a5b00,#f0b45a);--card:light-dark(#fff,#191a1e)}
-:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+:root{color-scheme:light;--bg:#ffffff;--bg2:#F2F6FC;--ink:#1d2433;--mute:#5b667a;--line:#e2e7f0;--brick:#2F5597;--brick2:#dbe8fb;--slate:#1F3864;--warn:#E26B0A;--card:#fff;--navy:#1F3864;--blue:#2F5597;--pale:#F2F6FC;--red:#C00000;--green:#2e7d32;--orange:#E26B0A;--violet:#7030A0;--r:12px}
+
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 Inter,system-ui,sans-serif;overflow-x:clip}
 h1,h2,h3{font-family:Archivo,Inter,sans-serif;line-height:1.1;margin:0;text-wrap:balance}
@@ -108,17 +108,53 @@ label>input,label>select,label>textarea{margin-top:4px}
 @media(max-width:600px){nav{position:fixed;top:auto;bottom:0;left:0;right:0;border-top:1px solid var(--line);border-bottom:0;justify-content:space-around;padding:0 0 env(safe-area-inset-bottom)}nav a{padding:12px 4px;font-size:12px;border-bottom:0;border-top:3px solid transparent}nav a.on{border-color:var(--brick)}.steps li{grid-template-columns:32px minmax(0,1fr);}.steps li input{grid-column:2}.prog{width:44px;height:44px}}
 @media(max-width:600px){.item.tr{grid-template-columns:auto minmax(0,1fr)}.item.tr>span:last-child{grid-column:1/-1}}
 @media(prefers-reduced-motion:reduce){.toast{transition:none}}
+
+/* ===== Habillage Évolud ===== */
+body{background:#eef2f8;font:15px/1.45 -apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+h1,h2,h3,.kpi b,.tile,.badge,.steps .ck,.yn button,.lot,input,select,textarea,button.b,label.b{font-family:-apple-system,"Segoe UI",Roboto,Arial,sans-serif!important}
+h2,h3{color:var(--navy)}
+header{background:var(--navy);color:#fff;border:0;padding:calc(12px + env(safe-area-inset-top)) 16px 12px;align-items:center;position:sticky;top:0;z-index:6}
+header h1{font-size:19px;font-weight:800;color:#fff}header .sub{color:rgba(255,255,255,.8)}
+header button.b{background:rgba(255,255,255,.14);color:#fff;border:0;border-radius:9px}
+nav{background:#fff;top:calc(52px + env(safe-area-inset-top))}
+nav a{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:13px}nav a b{font-size:19px;line-height:1.1}
+nav a.on{color:var(--blue);border-color:var(--blue)}
+main{max-width:1100px}
+button.b,label.b{border-radius:10px;font-weight:650}
+button.p,label.b.p{background:var(--blue)!important;border-color:var(--blue)!important;color:#fff}
+button.d{color:var(--red)}
+.sec{background:#fff;border:0;border-radius:var(--r);margin:0 12px 10px;box-shadow:0 1px 2px rgba(20,40,80,.06)}
+.panel{background:#eef2f8}.panel .top{background:var(--navy);color:#fff;border:0}.panel .top h2{color:#fff}.panel .top button.b{background:rgba(255,255,255,.14);color:#fff;border:0}
+.kpi{background:#fff;border:0;border-left:5px solid var(--blue);border-radius:var(--r);box-shadow:0 1px 2px rgba(20,40,80,.06)}
+.kpi b{color:var(--navy);font-weight:800}
+.kpi.r{border-color:var(--red)}.kpi.r b{color:var(--red)}.kpi.g{border-color:var(--green)}.kpi.g b{color:var(--green)}.kpi.o{border-color:var(--orange)}.kpi.o b{color:var(--orange)}.kpi.v{border-color:var(--violet)}.kpi.v b{color:var(--violet)}
+.item,.res,.ck,.lot{background:#fff}
+.note{background:#fff;border-left:4px solid var(--blue)}
+.cklot{color:var(--navy)}
+.card{background:#fff;border-radius:var(--r);padding:14px 16px;margin-bottom:12px;box-shadow:0 1px 2px rgba(20,40,80,.06)}
+.card h3{margin:0 0 10px;font-size:16px;color:var(--navy);display:flex;align-items:center;gap:8px}
+.card h3 .more{margin-left:auto;font-size:13px;font-weight:600;color:var(--blue);text-decoration:none}
+.hero{background:linear-gradient(135deg,#1F3864,#2F5597);color:#fff;border-radius:16px;padding:18px;margin-bottom:12px;display:flex;gap:16px;align-items:center}
+.hero h2{color:#fff;font-size:20px;margin:0 0 4px}.hero p{margin:0;opacity:.85;font-size:14px}
+.hero .ringbig{flex:none}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,340px),1fr));gap:12px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}.chip{background:var(--pale);color:var(--navy);border-radius:20px;padding:5px 10px;font-size:13px;font-weight:600}.chip b{font-size:15px;margin-right:4px}
+.line{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line);cursor:pointer}.line:last-child{border-bottom:0}
+.line .h{flex:none;font-weight:800;color:var(--violet);width:46px}.line .t{flex:1;min-width:0}.line .t small{display:block;color:var(--mute);font-size:12.5px}
+.pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap}.pill.r{background:#fbe0e0;color:var(--red)}.pill.o{background:#fde9d7;color:#a34a00}.pill.g{background:#dff3e0;color:#1b5e20}.pill.b{background:#dbe8fb;color:#1c4d9b}
+.mrow{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}.mrow:last-child{border:0}.mrow b{font-variant-numeric:tabular-nums}
+@media(max-width:600px){nav{top:auto;background:#fff;box-shadow:0 -1px 3px rgba(20,40,80,.06)}nav a{font-size:10.5px;padding:7px 2px 8px}nav a.on{border-color:transparent}main{padding:12px 12px 110px}.sec{margin:0 8px 10px}.hero{padding:14px}}
 </style>
 </head>
 <body>
 <header><h1 id="titre">ERBM</h1><span class="sub" id="soustitre">Réhabilitation de cités minières</span><span class="sub" id="syncst" style="margin-left:auto"></span><button class="b" data-act="sync" style="min-height:36px">⟳ Synchro</button></header>
 <nav id="nav">
-<a href="#tableau" data-v="tableau">Tableau de bord</a>
-<a href="#logements" data-v="logements">Logements</a>
-<a href="#planning" data-v="planning">Planning</a>
-<a href="#tiroirs" data-v="tiroirs">Tiroirs</a>
-<a href="#reserves" data-v="reserves">Réserves</a>
-<a href="#reglages" data-v="reglages">Réglages</a>
+<a href="#tableau" data-v="tableau"><b>📊</b>Tableau</a>
+<a href="#logements" data-v="logements"><b>🏠</b>Logements</a>
+<a href="#planning" data-v="planning"><b>📅</b>Planning</a>
+<a href="#tiroirs" data-v="tiroirs"><b>🔁</b>Tiroirs</a>
+<a href="#reserves" data-v="reserves"><b>⚠️</b>Réserves</a>
+<a href="#reglages" data-v="reglages"><b>⚙️</b>Réglages</a>
 </nav>
 <main id="main"><p class="empty">Chargement des données du chantier…</p></main>
 
@@ -523,18 +559,29 @@ function vTableau(){
  alerts.sort((a,b)=>a.k-b.k);
  const cites={};L.forEach(l=>(cites[l.cite||'Sans cité']??=[]).push(l));
  const bars=(arr,p)=>P[p].etapes.map((e,i)=>{const n=arr.filter(l=>curIdx(l)===i).length;return `<div class="row"><span>${esc(e)}</span><div class="track"><div class="fill" style="width:${arr.length?n/arr.length*100:0}%"></div></div><span class="n">${n}</span></div>`}).join('')+`<div class="row"><span><b>Terminés</b></span><div class="track"><div class="fill" style="background:var(--slate);width:${arr.length?arr.filter(l=>curIdx(l)>=P[p].etapes.length).length/arr.length*100:0}%"></div></div><span class="n">${arr.filter(l=>curIdx(l)>=P[p].etapes.length).length}</span></div>`;
- const SY2=L.map(l=>({l,y:synth(l)})).filter(o=>o.y.vt);const nB=SY2.filter(o=>o.y.B.length).length;const cnt=re=>SY2.reduce((s,o)=>s+o.y.C.filter(t=>re.test(nrm(t))).reduce((a,t)=>a+(parseInt(t)||1),0),0);
- const vtBlock=`<div class="sec" style="margin:0 0 16px"><h3>VTE · ce qui pilote le chantier</h3><div class="kpis"><div class="kpi"><b>${SY2.length}/${L.length}</b><span>VTE faites</span></div><div class="kpi"><b style="color:${nB?'#c0392b':'inherit'}">${nB}</b><span>logement(s) avec bloquant</span></div><div class="kpi"><b>${cnt(/escalier/)}</b><span>escalier(s) à commander</span></div><div class="kpi"><b>${cnt(/velux/)}</b><span>Velux</span></div><div class="kpi"><b>${cnt(/fenetre/)}</b><span>fenêtres / PF</span></div><div class="kpi"><b>${cnt(/pompe a chaleur/)}</b><span>PAC</span></div></div>
- ${nB?`<div style="margin-top:8px">${SY2.filter(o=>o.y.B.length).slice(0,12).map(o=>`<div class="res" data-open="${o.l.id}" style="cursor:pointer"><span><b>${esc(lname(o.l))}</b><br><span style="font-size:14px;color:#c0392b">${o.y.B.map(esc).join(' · ')}</span></span></div>`).join('')}</div>`:''}
- <div class="tools" style="margin-top:8px"><label class="b p">🤖 Robot Dalux<input type="file" id="daluxbulk" accept="application/pdf,.pdf" multiple class="fhide"></label><button class="b" data-act="csvsyn">Synthèse VTE (CSV : finances, planning, commandes)</button></div></div>`;
- return `<h2>${rec} logement${rec>1?'s':''} réceptionné${rec>1?'s':''} sur ${L.length}</h2>${vtBlock}
- <div class="kpis"><div class="kpi"><b>${gr.length}</b><span>en GR · site occupé</span></div><div class="kpi"><b>${ti.length}</b><span>en opération tiroir</span></div><div class="kpi"><b>${ro}</b><span>réserves ouvertes</span></div><div class="kpi"><b>${libres}</b><span>tiroirs libres sur ${tirArr().length}</span></div></div>
- <div class="kpis" style="margin-top:-12px"><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mtot)}</b><span>montant HT des fiches travaux (BPU)</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mrec)}</b><span>dont logements en VTS / réceptionnés</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mgr)}</b><span>GR · site occupé</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mti)}</b><span>opérations tiroir</span></div></div>
- <div class="kpis" style="margin-top:-12px"><div class="kpi"><b>${vteN}/${L.length}</b><span>VTE faites</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(pvok)}</b><span>provisions validées</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(pva)}</b><span>${pvn} provision${pvn>1?'s':''} à valider</span></div><div class="kpi"><b>${L.filter(l=>l.esc?.prevu&&!l.esc.cmd).length}</b><span>escalier(s) à commander</span></div></div>
- ${Object.entries(cites).map(([c,arr])=>`<div class="cite"><h3>${esc(c)} <span class="sub" style="font:400 14px Inter;color:var(--mute)">· ${arr.filter(recu).length}/${arr.length} réceptionnés</span></h3><div class="tiles">${arr.map(l=>`<button class="tile" data-open="${l.id}" style="background:${tileColor(l)}" title="${esc(lname(l)+' — '+etat(l))}">${esc(l.num||'?')}<i>${l.parcours==='GR'?'GR':'TIR'}</i></button>`).join('')}</div></div>`).join('')}
- <div class="legend"><span style="--c:light-dark(#c9c5bf,#45474d)">Pas commencé</span><span style="--c:color-mix(in srgb,var(--brick) 50%,#e8a58f)">Début</span><span style="--c:var(--brick)">Bien avancé</span><span style="--c:var(--slate)">Réceptionné</span></div>
- <div class="two"><div><h3 style="margin-bottom:10px">À surveiller</h3>${alerts.length?`<div class="list">${alerts.slice(0,12).map(a=>`<button class="item" data-open="${a.l.id}"><span class="badge ${a.late?'late':''}">${a.late?'Retard':'Bientôt'}</span><span><span class="t">${esc(lname(a.l))}</span><br><span class="s">${esc(a.t)}</span></span><span></span></button>`).join('')}</div>`:'<p class="note">Rien à signaler : pas de retour locataire sous 14 jours, pas de réserve ancienne.</p>'}</div>
- <div><h3 style="margin-bottom:6px">Où en sont les GR</h3><div class="bars">${bars(gr,'GR')}</div><h3 style="margin:18px 0 6px">Où en sont les tiroirs</h3><div class="bars">${bars(ti,'TIR')}</div></div></div>`;
+ const SY2=L.map(l=>({l,y:synth(l)}));const vtF=SY2.filter(o=>o.y.vt);const bloq=vtF.filter(o=>o.y.B.length);const cnt=re=>vtF.reduce((s,o)=>s+o.y.C.filter(t=>re.test(nrm(t))).reduce((a,t)=>a+(parseInt(t)||1),0),0);
+ const now=new Date().toISOString().slice(0,16),j7=new Date(Date.now()+7*864e5).toISOString().slice(0,16);
+ const rdv=L.filter(l=>!vtFaite(l)&&l.vte?.rdv).sort((a,b)=>a.vte.rdv.localeCompare(b.vte.rdv));const rdvRet=rdv.filter(l=>l.vte.rdv<now),rdvAv=rdv.filter(l=>l.vte.rdv>=now),rdv7=rdvAv.filter(l=>l.vte.rdv<=j7);const aPlan=L.filter(l=>!vtFaite(l)&&!l.vte?.rdv).length;
+ const avg=L.length?Math.round(L.reduce((s,l)=>s+pct(l),0)/L.length):0;
+ const tk={};L.forEach(l=>{const k=typeKey(l.type);if(k)tk[k]=1});const sansPlan=Object.keys(tk).filter(k=>!(plansT()[k]||[]).length&&!L.filter(l=>typeKey(l.type)===k).every(l=>l.tech?.planId));
+ const ringBig=(p)=>{const r=30,c=2*Math.PI*r;return `<svg class="ringbig" width="78" height="78" viewBox="0 0 78 78"><circle cx="39" cy="39" r="${r}" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="8"/>${p?`<circle cx="39" cy="39" r="${r}" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 39 39)" stroke-linecap="round"/>`:''}<text x="39" y="44" text-anchor="middle" font-size="17" font-weight="800" fill="#fff">${p}%</text></svg>`};
+ const jr=d=>new Date(d).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
+ const kpi=(v,lab,c,go)=>`<a class="kpi ${c||''}" ${go?`href="#${go}"`:''} style="text-decoration:none;color:inherit"><b>${v}</b><span>${lab}</span></a>`;
+ return `<div class="hero">${ringBig(avg)}<div><h2>${esc(S.cfg.nom||'Chantier ERBM')}</h2><p>${L.length} logements · ${gr.length} GR · ${ti.length} tiroirs${S.cfg.bailleur?' · '+esc(S.cfg.bailleur):''}</p><p>${rec} réceptionné${rec>1?'s':''} · avancement moyen ${avg} %</p></div></div>
+ <div class="kpis">${kpi(`${vtF.length}<small style="font-size:15px;color:var(--mute)">/${L.length}</small>`,'VTE faites','g','planning')}${kpi(rdv7.length,'VTE dans les 7 jours','v','planning')}${kpi(rdvRet.length,'RDV VTE en retard',rdvRet.length?'r':'','planning')}${kpi(bloq.length,'logements avec bloquant',bloq.length?'r':'')}${kpi(ro,'réserves ouvertes',ro?'o':'','reserves')}${kpi(libres+'/'+tirArr().length,'tiroirs libres','','tiroirs')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(mtot)}</span>`,'montant HT engagé')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(pva)}</span>`,pvn+' provision(s) à valider','o')}</div>
+ <div class="grid2">
+ <div class="card"><h3>⛔ Bloquants VTE <a class="more" href="#logements">${bloq.length}</a></h3>${bloq.length?bloq.slice(0,8).map(o=>`<div class="line" data-open="${o.l.id}"><span class="t"><b>${esc((o.l.num?'N° '+o.l.num+' ':'')+(o.l.adresse||''))}</b><small>${o.y.B.map(esc).join(' · ')}</small></span><span class="pill r">${o.y.B.length}</span></div>`).join(''):'<p class="mut" style="margin:0;color:var(--mute)">Aucun bloquant relevé.</p>'}</div>
+ <div class="card"><h3>📅 Prochaines VTE <a class="more" href="#planning">Planning ›</a></h3>${rdvRet.length?`<p style="margin:0 0 6px"><span class="pill r">${rdvRet.length} en retard</span></p>`:''}${rdvAv.length?rdvAv.slice(0,6).map(l=>`<div class="line" data-open="${l.id}"><span class="h">${esc(l.vte.rdv.slice(11,16))}</span><span class="t"><b>${esc((l.num?'N° '+l.num+' ':'')+(l.adresse||''))}</b><small>${esc(jr(l.vte.rdv))} · ${esc(l.type||'')}${l.loc?.nom?' · '+esc(l.loc.nom):''}</small></span></div>`).join(''):`<p style="margin:0;color:var(--mute)">Aucune VTE planifiée. ${aPlan} logement(s) à planifier.</p>`}</div>
+ <div class="card"><h3>📦 Commandes à lancer</h3><div class="chips"><span class="chip"><b>${cnt(/escalier/)}</b>escaliers</span><span class="chip"><b>${cnt(/velux/)}</b>Velux</span><span class="chip"><b>${cnt(/fenetre/)}</b>fenêtres / PF</span><span class="chip"><b>${cnt(/porte bs/)}</b>portes BS</span><span class="chip"><b>${cnt(/pompe a chaleur/)}</b>PAC</span><span class="chip"><b>${cnt(/exterieurs|portail/)}</b>portails / clôtures</span></div>
+  <div class="tools" style="margin:12px 0 0"><label class="b p">🤖 Robot Dalux<input type="file" id="daluxbulk" accept="application/pdf,.pdf" multiple class="fhide"></label><button class="b" data-act="csvsyn">Synthèse VTE (CSV)</button></div></div>
+ <div class="card"><h3>💶 Finances</h3><div class="mrow"><span>Montant HT des fiches travaux</span><b>${eur(mtot)}</b></div><div class="mrow"><span>dont GR · site occupé</span><b>${eur(mgr)}</b></div><div class="mrow"><span>dont opérations tiroir</span><b>${eur(mti)}</b></div><div class="mrow"><span>Logements en VTS / réceptionnés</span><b>${eur(mrec)}</b></div><div class="mrow"><span>Provisions validées</span><b>${eur(pvok)}</b></div><div class="mrow"><span>Provisions à valider</span><b style="color:var(--orange)">${eur(pva)}</b></div></div>
+ <div class="card"><h3>📈 Avancement GR</h3><div class="bars">${bars(gr,'GR')}</div></div>
+ <div class="card"><h3>📈 Avancement tiroirs</h3><div class="bars">${bars(ti,'TIR')}</div></div>
+ <div class="card"><h3>⚠️ À surveiller <a class="more">${alerts.length}</a></h3>${alerts.length?alerts.slice(0,8).map(a=>`<div class="line" data-open="${a.l.id}"><span class="t"><b>${esc(lname(a.l))}</b><small>${esc(a.t)}</small></span><span class="pill ${a.late?'r':'o'}">${a.late?'Retard':'Bientôt'}</span></div>`).join(''):'<p style="margin:0;color:var(--mute)">Rien à signaler.</p>'}</div>
+ <div class="card"><h3>🗂 Plans des logements <a class="more" href="#reglages">Réglages ›</a></h3><p style="margin:0">${Object.keys(tk).length-sansPlan.length}/${Object.keys(tk).length} types ont leur plan.${sansPlan.length?` <span class="pill o">Sans plan : ${sansPlan.map(esc).join(', ')}</span>`:' <span class="pill g">Complet</span>'}</p></div>
+ </div>
+ <div class="card"><h3>🏘 Carte de la cité</h3>${Object.entries(cites).map(([c,arr])=>`<div class="cite"><p style="margin:0 0 6px;font-weight:700;color:var(--navy)">${esc(c)} <span style="font-weight:400;color:var(--mute);font-size:13px">· ${arr.filter(recu).length}/${arr.length} réceptionnés</span></p><div class="tiles">${arr.map(l=>`<button class="tile" data-open="${l.id}" style="background:${tileColor(l)}" title="${esc(lname(l)+' — '+etat(l))}">${esc(l.num||'?')}<i>${l.parcours==='GR'?'GR':'TIR'}</i></button>`).join('')}</div></div>`).join('')}
+ <div class="legend"><span style="--c:#c9cfdb">Pas commencé</span><span style="--c:color-mix(in srgb,var(--brick) 50%,#c9d8f2)">Début</span><span style="--c:var(--brick)">Bien avancé</span><span style="--c:var(--slate)">Réceptionné</span></div></div>`;
 }
 function ring(l){const p=pct(l),r=22,c=2*Math.PI*r;return `<svg class="prog" viewBox="0 0 56 56"><circle cx="28" cy="28" r="${r}" fill="none" stroke="var(--bg2)" stroke-width="6"/><circle cx="28" cy="28" r="${r}" fill="none" stroke="${p>=100?'var(--slate)':'var(--brick)'}" stroke-width="6" stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 28 28)" stroke-linecap="round"/><text x="28" y="32" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" font-family="Archivo">${p}%</text></svg>`}
 function vLogements(){
