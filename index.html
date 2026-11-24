@@ -146,6 +146,7 @@ button.d{color:var(--red)}
 @media(max-width:600px){nav{top:auto;background:#fff;box-shadow:0 -1px 3px rgba(20,40,80,.06)}nav a{font-size:10.5px;padding:7px 2px 8px}nav a.on{border-color:transparent}main{padding:12px 12px 110px}.sec{margin:0 8px 10px}.hero{padding:14px}}
 /* ===== Points d'arrêt · Concessionnaires · Poste de commandement (fait par Saïd OUFQIR) ===== */
 #dlgTxt{white-space:pre-line}
+a.b{display:inline-flex;align-items:center;font-weight:650;font-size:15px;min-height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);text-decoration:none}
 .pa{border:1px solid var(--line);border-left:5px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:#fff}
 .pa.ok,.pa.so{border-left-color:var(--green)}.pa.nc{border-left-color:var(--red)}.pa.ph{border-left-color:var(--orange)}
 .pths{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;align-items:center}.pths img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block}
@@ -154,7 +155,7 @@ button.d{color:var(--red)}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-left:auto}.seg button{border:0;background:#fff;font-weight:600;font-size:13px;min-height:34px;padding:0 10px;cursor:pointer;color:var(--ink)}.seg button.on{background:var(--navy);color:#fff}
 .card.pc{background:linear-gradient(135deg,#14213a,#1F3864);color:#fff}.card.pc h3{color:#fff}.card.pc .line{border-color:rgba(255,255,255,.15)}.card.pc .line .t small{color:rgba(255,255,255,.75)}
 .sig{font-size:12.5px;color:var(--mute);text-align:center;margin:24px 0 0}
-@media(max-width:600px){nav{justify-content:stretch;overflow:hidden}nav a{flex:1 1 0;min-width:0;padding:7px 0 8px;font-size:9px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:clip}nav a b{font-size:17px}}
+@media(max-width:600px){nav{justify-content:flex-start;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}nav::-webkit-scrollbar{display:none}nav a{flex:0 0 auto;min-width:60px;padding:7px 4px 8px;font-size:10.5px;white-space:nowrap}nav a b{font-size:18px}nav a.on{color:var(--blue);background:var(--pale);border-radius:10px}}
 </style>
 </head>
 <body>
@@ -162,6 +163,7 @@ button.d{color:var(--red)}
 <nav id="nav">
 <a href="#tableau" data-v="tableau"><b>📊</b>Tableau</a>
 <a href="#logements" data-v="logements"><b>🏠</b>Logements</a>
+<a href="#vt" data-v="vt"><b>📋</b>VT</a>
 <a href="#planning" data-v="planning"><b>📅</b>Planning</a>
 <a href="#tiroirs" data-v="tiroirs"><b>🔁</b>Tiroirs</a>
 <a href="#reserves" data-v="reserves"><b>⚠️</b>Réserves</a>
@@ -789,6 +791,22 @@ async function importBdc(input){const f=input.files&&input.files[0];if(!f)return
   c.ft=[...nv,...manu];c.bdc={src:o.src||f.name,date:o.date||today(),n:nv.length};c.maj=today();save('logements',l.id,c);n++;tot+=base(c)});
  const sans=logArr().filter(l=>!o.logs[String(l.ug)]).map(l=>'UG '+l.ug+' '+(l.num||'')+' '+(l.adresse||''));
  render();info(`${n} bon(s) de commande importé(s) · ${eur(tot)} HT au total.\nBPU : ${S.bpu.length} codes.`+(sans.length?`\nSans bon de commande : ${sans.slice(0,10).join(' ; ')}${sans.length>10?'…':''}`:'')+(absents.length?`\nUG du fichier absents de l'appli : ${absents.slice(0,10).join(', ')}`:''))}
+/* ===== Onglet VT : visites techniques ===== */
+function vtSt(l){if(l.vte&&l.vte.ok)return 'Validée';if(vtFaite(l))return 'Faite, à valider';if(l.vte&&l.vte.rdv)return l.vte.rdv<new Date().toISOString().slice(0,16)?'RDV passé':'Planifiée';return 'À planifier'}
+const VTC={'Validée':'g','Faite, à valider':'o','RDV passé':'r','Planifiée':'b','À planifier':''};
+function openVT(id){openPanel(id);setTimeout(()=>{const v=$('vte');if(v)v.scrollIntoView({block:'start'})},80)}
+function vVT(){const L=logArr(),j=today(),c={};L.forEach(l=>{const s=vtSt(l);c[s]=(c[s]||0)+1});const jour=L.filter(l=>l.vte&&l.vte.rdv&&l.vte.rdv.slice(0,10)===j&&!vtFaite(l));
+ const F={jour:['Aujourd\'hui',l=>l.vte&&l.vte.rdv&&l.vte.rdv.slice(0,10)===j&&!vtFaite(l)],retard:['RDV passés',l=>vtSt(l)==='RDV passé'],plan:['Planifiées',l=>vtSt(l)==='Planifiée'],aplan:['À planifier',l=>vtSt(l)==='À planifier'],valider:['Faites à valider',l=>vtSt(l)==='Faite, à valider'],ok:['Validées',l=>vtSt(l)==='Validée'],all:['Toutes',()=>true]};
+ const k=F[S.vf]?S.vf:(jour.length?'jour':'aplan');const q=(S.vq||'').toLowerCase();
+ const list=L.filter(F[k][1]).filter(l=>!q||[l.ug,l.num,l.adresse,l.type].join(' ').toLowerCase().includes(q)).sort((a,b)=>String((a.vte||{}).rdv||'~').localeCompare(String((b.vte||{}).rdv||'~'))||(a.adresse||'').localeCompare(b.adresse||'','fr')||String(a.num).localeCompare(String(b.num),'fr',{numeric:true}));
+ const kp=(n,lab,cl,f)=>`<button class="kpi ${cl||''}" data-vf="${f}" style="text-align:left;cursor:pointer;font:inherit"><b>${n}</b><span>${lab}</span></button>`;
+ return `<h2 style="margin-bottom:6px">Visites techniques</h2>
+ <div class="kpis">${kp(jour.length,'VT aujourd\'hui','v','jour')}${kp(c['RDV passé']||0,'RDV passés sans VT',(c['RDV passé']?'r':''),'retard')}${kp(c['Planifiée']||0,'planifiées','','plan')}${kp(c['À planifier']||0,'à planifier','o','aplan')}${kp(c['Faite, à valider']||0,'faites, à valider','o','valider')}${kp(c['Validée']||0,'validées','g','ok')}</div>
+ <div class="tools"><label class="b p">🤖 Robot Dalux : importer des VT (PDF)<input type="file" id="daluxbulk" accept="application/pdf,.pdf" multiple class="fhide"></label><a class="b" href="#planning" style="display:inline-flex;align-items:center;text-decoration:none">📅 Planifier les VT ›</a></div>
+ <div class="tools"><input id="vq" placeholder="Chercher un UG, une adresse, un type" value="${esc(S.vq||'')}"></div>
+ <div class="chips" style="margin:0 0 12px">${Object.entries(F).map(([key,[t,f]])=>`<button class="b" data-vf="${key}" style="min-height:38px;${k===key?'background:var(--navy);color:#fff;border-color:var(--navy)':''}">${t} (${L.filter(f).length})</button>`).join('')}</div>
+ ${list.length?`<div class="list">${list.map(l=>{const st=vtSt(l),Y=synth(l),r=(l.vte||{}).rdv;return `<div class="item" style="cursor:default"><span class="pill ${VTC[st]}">${esc(st)}</span><span><span class="t">${esc(lname(l))}</span><br><span class="s">${esc(l.type||'')}${r?' · RDV '+esc(new Date(r).toLocaleString('fr-FR',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})):''}${(l.vte||{}).rdvPar?' · avec '+esc(l.vte.rdvPar):''}${l.mx&&l.mx.vo?' · '+esc(l.mx.vo):''}${Y.vt&&Y.B.length?' · <b style="color:var(--red)">'+Y.B.length+' bloquant(s)</b>':''}${l.dalux?' · VT Dalux':''}</span></span><span style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end"><button class="b ${st==='Validée'?'':'p'}" data-vtgo="${l.id}">${st==='Validée'||st==='Faite, à valider'?'Ouvrir la VT':'▶ Faire la VT'}</button></span></div>`}).join('')}</div>`:'<p class="note">Aucun logement dans cette liste.</p>'}
+ <p class="sig">ERBM · conçu et développé par Saïd OUFQIR</p>`}
 function vDecouvertes(){const A=[];logArr().forEach(l=>(l.dec||[]).forEach(d=>A.push({l,d})));const F={open:['Ouvertes',o=>o.d.st==='Ouverte'],urg:['Urgentes',o=>(o.d.grav==='Urgent sécurité'||/amiante/i.test(o.d.cat))&&o.d.st!=='Traitée'],bal:['En balance',o=>o.d.st==='En balance'],all:['Toutes',()=>true]};const k=F[S.df]?S.df:'open';const L=A.filter(F[k][1]).sort((a,b)=>String(b.d.at).localeCompare(String(a.d.at)));
  const balD=A.filter(o=>o.d.bal).reduce((s,o)=>{const x=(o.l.bal||[]).find(b=>b.id===o.d.bal);return s+(x?balMt(x):0)},0);
  return `<h2 style="margin-bottom:6px">Découvertes chantier</h2><div class="kpis"><div class="kpi o"><b>${A.filter(F.open[1]).length}</b><span>ouvertes, à chiffrer</span></div><div class="kpi ${A.filter(F.urg[1]).length?'r':''}"><b>${A.filter(F.urg[1]).length}</b><span>urgentes / amiante</span></div><div class="kpi"><b>${A.filter(F.bal[1]).length}</b><span>en balance</span></div><div class="kpi g"><b style="font-size:22px">${eur(balD)}</b><span>chiffré en balance</span></div></div>
@@ -901,11 +919,11 @@ function loadLocal(){try{const d=JSON.parse(localStorage.getItem(LSK)||'null');i
 function render(){
  const qm=!!(QR||SY.qrOnly);$('nav').style.display=qm?'none':'';
  if(qm){$('titre').textContent='ERBM · Intervenant';$('soustitre').textContent='Plans · fiche travaux · pointage';$('main').innerHTML=QR?vQR():'<div class="empty"><h2>Scannez le QR code du logement</h2><p>Ce téléphone est en mode intervenant : il s\'ouvre uniquement en scannant le QR code collé dans le logement.</p></div>';return}
- document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===S.view));
+ document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===S.view));{const a=document.querySelector('#nav a.on');if(a&&a.scrollIntoView)try{a.scrollIntoView({inline:'center',block:'nearest'})}catch(e){}}
  $('titre').textContent=S.cfg.nom||'ERBM';
  $('soustitre').textContent=[S.cfg.bailleur&&'Bailleur : '+S.cfg.bailleur,S.cfg.entreprise].filter(Boolean).join(' · ')||'Réhabilitation de cités minières';
  const m=$('main');const cc=conf();const banner=(!cc.u||!cc.t)?'<div class="note warn">Connexion au serveur Évolud non réglée : les données restent sur ce téléphone. Allez dans Réglages → Connexion.</div>':SY.err?'<div class="note warn">Synchro : '+esc(SY.err)+'</div>':'';
- m.innerHTML=banner+({tableau:vTableau,logements:vLogements,planning:vPlanning,tiroirs:vTiroirs,reserves:vReserves,reglages:vReglages,reseaux:vReseaux,decouvertes:vDecouvertes,balance:vBalance}[S.view]||vTableau)();
+ m.innerHTML=banner+({tableau:vTableau,logements:vLogements,planning:vPlanning,tiroirs:vTiroirs,reserves:vReserves,reglages:vReglages,vt:vVT,reseaux:vReseaux,decouvertes:vDecouvertes,balance:vBalance}[S.view]||vTableau)();
  if(S.open)renderPanel();
 }
 /* --- planning des VTE, relié aux logements --- */
@@ -1316,7 +1334,7 @@ function editTir(id,isNew){
 }
 
 document.addEventListener('click',e=>{
- const t=e.target.closest('[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon],[data-ptdel],[data-pa],[data-cn],[data-cnnew],[data-map],[data-cf],[data-df],[data-tk],[data-dec],[data-rdvdel],[data-baldel]');
+ const t=e.target.closest('[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon],[data-ptdel],[data-pa],[data-cn],[data-cnnew],[data-map],[data-cf],[data-df],[data-tk],[data-dec],[data-rdvdel],[data-baldel],[data-vf],[data-vtgo]');
  if(e.target===$('sheet')){closePanel();return}
  if(!t)return;
  if(t.tagName==='A'&&t.dataset.open)e.preventDefault();
@@ -1327,6 +1345,8 @@ document.addEventListener('click',e=>{
  if(t.dataset.map){S.map=t.dataset.map;return render()}
  if(t.dataset.cf){S.cf=t.dataset.cf;return render()}
  if(t.dataset.df){S.df=t.dataset.df;return render()}
+ if(t.dataset.vf){S.vf=t.dataset.vf;return render()}
+ if(t.dataset.vtgo)return openVT(t.dataset.vtgo);
  if(t.dataset.tk){const [id,a]=t.dataset.tk.split('|');return qrTk(id,a)}
  if(t.dataset.dec){const [l,d]=t.dataset.dec.split('|');return decToBal(l,d)}
  if(t.dataset.rdvdel){const r=t.dataset.rdvdel;return ask('Supprimer ce RDV ?').then(ok=>ok&&upd(l=>{l.rdv=(l.rdv||[]).filter(x=>x.id!==r)}))}
@@ -1373,9 +1393,9 @@ document.addEventListener('change',e=>{
  if(t.dataset.cfg){S.cfg[t.dataset.cfg]=t.value.trim();saveCfg();render()}
  if(t.id==='fp'){S.fp=t.value;render()}if(t.id==='fc'){S.fc=t.value;render()}if(t.id==='fe'){S.fe=t.value;render()}
 });
-document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=$('q');q.focus();q.setSelectionRange(pos,pos)}});
+document.addEventListener('input',e=>{if(e.target.id==='vq'){S.vq=e.target.value;const pos=e.target.selectionStart;render();const q=$('vq');if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(x){}}return}if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=$('q');q.focus();q.setSelectionRange(pos,pos)}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('sheet').classList.contains('on'))closePanel();if(e.key==='Enter'&&e.target.id==='jtxt')act('addj');if(e.key==='Enter'&&e.target.id==='rtxt')act('addres')});
-function route(){const h=location.hash.slice(1);S.view=['tableau','logements','planning','tiroirs','reserves','reglages','reseaux','decouvertes','balance'].includes(h)?h:'tableau';render()}
+function route(){const h=location.hash.slice(1);S.view=['tableau','logements','vt','planning','tiroirs','reserves','reglages','reseaux','decouvertes','balance'].includes(h)?h:'tableau';render()}
 addEventListener('hashchange',route);
 
 /* --- démarrage --- */
