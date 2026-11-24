@@ -115,6 +115,7 @@ label>input,label>select,label>textarea{margin-top:4px}
 <nav id="nav">
 <a href="#tableau" data-v="tableau">Tableau de bord</a>
 <a href="#logements" data-v="logements">Logements</a>
+<a href="#planning" data-v="planning">Planning</a>
 <a href="#tiroirs" data-v="tiroirs">Tiroirs</a>
 <a href="#reserves" data-v="reserves">Réserves</a>
 <a href="#reglages" data-v="reglages">Réglages</a>
@@ -476,9 +477,37 @@ function render(){
  $('titre').textContent=S.cfg.nom||'ERBM';
  $('soustitre').textContent=[S.cfg.bailleur&&'Bailleur : '+S.cfg.bailleur,S.cfg.entreprise].filter(Boolean).join(' · ')||'Réhabilitation de cités minières';
  const m=$('main');const cc=conf();const banner=(!cc.u||!cc.t)?'<div class="note warn">Connexion au serveur Évolud non réglée : les données restent sur ce téléphone. Allez dans Réglages → Connexion.</div>':SY.err?'<div class="note warn">Synchro : '+esc(SY.err)+'</div>':'';
- m.innerHTML=banner+({tableau:vTableau,logements:vLogements,tiroirs:vTiroirs,reserves:vReserves,reglages:vReglages}[S.view]||vTableau)();
+ m.innerHTML=banner+({tableau:vTableau,logements:vLogements,planning:vPlanning,tiroirs:vTiroirs,reserves:vReserves,reglages:vReglages}[S.view]||vTableau)();
  if(S.open)renderPanel();
 }
+/* --- planning des VTE, relié aux logements --- */
+const vtFaite=l=>!!(l.dalux||l.vte?.date||l.vte?.ok);
+const jourFr=d=>new Date(d+'T12:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+function vPlanning(){const L=logArr();const now=new Date().toISOString().slice(0,16);
+ const faites=L.filter(vtFaite),aPlan=L.filter(l=>!vtFaite(l)&&l.vte?.rdv),sans=L.filter(l=>!vtFaite(l)&&!l.vte?.rdv);
+ const retard=aPlan.filter(l=>l.vte.rdv<now);const jours={};aPlan.forEach(l=>(jours[l.vte.rdv.slice(0,10)]??=[]).push(l));
+ const ligne=l=>`<div class="res" data-open="${l.id}" style="cursor:pointer"><span><b>${esc(l.vte?.rdv?l.vte.rdv.slice(11,16):'')}</b> · ${esc(lname(l))} · ${esc(l.type||'')}<br><span style="font-size:13px;color:var(--mute)">${esc(P[l.parcours]?.court||'')}${l.loc?.nom?' · '+esc(l.loc.nom):''}${l.loc?.tel?' · '+esc(l.loc.tel):''}${l.vte?.rdvPar?' · avec '+esc(l.vte.rdvPar):''}${l.vte.rdv<now?' · <b style="color:#c0392b">RDV passé, VTE non saisie</b>':''}</span></span></div>`;
+ const c=S.cfg.planvt||{};
+ return `<h2>Planning des VTE</h2>
+ <div class="kpis"><div class="kpi"><b>${faites.length}</b><span>VTE faites</span></div><div class="kpi"><b>${aPlan.length}</b><span>planifiées</span></div><div class="kpi"><b style="color:${retard.length?'#c0392b':'inherit'}">${retard.length}</b><span>RDV passés sans VTE</span></div><div class="kpi"><b>${sans.length}</b><span>à planifier</span></div></div>
+ <div class="sec" style="margin-top:12px"><h3>Planifier automatiquement</h3><p style="margin:0 0 8px;font-size:14px;color:var(--mute)">Place les logements pas encore visités ni planifiés sur les jours ouvrés, rue par rue, sans toucher aux RDV déjà pris, avec une pause de 12 h à 13 h 30 et une fin de journée à 17 h 30. Ensuite, ajustez au cas par cas dans la fiche du logement.</p>
+ <div class="grid"><label>À partir du<input type="date" id="pv_d" value="${esc(c.d||new Date().toISOString().slice(0,10))}"></label><label>VTE par jour<input type="number" id="pv_n" min="1" max="20" value="${esc(c.n||6)}"></label><label>Première visite<input type="time" id="pv_h" value="${esc(c.h||'08:30')}"></label><label>Durée d'une visite (min)<input type="number" id="pv_m" min="15" step="5" value="${esc(c.m||60)}"></label><label>Parcours<select id="pv_p"><option value="">Tous</option><option value="TIR">Opérations tiroir</option><option value="GR">GR · site occupé</option></select></label><label>Visite avec<input id="pv_w" value="${esc(c.w||'')}" placeholder="Ex. Saïd + MOE"></label></div>
+ <div class="tools"><button class="b p" data-act="planvt">Planifier ${sans.length} logement(s)</button>${aPlan.length?'<button class="b" data-act="planics">Exporter vers le calendrier (.ics)</button><button class="b d" data-act="planclear">Effacer les RDV non faits</button>':''}</div></div>
+ ${retard.length?`<div class="sec"><h3 style="color:#c0392b">RDV passés, VTE non saisie (${retard.length})</h3>${retard.map(ligne).join('')}</div>`:''}
+ ${Object.keys(jours).sort().filter(d=>d>=now.slice(0,10)).map(d=>`<div class="sec"><h3>${esc(jourFr(d))} · ${jours[d].length} VTE</h3>${jours[d].sort((a,b)=>a.vte.rdv.localeCompare(b.vte.rdv)).map(ligne).join('')}</div>`).join('')||'<p class="note">Aucune VTE planifiée à venir.</p>'}`}
+async function planifierVT(){if(readonly)return toast('Lecture seule');const d0=$('pv_d').value,n=Math.max(1,+$('pv_n').value||6),h=$('pv_h').value||'08:30',m=Math.max(15,+$('pv_m').value||60),pf=$('pv_p').value,w=$('pv_w').value.trim();
+ if(!d0)return toast('Choisissez une date de départ');S.cfg={...S.cfg,planvt:{d:d0,n,h,m,w}};saveCfg();
+ const L=logArr().filter(l=>!vtFaite(l)&&!l.vte?.rdv&&(!pf||l.parcours===pf)).sort((a,b)=>(a.adresse||'').localeCompare(b.adresse||'','fr')||String(a.num).localeCompare(String(b.num),'fr',{numeric:true}));
+ if(!L.length)return toast('Rien à planifier');if(!(await ask(`Planifier ${L.length} VTE à partir du ${new Date(d0+'T12:00').toLocaleDateString('fr-FR')}, ${n} par jour ?`)))return;
+ let d=new Date(d0+'T12:00'),k=0;const [hh,mm]=h.split(':').map(Number);
+ const ouvre=()=>{while([0,6].includes(d.getDay()))d.setDate(d.getDate()+1)};ouvre();
+ const t0=hh*60+mm;let cur=t0;
+ L.forEach(l=>{if(cur<810&&cur+m>720)cur=810;if(k===n||cur+m>1050){k=0;cur=t0;d.setDate(d.getDate()+1);ouvre();if(cur<810&&cur+m>720)cur=810}const t=cur;cur+=m;const iso=d.toISOString().slice(0,10)+'T'+String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');const c=JSON.parse(JSON.stringify(S.logs[l.id]));c.vte={...(c.vte||{}),rdv:iso,rdvPar:c.vte?.rdvPar||w};c.maj=today();save('logements',l.id,c);k++});
+ toast(L.length+' VTE planifiées');render()}
+function icsVT(){const L=logArr().filter(l=>!vtFaite(l)&&l.vte?.rdv);const m=+(S.cfg.planvt?.m||60);const f=x=>x.replace(/[-:]/g,'')+'00';const add=(iso,mn)=>{const d=new Date(iso);d.setMinutes(d.getMinutes()+mn);const z=n=>String(n).padStart(2,'0');return `${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}T${z(d.getHours())}${z(d.getMinutes())}00`};const e=t=>String(t||'').replace(/[,;\\]/g,' ').replace(/\n/g,' ');
+ const ev=L.map(l=>['BEGIN:VEVENT','UID:erbm-vte-'+l.id+'@evolud','DTSTAMP:'+f(new Date().toISOString().slice(0,16)),'DTSTART;TZID=Europe/Paris:'+f(l.vte.rdv),'DTEND;TZID=Europe/Paris:'+add(l.vte.rdv,m),'SUMMARY:'+e('VTE '+(l.num?l.num+' ':'')+(l.adresse||'')+' ('+(l.type||'')+')'),'LOCATION:'+e((l.num?l.num+' ':'')+(l.adresse||'')+' '+(l.cite||'')),'DESCRIPTION:'+e('UG '+(l.ug||'')+' · '+(P[l.parcours]?.court||'')+(l.loc?.nom?' · '+l.loc.nom:'')+(l.loc?.tel?' '+l.loc.tel:'')),'END:VEVENT'].join('\r\n'));
+ const ics=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Evolud//ERBM//FR',...ev,'END:VCALENDAR'].join('\r\n');
+ if(!dl('planning-vte-erbm.ics',new Blob([ics],{type:'text/calendar'})))toast('Téléchargement impossible ici')}
 function vTableau(){
  const L=logArr();
  if(!L.length)return `<div class="empty"><h2>Aucun logement pour l'instant</h2><p>Importez la liste des logements du bailleur, ou ajoutez-les un par un.</p><div class="tools" style="justify-content:center"><button class="b p" data-act="new">Ajouter un logement</button><button class="b" data-go="reglages">Importer une liste</button><button class="b" data-act="evimp">Importer depuis Évolud</button></div></div>`;
@@ -497,7 +526,7 @@ function vTableau(){
  const SY2=L.map(l=>({l,y:synth(l)})).filter(o=>o.y.vt);const nB=SY2.filter(o=>o.y.B.length).length;const cnt=re=>SY2.reduce((s,o)=>s+o.y.C.filter(t=>re.test(nrm(t))).reduce((a,t)=>a+(parseInt(t)||1),0),0);
  const vtBlock=`<div class="sec" style="margin:0 0 16px"><h3>VTE · ce qui pilote le chantier</h3><div class="kpis"><div class="kpi"><b>${SY2.length}/${L.length}</b><span>VTE faites</span></div><div class="kpi"><b style="color:${nB?'#c0392b':'inherit'}">${nB}</b><span>logement(s) avec bloquant</span></div><div class="kpi"><b>${cnt(/escalier/)}</b><span>escalier(s) à commander</span></div><div class="kpi"><b>${cnt(/velux/)}</b><span>Velux</span></div><div class="kpi"><b>${cnt(/fenetre/)}</b><span>fenêtres / PF</span></div><div class="kpi"><b>${cnt(/pompe a chaleur/)}</b><span>PAC</span></div></div>
  ${nB?`<div style="margin-top:8px">${SY2.filter(o=>o.y.B.length).slice(0,12).map(o=>`<div class="res" data-open="${o.l.id}" style="cursor:pointer"><span><b>${esc(lname(o.l))}</b><br><span style="font-size:14px;color:#c0392b">${o.y.B.map(esc).join(' · ')}</span></span></div>`).join('')}</div>`:''}
- <div class="tools" style="margin-top:8px"><button class="b" data-act="csvsyn">Synthèse VTE (CSV : finances, planning, commandes)</button></div></div>`;
+ <div class="tools" style="margin-top:8px"><label class="b p">🤖 Robot Dalux<input type="file" id="daluxbulk" accept="application/pdf,.pdf" multiple class="fhide"></label><button class="b" data-act="csvsyn">Synthèse VTE (CSV : finances, planning, commandes)</button></div></div>`;
  return `<h2>${rec} logement${rec>1?'s':''} réceptionné${rec>1?'s':''} sur ${L.length}</h2>${vtBlock}
  <div class="kpis"><div class="kpi"><b>${gr.length}</b><span>en GR · site occupé</span></div><div class="kpi"><b>${ti.length}</b><span>en opération tiroir</span></div><div class="kpi"><b>${ro}</b><span>réserves ouvertes</span></div><div class="kpi"><b>${libres}</b><span>tiroirs libres sur ${tirArr().length}</span></div></div>
  <div class="kpis" style="margin-top:-12px"><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mtot)}</b><span>montant HT des fiches travaux (BPU)</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mrec)}</b><span>dont logements en VTS / réceptionnés</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mgr)}</b><span>GR · site occupé</span></div><div class="kpi"><b style="font-size:clamp(20px,4vw,26px)">${eur(mti)}</b><span>opérations tiroir</span></div></div>
@@ -549,7 +578,7 @@ function vReglages(){
  <div class="tools"><button class="b p" data-act="import">Importer</button></div>
  <h2 style="margin:28px 0 8px">Visites techniques Dalux</h2>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Sélectionnez un ou plusieurs PDF exportés de Dalux (formulaire « Visite technique INT »). Chaque visite est rattachée au logement qui a le même N° et la même rue : les réponses remplissent la fiche VTE, et les pages (avec les photos) sont gardées dans la fiche. ${logArr().filter(l=>l.dalux).length} logement(s) ont déjà une VT Dalux.</p>
- <div class="tools"><label class="b p" style="display:inline-flex;align-items:center;cursor:pointer">Importer des VT Dalux (PDF)<input type="file" id="daluxbulk" accept="application/pdf,.pdf" multiple class="fhide"></label></div>
+ <div class="tools"><label class="b p" style="display:inline-flex;align-items:center;cursor:pointer">🤖 Robot Dalux : importer les VT (PDF)<input type="file" id="daluxbulk" accept="application/pdf,.pdf" multiple class="fhide"></label></div>
  <h2 style="margin:28px 0 8px">Modèle de fiche VTE</h2>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Par défaut, la fiche reprend le formulaire Dalux « Visite technique INT », dans le même ordre. ${S.cfg.modele&&S.cfg.modele!==MODDEF?'<b>Un modèle personnalisé est enregistré :</b> <button class="b" data-act="moddalux">Revenir au formulaire Dalux</button>':''}</p>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Une ligne par point à vérifier : <code>Lot ; Libellé ; champs ; code BPU</code>. Champs possibles : <code>q</code> quantité, <code>loc</code> localisation, <code>dim</code> dimensions, <code>photo</code>, ou <code>choix:A|B</code> pour une liste. Le lot (Curage, GO, Mext, Placo, Mint, Électricité, Plomberie, Carrelage, Sol souple) décide du corps d'état sur la fiche travaux.</p>
@@ -604,6 +633,8 @@ function renderPanel(){
  <div class="sec" id="vte"><h3>VTE · provisions ${l.vte?.ok?'<span class="badge ok" style="vertical-align:2px">VTE validée</span>':''}${l.dalux?'<span class="badge" style="vertical-align:2px;margin-left:6px">VT Dalux</span>':''}</h3>
   ${daluxHtml(l)}${synthHtml(l)}
   <div class="grid">
+   <label>RDV VTE prévu<input type="datetime-local" data-f="vte.rdv" value="${esc(l.vte?.rdv||'')}"></label>
+   <label>Visite prévue avec<input data-f="vte.rdvPar" value="${esc(l.vte?.rdvPar||'')}" placeholder="Ex. Saïd + MOE"></label>
    <label>Date de la VTE<input type="date" data-f="vte.date" value="${esc(l.vte?.date||'')}"></label>
    <label>Faite par<input data-f="vte.par" value="${esc(l.vte?.par||'')}"></label>
    <label>Typologie<input data-f="vte.typo" value="${esc(l.vte?.typo||'')}" placeholder="Ex. C310XZ"></label>
@@ -612,7 +643,7 @@ function renderPanel(){
    <label>Diag plomb<select data-f="vte.pb"><option value="">—</option>${['Pas de plomb','Présence de plomb','En attente du diag'].map(o=>`<option ${l.vte?.pb===o?'selected':''}>${o}</option>`).join('')}</select></label>
   </div>
   ${(()=>{const M=modele(),g={};M.forEach(it=>(g[it.sec||it.lot]??=[]).push(it));return Object.entries(g).map(([lot,its])=>`<h3 class="cklot">${esc(lot)}</h3>${its.map(it=>{const v=(l.chk||{})[it.id]||{};const on=v.on===true,off=v.on===false;return `<div class="ck ${on||(it.txt&&v.txt)||(it.choix&&v.choix)?'on':''}"><div class="ckh"><span>${esc(it.lib)}${v.com?`<br><span style="font-size:13px;color:var(--mute);font-weight:400">Dalux : ${esc(v.com)}</span>`:''}</span>${it.txt?`<input data-ck="${it.id}|txt" value="${esc(v.txt||'')}" style="max-width:60%;min-height:38px;padding:4px 8px">`:it.choix?`<select data-ck="${it.id}|choix" style="width:auto;min-height:38px;padding:4px 8px"><option value="">—</option>${[...it.choix,...(v.choix&&!it.choix.includes(v.choix)?[v.choix]:[])].map(o=>`<option ${v.choix===o?'selected':''}>${esc(o)}</option>`).join('')}</select>`:`<span class="yn"><button class="${on?'sel':''}" data-ckon="${it.id}|1">Oui</button><button class="${off?'sel':''}" data-ckon="${it.id}|0">Non</button></span>`}</div>
-   ${on||(it.choix&&it.photo)?`<div class="ckb">${it.q?`<label>Quantité<input type="number" step="any" min="0" data-ck="${it.id}|q" value="${esc(v.q||'')}"></label>`:''}${it.loc?`<label>Localisation<input data-ck="${it.id}|loc" value="${esc(v.loc||'')}"></label>`:''}${it.dim?`<label>Dimensions<input data-ck="${it.id}|dim" value="${esc(v.dim||'')}" placeholder="Ex. 73 x 204"></label>`:''}<label>Code BPU<input data-ck="${it.id}|c" list="bpulist" value="${esc(v.c??it.c)}" autocomplete="off"></label>${assets?`<label>Photo<input type="file" accept="image/*" data-ckph="${it.id}"></label>`:''}</div>${(v.photos||[]).map(ph=>`<img src="${esc(blob(ph))}" alt="" class="ckimg">`).join('')}`:''}</div>`}).join('')}`).join('')})()}
+   ${on||(it.choix&&it.photo)?`<div class="ckb">${it.q?`<label>Quantité<input type="number" step="any" min="0" data-ck="${it.id}|q" value="${esc(v.q||'')}"></label>`:''}${it.loc?`<label>Localisation<input data-ck="${it.id}|loc" value="${esc(v.loc||'')}"></label>`:''}${it.dim?`<label>Dimensions<input data-ck="${it.id}|dim" value="${esc(v.dim||'')}" placeholder="Ex. 73 x 204"></label>`:''}<label>Code BPU<input data-ck="${it.id}|c" list="bpulist" value="${esc(v.c??it.c)}" autocomplete="off"></label></div>`:''}<div style="display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:6px">${assets?`<label class="b" style="min-height:36px;padding:0 12px;font-size:14px">📷 Photo${(v.photos||[]).length?' ('+v.photos.length+')':''}<input type="file" accept="image/*" class="fhide" data-ckph="${it.id}"></label>`:''}${(v.photos||[]).map(ph=>`<a href="${esc(driveLink(ph))}" target="_blank" rel="noopener"><img src="${esc(blob(ph))}" alt="" style="height:56px;width:56px;object-fit:cover;border-radius:8px;border:1px solid var(--line)"></a>`).join('')}</div></div>`}).join('')}`).join('')})()}
   <p style="margin:14px 0 6px;font-size:14px;color:var(--mute)">Autres provisions relevées sur place, hors fiche. Validées : ${eur(provMt(l))} · à valider : ${eur(provAv(l))}</p>
   ${(l.prov||[]).map((x,i)=>`<div class="res pv ${x.st==='ko'?'lev':''}"><span><b>${esc(x.type)}</b>${x.piece?' · '+esc(x.piece):''}<br><span style="font-size:13px;color:var(--mute)">${x.c?esc(x.c)+' · ':''}${esc(x.d||'')}${x.u?' · '+esc(x.u):''}${x.p?' · '+eur(+x.p):''}</span>${x.com?`<br><span style="font-size:14px">${esc(x.com)}</span>`:''}</span>
    <span class="pvc"><input type="number" step="any" min="0" data-pvq="${i}" value="${esc(x.q)}" aria-label="Quantité" style="width:80px;min-height:38px;padding:6px"><b class="num" style="white-space:nowrap">${eur(ligneMt(x))}</b>${lotSel('data-pvlot',i,lotOf(x))}<select data-pvst="${i}" style="width:auto;min-height:38px;padding:4px 8px" aria-label="Statut">${Object.entries(PST).map(([k,v])=>`<option value="${k}" ${(x.st||'av')===k?'selected':''}>${v}</option>`).join('')}</select><button class="b d" data-pvdel="${i}" aria-label="Supprimer" style="min-height:38px">✕</button></span>
@@ -736,6 +767,9 @@ async function act(a){
  if(a==='sync'){SY.err='';sync()}
  if(a==='cflink'){const c=conf();if(!c.u||!c.t)return toast('Réglez d\'abord la connexion');const url=location.origin+location.pathname+'#setup?u='+encodeURIComponent(c.u)+'&t='+encodeURIComponent(c.t);try{if(navigator.share){await navigator.share({title:'Évolud · ERBM',text:'Installe l\'appli ERBM :',url});return}}catch(e){if(e&&e.name==='AbortError')return}try{await navigator.clipboard.writeText(url);toast('Lien copié')}catch(e){prompt('Copiez ce lien :',url)}return}
  if(a==='cfsave'){SY.conf={u:$('cfu').value.trim(),t:$('cft').value.trim(),n:$('cfn').value.trim()};persistLocal();toast('Test de la connexion…');try{await api({action:'erbm',since:Date.now(),records:[]});SY.err='';toast('Connexion OK');sync()}catch(e){SY.err=String(e.message||e);toast(SY.err)}render()}
+ if(a==='planvt')return planifierVT();
+ if(a==='planics')return icsVT();
+ if(a==='planclear'){if(readonly)return toast('Lecture seule');if(!(await ask('Effacer tous les RDV de VTE pas encore faites ?')))return;logArr().filter(l=>!vtFaite(l)&&l.vte?.rdv).forEach(l=>{const c=JSON.parse(JSON.stringify(S.logs[l.id]));delete c.vte.rdv;c.maj=today();save('logements',l.id,c)});render();return toast('RDV effacés')}
  if(a==='moddalux'){if(readonly)return toast('Lecture seule');if(!(await ask('Remplacer le modèle de fiche VTE par le formulaire Dalux ?')))return;S.cfg={...S.cfg,modele:MODDEF};saveCfg();render();return toast('Formulaire Dalux remis')}
  if(a==='evimp'){location.hash='reglages';setTimeout(()=>act('evscan'),50)}
  if(a==='evscan'){$('evres').innerHTML='<p class="note">Recherche dans les données d\'Évolud…</p>';const G=await chargeEvolud();if(!G){$('evres').innerHTML='<p class="note warn">Logements Évolud introuvables sur ce téléphone. Ouvrez d\'abord Évolud et faites une synchro, ou utilisez l\'import Excel ci-dessous.</p>';return}
@@ -833,7 +867,7 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=$('q');q.focus();q.setSelectionRange(pos,pos)}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('sheet').classList.contains('on'))closePanel();if(e.key==='Enter'&&e.target.id==='jtxt')act('addj');if(e.key==='Enter'&&e.target.id==='rtxt')act('addres')});
-function route(){const h=location.hash.slice(1);S.view=['tableau','logements','tiroirs','reserves','reglages'].includes(h)?h:'tableau';render()}
+function route(){const h=location.hash.slice(1);S.view=['tableau','logements','planning','tiroirs','reserves','reglages'].includes(h)?h:'tableau';render()}
 addEventListener('hashchange',route);
 
 /* --- démarrage --- */
