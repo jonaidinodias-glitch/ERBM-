@@ -144,6 +144,17 @@ button.d{color:var(--red)}
 .pill{display:inline-block;padding:2px 8px;border-radius:20px;font-size:11.5px;font-weight:700;white-space:nowrap}.pill.r{background:#fbe0e0;color:var(--red)}.pill.o{background:#fde9d7;color:#a34a00}.pill.g{background:#dff3e0;color:#1b5e20}.pill.b{background:#dbe8fb;color:#1c4d9b}
 .mrow{display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}.mrow:last-child{border:0}.mrow b{font-variant-numeric:tabular-nums}
 @media(max-width:600px){nav{top:auto;background:#fff;box-shadow:0 -1px 3px rgba(20,40,80,.06)}nav a{font-size:10.5px;padding:7px 2px 8px}nav a.on{border-color:transparent}main{padding:12px 12px 110px}.sec{margin:0 8px 10px}.hero{padding:14px}}
+/* ===== Points d'arrêt · Concessionnaires · Poste de commandement (fait par Saïd OUFQIR) ===== */
+#dlgTxt{white-space:pre-line}
+.pa{border:1px solid var(--line);border-left:5px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:#fff}
+.pa.ok,.pa.so{border-left-color:var(--green)}.pa.nc{border-left-color:var(--red)}.pa.ph{border-left-color:var(--orange)}
+.pths{display:flex;gap:8px;flex-wrap:wrap;margin:8px 0;align-items:center}.pths img{width:64px;height:64px;object-fit:cover;border-radius:8px;border:1px solid var(--line);display:block}
+.pths .x{position:relative}.pths .x button{position:absolute;top:-7px;right:-7px;width:24px;height:24px;border-radius:50%;border:0;background:var(--red);color:#fff;font-size:12px;padding:0;cursor:pointer}
+.alv{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-left:auto}.seg button{border:0;background:#fff;font-weight:600;font-size:13px;min-height:34px;padding:0 10px;cursor:pointer;color:var(--ink)}.seg button.on{background:var(--navy);color:#fff}
+.card.pc{background:linear-gradient(135deg,#14213a,#1F3864);color:#fff}.card.pc h3{color:#fff}.card.pc .line{border-color:rgba(255,255,255,.15)}.card.pc .line .t small{color:rgba(255,255,255,.75)}
+.sig{font-size:12.5px;color:var(--mute);text-align:center;margin:24px 0 0}
+@media(max-width:600px){nav{justify-content:stretch;overflow:hidden}nav a{flex:1 1 0;min-width:0;padding:7px 0 8px;font-size:9px;letter-spacing:-.2px;white-space:nowrap;overflow:hidden;text-overflow:clip}nav a b{font-size:17px}}
 </style>
 </head>
 <body>
@@ -154,6 +165,8 @@ button.d{color:var(--red)}
 <a href="#planning" data-v="planning"><b>📅</b>Planning</a>
 <a href="#tiroirs" data-v="tiroirs"><b>🔁</b>Tiroirs</a>
 <a href="#reserves" data-v="reserves"><b>⚠️</b>Réserves</a>
+<a href="#reseaux" data-v="reseaux"><b>⚡</b>Réseaux</a>
+<a href="#decouvertes" data-v="decouvertes"><b>🔎</b>Imprévus</a>
 <a href="#reglages" data-v="reglages"><b>⚙️</b>Réglages</a>
 </nav>
 <main id="main"><p class="empty">Chargement des données du chantier…</p></main>
@@ -364,11 +377,12 @@ function applyRecs(recs){
 async function sync(){
  if(syncing){again=true;return}
  const c=conf();if(!c.u||!c.t){SY.err='serveur non réglé';setSt();return}
+ if(SY.qrOnly){if(!QR)return;syncing=true;SY.err='';setSt();try{const j=await api({action:'qrget',l:QR.l});if(j.l){S.logs={[QR.l]:{...j.l,_u:j.u}};S.cfg=j.cfg||{};SY.last=Date.now();persistLocal();if(!typing())render()}}catch(e){SY.err=String(e&&e.message||e).slice(0,140);if(!typing())render()}syncing=false;setSt();return}
  syncing=true;SY.err='';setSt();
  const keys=Object.keys(SY.dirty),sentU={};keys.forEach(k=>{sentU[k]=k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0)});
  const records=[].concat(...keys.map(recOf));
  try{
-  const j=await api({action:'erbm',since:SY.since||0,records});
+  const j=await api({action:'erbm',since:SY.since||0,records});if(j.qrKey)SY.qrKey=j.qrKey;
   keys.forEach(k=>{const now=k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0);if(now===sentU[k])delete SY.dirty[k]});
   const ch=applyRecs(j.records||[]);SY.since=j.now||Date.now();SY.last=Date.now();persistLocal();
   if(ch&&!typing())render();
@@ -407,6 +421,330 @@ const lotSel=(attr,i,cur)=>`<select ${attr}="${i}" aria-label="Intervenant" styl
 const escSt=e=>!e?.prevu?'':e.pose?'Posé':e.liv?'Livré':e.cmd?'Commandé':e.cotes?'Cotes prises':'À commander';
 const CURACT=['Démolir','Déposer','Conserver / protéger'];
 const CUREL=['Cloison','Mur / doublage','Plafond','Sol / chape','Conduit de cheminée','Escalier','Placard','Autre'];
+/* ===== POINTS D'ARRÊT · CONCESSIONNAIRES · VERROUS · POSTE DE COMMANDEMENT — conçu et développé par Saïd OUFQIR ===== */
+const PADEF=`Curage ; Curage terminé (photo de chaque pièce) ; TOUS ; Repérage amiante avant travaux disponible sur place
+Avant fermeture placo ; Réseaux électriques encastrés ; GR ; Gaines, boîtes, hauteurs prises et interrupteurs
+Avant fermeture placo ; Réseaux plomberie / chauffage ; GR ; Essai en pression, manomètre visible
+Avant fermeture placo ; Isolation des murs ; TOUS ; Épaisseur et étiquette R lisibles, pas de vide
+Avant fermeture placo ; Pare-vapeur et adhésifs ; TOUS ; Recouvrements scotchés, traversées traitées
+Avant fermeture placo ; Gaines VMC et traversées ; TOUS ; Gaines raccordées, fixées, calfeutrées
+Avant fermeture placo ; Étanchéité à l'air des menuiseries ; TOUS ; Compribande / membrane visible avant habillage
+Combles / rampants ; Isolation des rampants ; TOUS ; Continuité isolant + pare-vapeur
+Combles / rampants ; Soufflage combles : piges de hauteur ; TOUS ; Pige lisible, trappe isolée, déflecteurs en place
+Plancher bas (avant chape) ; Voûtains refaits ; GR ; Voûtains et poutrelles traités avant coulage
+Plancher bas (avant chape) ; Isolant plancher bas / sous chape ; TOUS ; Épaisseur et étiquette visibles
+Plancher bas (avant chape) ; Réseaux sous chape ; GR ; Fourreaux fixés et protégés
+Avant carrelage ; Étanchéité salle d'eau (SPEC) ; GR ; Bandes d'angle et SPEC avant carrelage`;
+const paModel=()=>(S.cfg.pamod||PADEF).split(/\r?\n/).map(x=>x.split(';').map(y=>y.trim())).filter(x=>x[0]&&x[1]).map(([ph,lib,nat,det])=>({id:slug(ph+'-'+lib),ph,lib,nat:/^ath$/i.test(nat||'')?'ATH':/^gr$/i.test(nat||'')?'GR':'TOUS',det:det||''}));
+const natOf=l=>{const it=modele().find(m=>/^ath ou gr$/.test(nrm(m.lib)));const c=it&&((l.chk||{})[it.id]||{}).choix;if(c)return c;return /\bath\b/i.test(l.type||'')?'ATH':'GR'};
+const paOf=l=>paModel().filter(m=>m.nat==='TOUS'||m.nat===natOf(l));
+const paSt=(l,m)=>((l.pa||{})[m.id])||{st:'todo',ph:[]};
+const PAL={todo:'À faire',ph:'Photo prise',ok:'Levé',nc:'Non conforme',so:'Sans objet'};
+const paStats=l=>{let n=0,d=0,nc=0,w=0;paOf(l).forEach(m=>{const s=paSt(l,m).st;n++;if(s==='ok'||s==='so')d++;if(s==='nc')nc++;if(s==='ph')w++});return {n,d,nc,w}};
+const CONC=['Enedis','GRDF','Eau','Autre'];
+const COBJ=['Mise hors tension / dépose avant travaux','Remplacement compteur volé ou dégradé','Raccordement / mise en service','Déplacement de compteur ou branchement','Suppression de branchement','Modification de puissance','Autre'];
+const CST=['À envoyer','Envoyée','Relancée','RDV fixé','Réalisée','Annulée'];
+const cOpen=d=>!['Réalisée','Annulée'].includes(d.st);
+const addDays=(s,n)=>{const d=new Date(s+'T12:00');d.setDate(d.getDate()+(+n||0));return d.toISOString().slice(0,10)};
+const relDelai=()=>Math.max(1,parseInt(S.cfg.relance)||7);
+const cDue=d=>(d.st==='Envoyée'||d.st==='Relancée')&&!!d.dRel&&d.dRel<=today();
+const cSoon=d=>d.st==='RDV fixé'&&!!d.dRdv&&days(d.dRdv)>=-1&&days(d.dRdv)<=7;
+const allDem=()=>{const o=[];logArr().forEach(l=>(l.cn||[]).forEach(d=>o.push({l,d})));return o};
+const nomL=l=>(l.num?'N° '+l.num+' ':'')+(l.adresse||'')+(l.ug?' (UG '+l.ug+')':'');
+const sigTxt=()=>(S.cfg.cdt||'Saïd OUFQIR')+(S.cfg.entreprise?' – '+S.cfg.entreprise:'');
+/* verrous : pas de curage sans diag amiante, pas de fermeture ni de réception sans points d'arrêt levés */
+function gate(l,i){const e=etapes(l)[i]||'',R=[];
+ if(/curage|travaux en cours/i.test(e)){const am=(l.vte||{}).am||'';if(!am||/attente/i.test(am))R.push('Diag amiante avant travaux non reçu : curage interdit.');else if(/présence/i.test(am)&&!l.amPlan)R.push('Amiante présent : plan de retrait / mode opératoire non validé (case à cocher dans « Points d\'arrêt »).')}
+ if(/travaux termin|vts|réception/i.test(e)){const ps=paOf(l).filter(m=>!['ok','so'].includes(paSt(l,m).st));if(ps.length)R.push(ps.length+' point(s) d\'arrêt non levé(s) : '+ps.slice(0,4).map(m=>m.lib).join(', ')+(ps.length>4?'…':''))}
+ if(/vts|réception/i.test(e)){const cb=(l.cn||[]).filter(d=>d.bloq&&cOpen(d));if(cb.length)R.push(cb.length+' demande(s) concessionnaire bloquante(s) en cours ('+cb.map(d=>d.conc).join(', ')+').')}
+ return R}
+/* niveau d'alerte par logement : 0 vert, 1 orange, 2 rouge */
+function alerte(l){const R=[],O=[];if(curIdx(l)>=etapes(l).length)return {lv:0,R,O};const Y=synth(l);
+ if(Y.vt&&Y.B.length)R.push(Y.B.length+' bloquant(s) VTE');
+ const ps=paStats(l);if(ps.nc)R.push(ps.nc+' point(s) d\'arrêt non conforme(s)');if(ps.w)O.push(ps.w+' point(s) d\'arrêt à valider');
+ (l.cn||[]).filter(cOpen).forEach(d=>{if(cDue(d))(d.bloq?R:O).push(d.conc+' : relance due'+(d.bloq?' (bloquant)':''));else if(d.st==='À envoyer')(d.bloq?R:O).push(d.conc+' : demande à envoyer')});
+ if(l.parcours==='TIR'&&l.tir&&l.tir.au&&!(l.et&&l.et[8])&&days(l.tir.au)<0)R.push('Retour tiroir dépassé de '+(-days(l.tir.au))+' j');
+ if(!vtFaite(l)&&l.vte&&l.vte.rdv&&l.vte.rdv<new Date().toISOString().slice(0,16))O.push('RDV VTE passé sans saisie');
+ if(resOuv(l).some(r=>r.date&&days(r.date)<-15))O.push('Réserve ouverte depuis plus de 15 j');
+ if(l.esc&&l.esc.prevu&&!l.esc.cmd)O.push('Escalier pas commandé');
+ (l.dec||[]).filter(d=>d.st!=='Traitée').forEach(d=>{if(d.grav==='Urgent sécurité'||/amiante/i.test(d.cat))R.push('Découverte urgente : '+d.cat);else if(d.st==='Ouverte')O.push('Découverte à chiffrer : '+d.cat)});
+ return {lv:R.length?2:O.length?1:0,R,O}}
+const ALC=['var(--green)','var(--orange)','var(--red)'];
+/* photo tamponnée (adresse, point, date, GPS) avant envoi sur Drive */
+function getPos(){return new Promise(r=>{try{if(!navigator.geolocation)return r(null);navigator.geolocation.getCurrentPosition(p=>r({lat:+p.coords.latitude.toFixed(6),lng:+p.coords.longitude.toFixed(6),acc:Math.round(p.coords.accuracy)}),()=>r(null),{enableHighAccuracy:true,timeout:7000,maximumAge:60000})}catch(e){r(null)}})}
+async function stamp(file,lines){const [pos,im]=await Promise.all([getPos(),new Promise((ok,ko)=>{const u=URL.createObjectURL(file);const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=u})]);
+ let w=im.naturalWidth,h=im.naturalHeight;const k=Math.min(1,1600/Math.max(w,h));w=Math.round(w*k);h=Math.round(h*k);
+ const c=document.createElement('canvas');c.width=w;c.height=h;const x=c.getContext('2d');x.drawImage(im,0,0,w,h);URL.revokeObjectURL(im.src);
+ const d=new Date();const all=[...lines,d.toLocaleString('fr-FR')+' · '+(pos?`GPS ${pos.lat}, ${pos.lng} (±${pos.acc} m)`:'GPS non disponible'),'ERBM · appli de Saïd OUFQIR'];
+ const fs=Math.max(14,Math.round(w/52)),lh=fs*1.3,bh=lh*all.length+fs*.7;x.fillStyle='rgba(0,0,0,.62)';x.fillRect(0,h-bh,w,bh);x.fillStyle='#fff';x.font=`600 ${fs}px Arial,sans-serif`;all.forEach((t,i)=>x.fillText(t,fs*.6,h-bh+fs*1.1+i*lh,w-fs*1.2));
+ const out=await new Promise(r=>c.toBlob(r,'image/jpeg',.85));return {blob:out,pos,ts:d.toISOString()}}
+function askTxt(t,ph,type){return new Promise(r=>{const p=$('dlgTxt');p.innerHTML=esc(t)+`<input id="dlgIn" type="${type||'text'}" style="margin-top:10px" placeholder="${esc(ph||'')}">`;$('dlg').classList.add('on');setTimeout(()=>{const i=$('dlgIn');if(i)i.focus()},60);const end=v=>{$('dlg').classList.remove('on');p.textContent='';r(v)};$('dlgOk').onclick=()=>end((($('dlgIn')||{}).value||'').trim());$('dlgNo').onclick=()=>end(null)})}
+function info(t){return new Promise(r=>{$('dlgTxt').textContent=t;$('dlgNo').style.display='none';$('dlgOk').textContent='Compris';$('dlg').classList.add('on');$('dlgOk').onclick=()=>{$('dlg').classList.remove('on');$('dlgNo').style.display='';$('dlgOk').textContent='Confirmer';r(true)}})}
+async function uploadPA(input){const f=input.files&&input.files[0],pid=input.dataset.paph;if(!f)return;if(readonly)return toast('Lecture seule');const l=S.logs[S.open],m=paModel().find(x=>x.id===pid);if(!l||!m)return;
+ try{toast('Photo : tampon date + GPS…');const r=await stamp(f,[`${l.ug?'UG '+l.ug+' · ':''}${l.num?'N° '+l.num+' ':''}${l.adresse||''}`,'Point d\'arrêt : '+m.lib]);toast('Envoi de la photo…');const a=await assets.upload(r.blob);
+  upd(x=>{x.pa={...(x.pa||{})};const c=x.pa[pid]||{st:'todo',ph:[]};x.pa[pid]={...c,ph:[...(c.ph||[]),{id:a.id,ts:r.ts,gps:r.pos}],st:c.st==='todo'||c.st==='nc'?'ph':c.st}});toast('Photo enregistrée')}
+ catch(e){toast('Photo non envoyée : '+((e&&e.message)||e))}input.value=''}
+async function paAct(pid,a){if(readonly)return toast('Lecture seule');const l=S.logs[S.open],m=paModel().find(x=>x.id===pid);if(!l||!m)return;const c=paSt(l,m),who=(SY.conf||{}).n||S.cfg.cdt||'Non renseigné',now=new Date().toISOString();const put=v=>upd(x=>{x.pa={...(x.pa||{})};x.pa[pid]=v});
+ if(a==='ok'){if(!(c.ph||[]).length)return toast('Photo obligatoire avant validation');return put({...c,st:'ok',by:who,at:now})}
+ if(a==='nc'){const t=await askTxt('Non conforme — '+m.lib+'\nCe qui ne va pas :','Ex. lame d\'air derrière l\'isolant');if(t===null)return;if(!t)return toast('Décrivez l\'anomalie');return upd(x=>{x.pa={...(x.pa||{})};x.pa[pid]={...c,st:'nc',com:t,by:'',at:''};x.journal=[...(x.journal||[]),{d:today(),t:'Point d\'arrêt NON CONFORME : '+m.lib+' — '+t}]})}
+ if(a==='so'){const t=await askTxt('Sans objet — '+m.lib+'\nMotif (obligatoire) :','Ex. pas de plancher bas sur ce type');if(t===null)return;if(!t)return toast('Le motif est obligatoire');return put({...c,st:'so',com:t,by:who,at:now})}
+ if(a==='re')return put({...c,st:(c.ph||[]).length?'ph':'todo',by:'',at:''});
+ if(a.startsWith('del')){const i=+a.slice(3);if(!(await ask('Retirer cette photo du point d\'arrêt ?')))return;const ph=(c.ph||[]).filter((_,k)=>k!==i);return put({...c,ph,st:ph.length?c.st:'todo',by:ph.length?c.by:'',at:ph.length?c.at:''})}}
+function paHtml(l){const L=paOf(l),s=paStats(l),g={};L.forEach(m=>(g[m.ph]??=[]).push(m));const am=(l.vte||{}).am||'';
+ return `<div class="sec" id="pa"><h3>🛑 Points d'arrêt · ${s.d}/${s.n} levés ${s.nc?`<span class="pill r">${s.nc} NC</span>`:''} ${s.w?`<span class="pill o">${s.w} à valider</span>`:''}</h3>
+ <p style="margin:0 0 8px;font-size:13px;color:var(--mute)">Nature <b>${esc(natOf(l))}</b>. Un point ne se valide qu'avec sa photo, tamponnée adresse + date + GPS. Tant qu'un point n'est pas levé, « Travaux terminés » et la réception restent verrouillées.</p>
+ ${/présence/i.test(am)?`<label class="chk"><input type="checkbox" data-f="amPlan" ${l.amPlan?'checked':''}> Amiante : plan de retrait / mode opératoire validé (déverrouille le curage)</label>`:''}
+ ${Object.entries(g).map(([ph,ms])=>{const ok=ms.every(m=>['ok','so'].includes(paSt(l,m).st));return `<h3 class="cklot">${esc(ph)} ${ok?'<span class="pill g">Fermeture autorisée</span>':'<span class="pill r">Fermeture interdite</span>'}</h3>${ms.map(m=>{const c=paSt(l,m),phs=c.ph||[],fin=c.st==='ok'||c.st==='so';return `<div class="pa ${c.st}"><div class="ckh"><b>${esc(m.lib)}</b><span class="pill ${fin?'g':c.st==='nc'?'r':c.st==='ph'?'o':'b'}">${PAL[c.st]}</span></div>${m.det?`<div style="font-size:13px;color:var(--mute)">${esc(m.det)}</div>`:''}
+ <div class="pths">${phs.map((p,i)=>`<span class="x"><a href="${esc(driveLink(p.id))}" target="_blank" rel="noopener"><img src="${esc(blob(p.id))}" alt="Photo ${esc(m.lib)}"></a>${fin?'':`<button data-pa="${m.id}|del${i}" aria-label="Retirer la photo">✕</button>`}</span>`).join('')}${fin?'':`<label class="b" style="min-height:64px;width:64px;padding:0;font-size:12px;flex-direction:column;gap:0">📷<span>Photo</span><input type="file" accept="image/*" class="fhide" data-paph="${m.id}"></label>`}</div>
+ ${c.com?`<div style="font-size:14px"><b>${c.st==='so'?'Motif':'Constat'} :</b> ${esc(c.com)}</div>`:''}${c.by?`<div style="font-size:13px;color:var(--mute)">${c.st==='so'?'Sans objet':'Levé'} par ${esc(c.by)} le ${esc(new Date(c.at).toLocaleString('fr-FR'))}</div>`:''}
+ <div class="tools" style="margin:8px 0 0">${fin?`<button class="b" data-pa="${m.id}|re">Rouvrir</button>`:`<button class="b p" data-pa="${m.id}|ok" ${phs.length?'':'disabled style="opacity:.45" title="Photo obligatoire"'}>Valider</button><button class="b d" data-pa="${m.id}|nc">Non conforme</button><button class="b" data-pa="${m.id}|so">Sans objet</button>`}</div></div>`}).join('')}`}).join('')}
+ <div class="tools"><button class="b" data-act="preuve">📄 Dossier de preuves (PDF)</button></div></div>`}
+/* concessionnaires */
+function cnCard(l,d,withLog){const due=cDue(d),soon=cSoon(d),nRel=(d.hist||[]).filter(h=>/relance/i.test(h.t)).length,o=cOpen(d);
+ return `<div class="res" style="border-left:5px solid ${due?'var(--red)':soon?'var(--orange)':d.st==='Réalisée'?'var(--green)':'var(--line)'}"><span><b>${esc(d.conc)} — ${esc(d.objet)}</b> <span class="pill ${d.st==='Réalisée'?'g':due?'r':d.st==='RDV fixé'?'o':'b'}">${esc(d.st)}</span>${d.bloq&&o?' <span class="pill r">Bloquante</span>':''}<br><span style="font-size:13px;color:var(--mute)">${withLog?`<a href="#" data-open="${l.id}">${esc(lname(l))}</a> · `:''}${d.ref?'Réf. '+esc(d.ref)+' · ':''}demandée le ${esc(fdate(d.dDem))}${o&&['Envoyée','Relancée'].includes(d.st)?` · relance le <b style="color:${due?'var(--red)':'inherit'}">${esc(fdate(d.dRel))}</b>`:''}${d.dRdv?' · RDV le <b>'+esc(fdate(d.dRdv))+'</b>':''}${nRel?' · '+nRel+' relance(s)':''}</span>${d.note?`<br><span style="font-size:14px">${esc(d.note)}</span>`:''}</span>
+ <span class="pvc">${d.st==='À envoyer'?`<button class="b p" data-cn="${l.id}|${d.id}|sent">Envoyée</button>`:''}${o&&['Envoyée','Relancée'].includes(d.st)?`<button class="b p" data-cn="${l.id}|${d.id}|rel">Relancer</button>`:''}${o?`<button class="b" data-cn="${l.id}|${d.id}|txt">Mail</button><button class="b" data-cn="${l.id}|${d.id}|rdv">RDV</button><button class="b" data-cn="${l.id}|${d.id}|done">Réalisée</button>`:''}<button class="b" data-cn="${l.id}|${d.id}|edit">Modifier</button></span></div>`}
+function cnHtml(l){const L=l.cn||[],sug=[],has=c=>L.some(d=>d.conc===c&&cOpen(d));const ch=re=>{const x=vCk(l,re);return x?(x.v.choix||''):''};
+ const ce=ch(/^compteur electrique/),cg=ch(/^compteur gaz/),cw=ch(/^compteur eau/),coms=Object.values(l.chk||{}).map(v=>v.com||'').join(' ');
+ if((/absent|vol/i.test(ce)||/compteur vol/i.test(coms))&&!has('Enedis'))sug.push(['Enedis','Remplacement compteur volé ou dégradé']);
+ if(/déposer|absent/i.test(cg)&&!has('GRDF'))sug.push(['GRDF',/déposer/i.test(cg)?'Suppression de branchement':'Raccordement / mise en service']);
+ if(/absent|hors gel/i.test(cw)&&!has('Eau'))sug.push(['Eau',/absent/i.test(cw)?'Raccordement / mise en service':'Déplacement de compteur ou branchement']);
+ return `<div class="sec" id="cn"><h3>⚡ Concessionnaires (${L.filter(cOpen).length} en cours)</h3>
+ ${sug.map(([c,o])=>`<div class="note warn" style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap"><span>Relevé en VTE : demande ${esc(c)} à lancer (${esc(o)})</span><button class="b p" data-cnnew="${l.id}|${esc(c)}|${esc(o)}">Créer la demande</button></div>`).join('')}
+ ${L.length?L.map(d=>cnCard(l,d)).join(''):'<p style="margin:0;color:var(--mute);font-size:14px">Aucune demande.</p>'}
+ <div class="tools"><button class="b" data-cnnew="${l.id}">+ Demande Enedis / GRDF / eau</button></div></div>`}
+function editCn(lid,did,pre){const l=S.logs[lid];if(!l)return;const d=(l.cn||[]).find(x=>x.id===did)||{conc:(pre&&pre[0])||'Enedis',objet:(pre&&pre[1])||COBJ[0],st:'À envoyer',dDem:today(),bloq:true};const isNew=!did,back=S.open,fiche=S.fiche;S.open=null;S.fiche=null;$('sheet').classList.add('on');
+ $('panel').innerHTML=`<div class="top"><h2>${isNew?'Nouvelle demande':'Demande '+esc(d.conc)}</h2><button class="b" id="cnx">Fermer</button></div><div class="sec"><div class="grid">
+ <label style="grid-column:1/-1">Logement<select id="cnl">${logArr().map(x=>`<option value="${x.id}" ${x.id===lid?'selected':''}>${esc(lname(x))}</option>`).join('')}</select></label>
+ <label>Concessionnaire<select id="cnc">${CONC.map(c=>`<option ${d.conc===c?'selected':''}>${c}</option>`).join('')}</select></label>
+ <label>Objet<select id="cno">${[...COBJ,...(COBJ.includes(d.objet)?[]:[d.objet])].map(c=>`<option ${d.objet===c?'selected':''}>${esc(c)}</option>`).join('')}</select></label>
+ <label>Référence (n° demande, PDL, PCE)<input id="cnr" value="${esc(d.ref||'')}"></label>
+ <label>Statut<select id="cns">${CST.map(c=>`<option ${d.st===c?'selected':''}>${c}</option>`).join('')}</select></label>
+ <label>Date de la demande<input type="date" id="cnd" value="${esc(d.dDem||today())}"></label>
+ <label>Prochaine relance<input type="date" id="cnrl" value="${esc(d.dRel||'')}"></label>
+ <label>RDV d'intervention<input type="date" id="cnv" value="${esc(d.dRdv||'')}"></label>
+ <label class="chk"><input type="checkbox" id="cnb" ${d.bloq?'checked':''}> Bloque les travaux</label>
+ <label style="grid-column:1/-1">Note<input id="cnn" value="${esc(d.note||'')}" placeholder="Ex. compteur volé constaté en VTE, plainte déposée"></label></div>
+ <p style="font-size:13px;color:var(--mute)">Relance laissée vide = date de la demande + ${relDelai()} jours (réglable dans Réglages).</p>
+ ${(d.hist||[]).length?`<details><summary style="cursor:pointer;font-weight:600">Historique (${d.hist.length})</summary>${d.hist.map(h=>`<p style="margin:4px 0;font-size:14px">${esc(new Date(h.d).toLocaleString('fr-FR'))} · ${esc(h.t)}</p>`).join('')}</details>`:''}
+ <div class="tools"><button class="b p" id="cnsave">Enregistrer</button>${isNew?'':'<button class="b d" id="cndel">Supprimer</button>'}</div></div>`;
+ const fin=()=>{if(back&&S.logs[back]){S.open=back;S.fiche=fiche;renderPanel()}else $('sheet').classList.remove('on');render()};
+ $('cnx').onclick=fin;
+ $('cnsave').onclick=()=>{if(readonly)return toast('Lecture seule');const nl=$('cnl').value,st=$('cns').value,dd=$('cnd').value||today();
+  const n={...d,id:d.id||uid(),conc:$('cnc').value,objet:$('cno').value,ref:$('cnr').value.trim(),st,dDem:dd,dRel:$('cnrl').value||addDays(dd,relDelai()),dRdv:$('cnv').value,bloq:$('cnb').checked,note:$('cnn').value.trim(),hist:[...(d.hist||[]),{d:new Date().toISOString(),t:(isNew?'Création':'Modification')+' ('+st+')'}]};
+  if(!isNew&&nl!==lid){const o=JSON.parse(JSON.stringify(S.logs[lid]));o.cn=(o.cn||[]).filter(x=>x.id!==d.id);o.maj=today();save('logements',lid,o)}
+  const t=JSON.parse(JSON.stringify(S.logs[nl]));t.cn=[...(t.cn||[]).filter(x=>x.id!==n.id),n];t.maj=today();save('logements',nl,t);toast('Demande enregistrée');fin()};
+ if(!isNew)$('cndel').onclick=async()=>{if(!(await ask('Supprimer cette demande ?')))return;const o=JSON.parse(JSON.stringify(S.logs[lid]));o.cn=(o.cn||[]).filter(x=>x.id!==d.id);o.maj=today();save('logements',lid,o);fin()}}
+async function cnAct(lid,did,a){if(readonly)return toast('Lecture seule');if(!S.logs[lid])return;const o=JSON.parse(JSON.stringify(S.logs[lid])),d=(o.cn||[]).find(x=>x.id===did);if(!d)return;const H=t=>{d.hist=[...(d.hist||[]),{d:new Date().toISOString(),t}]};const keep=()=>{o.maj=today();save('logements',lid,o);render()};
+ if(a==='edit')return editCn(lid,did);
+ if(a==='txt'){const t=`Bonjour,\n\nJe reviens vers vous concernant la demande ${d.ref?'n° '+d.ref+' ':''}(${d.objet.toLowerCase()}) pour le logement ${nomL(o)}${o.cite?', '+o.cite:''}, transmise le ${new Date(d.dDem+'T12:00').toLocaleDateString('fr-FR')}.\n${d.bloq?'Cette intervention conditionne la poursuite de nos travaux de réhabilitation (programme ERBM).\n':''}Pourriez-vous m'indiquer la date d'intervention prévue ?\n\nCordialement,\n${sigTxt()}`;
+  return showText('Mail de relance · '+d.conc,t,()=>{if(['Envoyée','Relancée'].includes(d.st)){d.st='Relancée';d.dRel=addDays(today(),relDelai());H('Relance (mail)');o.maj=today();save('logements',lid,o)}})}
+ if(a==='sent'){d.st='Envoyée';d.dDem=today();d.dRel=addDays(today(),relDelai());H('Envoyée');return keep()}
+ if(a==='rel'){d.st='Relancée';d.dRel=addDays(today(),relDelai());H('Relance');toast('Relance notée · prochaine le '+fdate(d.dRel));return keep()}
+ if(a==='done'){d.st='Réalisée';H('Réalisée');return keep()}
+ if(a==='rdv'){const v=await askTxt('Date du RDV '+d.conc+' :','','date');if(!v)return;d.dRdv=v;d.st='RDV fixé';H('RDV fixé au '+fdate(v));return keep()}}
+function showText(title,txt,onCopy){const back=S.open,fiche=S.fiche;S.open=null;S.fiche=null;$('sheet').classList.add('on');
+ $('panel').innerHTML=`<div class="top"><h2>${esc(title)}</h2><button class="b" id="stx">Fermer</button></div><div class="sec"><textarea id="stt" style="min-height:55vh;font-size:14px;line-height:1.45">${esc(txt)}</textarea><div class="tools"><button class="b p" id="stc">Copier</button>${navigator.share?'<button class="b" id="sts">Partager (mail, WhatsApp…)</button>':''}</div><p class="sig">Généré par l'appli ERBM de Saïd OUFQIR</p></div>`;$('panel').scrollTop=0;
+ const fin=()=>{if(back&&S.logs[back]){S.open=back;S.fiche=fiche;renderPanel()}else $('sheet').classList.remove('on');render()};
+ $('stx').onclick=fin;
+ $('stc').onclick=async()=>{const v=$('stt').value;try{await navigator.clipboard.writeText(v);toast('Copié')}catch(e){$('stt').select();try{document.execCommand('copy');toast('Copié')}catch(x){toast('Sélectionnez le texte et copiez-le')}}if(onCopy)onCopy()};
+ if($('sts'))$('sts').onclick=async()=>{try{await navigator.share({title,text:$('stt').value});if(onCopy)onCopy()}catch(e){}}}
+/* --- poste de commandement : ordre du jour, SITREP, objectifs --- */
+const secTxt=(t,arr)=>t+'\n'+(arr.length?arr.map(x=>'  • '+x).join('\n'):'  RAS')+'\n';
+function txtBriefing(){const L=logArr(),j=today(),dem=addDays(j,1),AL=L.map(l=>({l,a:alerte(l)}));
+ const vte=L.filter(l=>!vtFaite(l)&&l.vte&&l.vte.rdv&&l.vte.rdv.slice(0,10)===j).sort((a,b)=>a.vte.rdv.localeCompare(b.vte.rdv)).map(l=>l.vte.rdv.slice(11,16)+' · '+nomL(l)+(l.loc&&l.loc.nom?' · '+l.loc.nom:'')+(l.loc&&l.loc.tel?' '+l.loc.tel:'')+(l.vte.rdvPar?' · avec '+l.vte.rdvPar:''));
+ const rouges=AL.filter(o=>o.a.lv===2).map(o=>nomL(o.l)+' → '+o.a.R.join(' ; '));
+ const pa=[];L.forEach(l=>paOf(l).forEach(m=>{const c=paSt(l,m);if(c.st==='nc')pa.push('NON CONFORME · '+m.lib+' · '+nomL(l)+(c.com?' — '+c.com:''));if(c.st==='ph')pa.push('À valider · '+m.lib+' · '+nomL(l))}));
+ const cn=[];allDem().forEach(({l,d})=>{if(cDue(d))cn.push('RELANCER '+d.conc+' · '+d.objet+' · '+nomL(l)+(d.ref?' · réf. '+d.ref:''));if(d.st==='RDV fixé'&&(d.dRdv===j||d.dRdv===dem))cn.push('RDV '+d.conc+(d.dRdv===j?" AUJOURD'HUI":' DEMAIN')+' · '+nomL(l)+' : prévoir accès et locataire');if(d.st==='À envoyer')cn.push('ENVOYER la demande '+d.conc+' · '+d.objet+' · '+nomL(l))});
+ const am=L.filter(l=>!vtFaite(l)?false:(!(l.vte||{}).am||/attente/i.test(l.vte.am))&&curIdx(l)<etapes(l).length).map(nomL);
+ const tir=L.filter(l=>l.parcours==='TIR'&&l.tir&&l.tir.au&&!(l.et&&l.et[8])&&days(l.tir.au)<=7).map(l=>nomL(l)+' · retour '+(days(l.tir.au)<0?'DÉPASSÉ de '+(-days(l.tir.au))+' j':'dans '+days(l.tir.au)+' j'));
+ const esc2=L.filter(l=>l.esc&&l.esc.prevu&&!l.esc.cmd).map(l=>nomL(l)+(l.esc.cotes?' · cotes prises, À COMMANDER':' · cotes à faire prendre'));
+ const res=[];L.forEach(l=>resOuv(l).forEach(r=>{if(r.date&&days(r.date)<-15)res.push(nomL(l)+' · '+r.txt+' ('+(-days(r.date))+' j)')}));
+ const avg=L.length?Math.round(L.reduce((s,l)=>s+pct(l),0)/L.length):0;
+ const rdvJ=[];L.forEach(l=>(l.rdv||[]).forEach(r=>{if(r.st==='Prévu'&&r.dt&&r.dt.slice(0,10)===j)rdvJ.push(r.dt.slice(11,16)+' · '+r.type+' · '+nomL(l)+(r.obj?' · '+r.obj:'')+(r.qui?' · '+r.qui:'')+(l.loc&&l.loc.tel?' · tél. '+l.loc.tel:''))}));rdvJ.sort();
+ const decU=[];L.forEach(l=>(l.dec||[]).forEach(d=>{if(d.st==='Ouverte')decU.push((d.grav==='Urgent sécurité'||/amiante/i.test(d.cat)?'URGENT · ':'À chiffrer · ')+d.cat+' · '+nomL(l)+' — '+d.txt)}));decU.sort();
+ vte.push(...rdvJ.map(x=>'RDV '+x));rouges.push(...decU.filter(x=>x.startsWith('URGENT')));
+ return `ORDRE DU JOUR — ${S.cfg.nom||'Chantier ERBM'}\n${new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}\n\n1. SITUATION\n  ${L.length} logements · avancement moyen ${avg} % · ${AL.filter(o=>o.a.lv===2).length} rouge(s) · ${AL.filter(o=>o.a.lv===1).length} orange(s)\n\n`
+  +secTxt('2. VTE ET RDV LOCATAIRES (GR / GPA) DU JOUR',vte)+'\n'+secTxt('3. LOGEMENTS EN ROUGE (priorité absolue)',rouges)+'\n'+secTxt('4. POINTS D\'ARRÊT À TRAITER',pa)+'\n'+secTxt('5. CONCESSIONNAIRES',cn)+'\n'+secTxt('6. DIAGS AMIANTE À RÉCLAMER (curage bloqué)',am)+'\n'+secTxt('7. TIROIRS (retours ≤ 7 j)',tir)+'\n'+secTxt('8. ESCALIERS À COMMANDER',esc2)+'\n'+secTxt('9. RÉSERVES OUVERTES > 15 JOURS',res)+'\n'+secTxt('10. DÉCOUVERTES CHANTIER À TRAITER',decU)
+  +`\nCONSIGNES PERMANENTES\n  • Aucune fermeture sans photo de point d'arrêt.\n  • Aucun curage sans diag amiante.\n  • Toute anomalie remontée le jour même.\n\n${sigTxt()}`}
+function txtSitrep(){const L=logArr(),d7=addDays(today(),-7),nowI=new Date().toISOString().slice(0,16),f7=new Date(Date.now()+7*864e5).toISOString().slice(0,16),AL=L.map(l=>({l,a:alerte(l)}));
+ const cnt={};L.forEach(l=>etapes(l).forEach((e,i)=>{const d=l.et&&l.et[i];if(d&&d>=d7)cnt[e]=(cnt[e]||0)+1}));
+ let paW=0;L.forEach(l=>Object.values(l.pa||{}).forEach(p=>{if(p.st==='ok'&&(p.at||'').slice(0,10)>=d7)paW++}));
+ const pas=L.reduce((s,l)=>{const p=paStats(l);s.n+=p.n;s.d+=p.d;s.nc+=p.nc;return s},{n:0,d:0,nc:0});
+ const rec=L.filter(l=>{const i=etapes(l).indexOf('VTS / réception');return i>=0&&l.et&&l.et[i]&&l.et[i]>=d7});
+ const DM=allDem(),cnR=DM.filter(({d})=>(d.hist||[]).some(h=>/Réalisée/.test(h.t)&&h.d.slice(0,10)>=d7)).length;
+ const avg=L.length?Math.round(L.reduce((s,l)=>s+pct(l),0)/L.length):0;
+ const amM=L.filter(l=>vtFaite(l)&&(!(l.vte||{}).am||/attente/i.test(l.vte.am))&&curIdx(l)<etapes(l).length);
+ const cnEsc=DM.filter(({d})=>cOpen(d)&&d.bloq&&(d.hist||[]).filter(h=>/relance/i.test(h.t)).length>=2);
+ const rouges=AL.filter(o=>o.a.lv===2);
+ return `SITREP HEBDOMADAIRE — ${S.cfg.nom||'Chantier ERBM'}${S.cfg.bailleur?' · '+S.cfg.bailleur:''}\nPériode du ${new Date(d7+'T12:00').toLocaleDateString('fr-FR')} au ${new Date().toLocaleDateString('fr-FR')}\n\n1. ÉTAT DES FORCES\n  Logements : ${L.length} (GR ${L.filter(l=>l.parcours==='GR').length} · tiroirs ${L.filter(l=>l.parcours==='TIR').length})\n  VTE faites : ${L.filter(vtFaite).length}/${L.length}\n  Avancement moyen : ${avg} %\n  Points d'arrêt levés : ${pas.d}/${pas.n}${pas.nc?' · '+pas.nc+' non conforme(s)':''}\n  Montant HT engagé : ${eur(L.reduce((s,l)=>s+montant(l),0))}\n\n2. RÉALISÉ SUR 7 JOURS\n  VTE faites : ${L.filter(l=>((l.vte||{}).date||'')>=d7).length}\n  Étapes franchies : ${Object.entries(cnt).map(([e,k])=>e+' ×'+k).join(' · ')||'aucune'}\n  Points d'arrêt levés : ${paW}\n  Réceptions : ${rec.length}${rec.length?' ('+eur(rec.reduce((s,l)=>s+montant(l),0))+' HT)':''}\n  Interventions concessionnaires réalisées : ${cnR}\n\n`
+  +secTxt('3. MENACES ET BLOCAGES ('+rouges.length+' logement(s) en rouge)',rouges.slice(0,15).map(o=>nomL(o.l)+' → '+o.a.R.join(' ; ')))+'\n4. SEMAINE À VENIR\n  VTE planifiées : '+L.filter(l=>!vtFaite(l)&&l.vte&&l.vte.rdv&&l.vte.rdv>=nowI&&l.vte.rdv<=f7).length+'\n  Retours locataires (tiroirs) : '+L.filter(l=>l.parcours==='TIR'&&l.tir&&l.tir.au&&!(l.et&&l.et[8])&&days(l.tir.au)>=0&&days(l.tir.au)<=7).length+'\n  Relances concessionnaires dues : '+DM.filter(({d})=>cDue(d)).length+'\n\n'
+  +secTxt('5. DEMANDES AU MAÎTRE D\'OUVRAGE',[...(amM.length?[amM.length+' diag(s) amiante manquant(s), curage bloqué : '+amM.slice(0,12).map(l=>l.ug||nomL(l)).join(', ')+(amM.length>12?'…':'')]:[]),...cnEsc.map(({l,d})=>'Appui pour débloquer '+d.conc+' ('+d.objet+') · '+nomL(l)+' · '+(d.hist||[]).filter(h=>/relance/i.test(h.t)).length+' relances sans réponse')])
+  +`\n${sigTxt()}`}
+function txtCible(){const L=logArr().filter(l=>curIdx(l)<etapes(l).length&&pct(l)>0).map(l=>{const a=alerte(l),reste=etapes(l).filter((_,i)=>!(l.et&&l.et[i])),pa=paOf(l).filter(m=>!['ok','so'].includes(paSt(l,m).st)).length;return {l,a,reste,pa,score:pct(l)-a.lv*30-pa*2-resOuv(l).length*3}}).filter(o=>o.a.lv<2).sort((x,y)=>y.score-x.score).slice(0,10);
+ return `OBJECTIFS DE LA SEMAINE — ${S.cfg.nom||'Chantier ERBM'}\nLes ${L.length} logements les plus proches de la réception, sans blocage rouge. Effort principal sur eux.\n\n`
+  +(L.map((o,i)=>`${i+1}. ${nomL(o.l)} — ${pct(o.l)} %\n   Reste : ${o.reste.join(' → ')}${o.pa?'\n   Points d\'arrêt à lever : '+o.pa:''}${resOuv(o.l).length?'\n   Réserves ouvertes : '+resOuv(o.l).length:''}${o.a.O.length?'\n   Attention : '+o.a.O.join(' ; '):''}`).join('\n\n')||'Aucun logement engagé pour l\'instant.')+`\n\n${sigTxt()}`}
+/* dossier de preuves PDF : points d'arrêt avec photos, historique concessionnaires, réserves */
+async function dossierPreuve(l){if(!l)return;toast('Préparation du dossier de preuves…');
+ try{if(!window.jspdf)await new Promise((ok,ko)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js';sc.onload=ok;sc.onerror=ko;document.head.appendChild(sc)});
+  const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4'}),X=15,W=180;let y=16;
+  const clean=t=>String(t??'').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').replace(/ | /g,' ').replace(/[^\x00-\xFF€]/g,'-');
+  const line=(t,o={})=>{doc.setFont('helvetica',o.b?'bold':'normal');doc.setFontSize(o.s||10);doc.splitTextToSize(clean(t),W).forEach(r=>{if(y>282){doc.addPage();y=16}doc.text(r,X,y);y+=(o.s||10)*.45});y+=o.gap??1.5};
+  const img=async id=>{try{const bl=await (await fetch(blob(id))).blob();const du=await new Promise(ok=>{const fr=new FileReader();fr.onload=()=>ok(fr.result);fr.readAsDataURL(bl)});const im=await new Promise((ok,ko)=>{const i=new Image();i.onload=()=>ok(i);i.onerror=ko;i.src=du});let w=80,h=im.height*80/im.width;if(h>70){h=70;w=im.width*70/im.height}return {du,w,h}}catch(e){return null}};
+  line('DOSSIER DE PREUVES - POINTS D\'ARRÊT',{s:15,b:true});line(lname(l),{s:12,b:true});line([l.cite,(P[l.parcours]||{}).nom,'Nature '+natOf(l),'Amiante : '+((l.vte||{}).am||'non renseigné')].filter(Boolean).join(' - '));line('Édité le '+new Date().toLocaleString('fr-FR')+' - '+sigTxt());y+=3;
+  for(const m of paOf(l)){const c=paSt(l,m);line(m.ph+' - '+m.lib+' : '+PAL[c.st],{b:true,s:11});if(c.com)line((c.st==='so'?'Motif : ':'Constat : ')+c.com);if(c.by)line('Validé par '+c.by+' le '+new Date(c.at).toLocaleString('fr-FR'));
+   for(const p of (c.ph||[])){line('Photo du '+new Date(p.ts).toLocaleString('fr-FR')+(p.gps?' - GPS '+p.gps.lat+', '+p.gps.lng+' (±'+p.gps.acc+' m)':' - sans GPS'),{s:9,gap:.5});const I=await img(p.id);if(I){if(y+I.h>285){doc.addPage();y=16}doc.addImage(I.du,'JPEG',X,y,I.w,I.h);y+=I.h+3}else line('Photo : '+driveLink(p.id),{s:9})}y+=2}
+  if((l.cn||[]).length){y+=2;line('CONCESSIONNAIRES',{s:12,b:true});l.cn.forEach(d=>{line(d.conc+' - '+d.objet+' - '+d.st+(d.ref?' - réf. '+d.ref:''),{b:true});(d.hist||[]).forEach(h=>line('   '+new Date(h.d).toLocaleString('fr-FR')+' : '+h.t,{s:9,gap:.5}))})}
+  if((l.res||[]).length){y+=2;line('RÉSERVES',{s:12,b:true});l.res.forEach(r=>line('- '+r.txt+(r.lot?' ('+r.lot+')':'')+' - '+r.etat+(r.lev?' le '+r.lev:'')))}
+  await downloads.save({filename:`dossier-preuves-${l.ug||l.num||'logement'}.pdf`,data:doc.output('blob')});toast('Dossier prêt')}
+ catch(e){toast('Dossier impossible pour le moment')}}
+function vReseaux(){const DM=allDem(),F={open:['En cours',o=>cOpen(o.d)],due:['À relancer',o=>cDue(o.d)],rdv:['RDV ≤ 7 j',o=>cSoon(o.d)],env:['À envoyer',o=>o.d.st==='À envoyer'],bloq:['Bloquantes',o=>o.d.bloq&&cOpen(o.d)],all:['Toutes',()=>true]};const k=F[S.cf]?S.cf:'open';
+ const L=DM.filter(F[k][1]).sort((a,b)=>(cDue(b.d)-cDue(a.d))||String(a.d.dRel||a.d.dDem||'').localeCompare(String(b.d.dRel||b.d.dDem||'')));const nd=DM.filter(o=>cDue(o.d)).length;
+ return `<h2 style="margin-bottom:6px">Concessionnaires</h2><div class="kpis">${CONC.map(c=>`<div class="kpi"><b>${DM.filter(o=>o.d.conc===c&&cOpen(o.d)).length}</b><span>${esc(c)} en cours</span></div>`).join('')}<div class="kpi ${nd?'r':'g'}"><b>${nd}</b><span>relances dues</span></div></div>
+ <div class="tools"><button class="b p" data-cnnew="">+ Nouvelle demande</button><button class="b" data-act="csvcn">Export CSV</button></div>
+ <div class="chips" style="margin:0 0 12px">${Object.entries(F).map(([key,[t,f]])=>`<button class="b" data-cf="${key}" style="min-height:38px;${k===key?'background:var(--navy);color:#fff;border-color:var(--navy)':''}">${t} (${DM.filter(f).length})</button>`).join('')}</div>
+ ${L.length?L.map(o=>cnCard(o.l,o.d,true)).join(''):'<p class="note">Aucune demande dans cette liste.</p>'}
+ <p class="note">Les compteurs volés ou absents relevés en VTE (ou par le robot Dalux) sont proposés dans la fiche du logement. Relance automatique tous les ${relDelai()} jours.</p><p class="sig">ERBM · conçu et développé par Saïd OUFQIR</p>`}
+/* ===== TÂCHES INTERVENANTS (ordre imposé) · POINTAGE QR · RDV GR/GPA · BALANCE +/− ===== */
+let QR=null;
+const METIERS=['Électricien','Plombier / chauffagiste','Cureur','Menuisier ext.','Plaquiste','Peintre','Menuisier int.','Carreleur / sols','Nettoyage','Autre'];
+const TK=[
+ ['cons_e','Consignation électricité','Électricien',[],'Démarrage (avant curage)'],
+ ['cons_g','Consignation gaz','Plombier / chauffagiste',[],'Démarrage (avant curage)'],
+ ['cons_w','Consignation eau','Plombier / chauffagiste',[],'Démarrage (avant curage)'],
+ ['curage','Curage','Cureur',['cons_e','cons_g','cons_w'],'Curage'],
+ ['inc_e','Incorporation électricité','Électricien',['curage'],'Réseaux et clos'],
+ ['inc_p','Incorporation plomberie','Plombier / chauffagiste',['curage'],'Réseaux et clos'],
+ ['mext','Menuiseries extérieures','Menuisier ext.',['curage'],'Réseaux et clos'],
+ ['placo','Placo','Plaquiste',['inc_e','inc_p','mext'],'Second œuvre'],
+ ['enduit','Enduit','Plaquiste',['placo'],'Second œuvre'],
+ ['mint','Menuiserie intérieure','Menuisier int.',['placo'],'Second œuvre'],
+ ['faience','Faïence','Carreleur / sols',['placo'],'Second œuvre'],
+ ['carrel','Carrelage','Carreleur / sols',['placo'],'Second œuvre'],
+ ['poncage','Ponçage','Peintre',['enduit'],'Finitions'],
+ ['pein1','Peinture 1re couche','Peintre',['poncage'],'Finitions'],
+ ['app_p','Appareillage plomberie','Plombier / chauffagiste',['faience'],'Finitions'],
+ ['app_e','Appareillage électrique','Électricien',['pein1'],'Finitions'],
+ ['pein2','Peinture 2e couche','Peintre',['pein1','mint'],'Finitions'],
+ ['solsoup','Sol souple','Carreleur / sols',['pein2'],'Finitions'],
+ ['net1','Nettoyage 1','Nettoyage',['pein2'],'Finitions'],
+ ['mee','Mise en eau','Plombier / chauffagiste',['app_p'],'Essais avant réception'],
+ ['test_e','Test électrique','Électricien',['app_e'],'Essais avant réception'],
+ ['test_v','Test VMC','Électricien',['app_e'],'Essais avant réception'],
+ ['netf','Nettoyage final','Nettoyage',['net1','solsoup','carrel','mee','test_e','test_v'],'Essais avant réception']
+].map(([id,lib,m,pre,ph])=>({id,lib,m,pre,ph}));
+const TKL={todo:'À faire',go:'En cours',ok:'Terminé',np:'Non prévu'};
+const tkS=(l,t)=>((l.tk||{})[t.id])||{st:'todo'};
+const tkDone=(l,id)=>{const s=tkS(l,{id}).st;return s==='ok'||s==='np'};
+function tkLock(l,t){const R=[];t.pre.forEach(p=>{if(!tkDone(l,p))R.push('« '+TK.find(x=>x.id===p).lib+' » pas terminé')});
+ if(t.id==='curage'){const am=(l.vte||{}).am||'';if(!am||/attente/i.test(am))R.push('diag amiante non reçu');else if(/présence/i.test(am)&&!l.amPlan)R.push('plan de retrait amiante non validé')}
+ if(t.id==='placo'){const ps=paOf(l).filter(m=>/fermeture/i.test(m.ph)&&!['ok','so'].includes(paSt(l,m).st));if(ps.length)R.push(ps.length+' point(s) d\'arrêt avant fermeture non levé(s)')}
+ if(['carrel','faience','solsoup'].includes(t.id)){const ps=paOf(l).filter(m=>/chape|carrelage/i.test(m.ph)&&!['ok','so'].includes(paSt(l,m).st));if(ps.length)R.push(ps.length+' point(s) d\'arrêt sol / SPEC non levé(s)')}
+ return R}
+/* téléphone intervenant : chaque action part au serveur (clé limitée), qui l'ajoute au logement sans rien écraser */
+async function qrOp(op){try{const j=await api({action:'qrput',l:QR.l,op});if(j.l){S.logs[QR.l]={...j.l,_u:j.u};persistLocal()}return true}catch(e){toast('Non enregistré : '+((e&&e.message)||e));throw e}}
+function tkSet(lid,tid,st,who,photo){if(SY.qrOnly){const t=TK.find(x=>x.id===tid);return qrOp({op:'tk',tid,st,n:who.n,e:who.e||'',ph:photo||'',lib:t?t.lib:tid})}const o=JSON.parse(JSON.stringify(S.logs[lid]));const t=TK.find(x=>x.id===tid);o.tk={...(o.tk||{})};const c=o.tk[tid]||{st:'todo'};
+ o.tk[tid]={...c,st,by:who.n,ent:who.e||'',at:new Date().toISOString(),upd:today(),ph:photo?[...(c.ph||[]),photo]:(c.ph||[])};
+ o.journal=[...(o.journal||[]),{d:today(),t:t.lib+' : '+TKL[st]+' ('+who.n+(who.e?' · '+who.e:'')+')'}];o.maj=today();save('logements',lid,o);sched(300)}
+const ME_K='erbm_intervenant';
+const meGet=()=>{try{return JSON.parse(localStorage.getItem(ME_K)||'null')}catch(e){return null}};
+const meSet=v=>{try{localStorage.setItem(ME_K,JSON.stringify(v))}catch(e){}};
+const presents=l=>(l.pt||[]).filter(p=>!p.out&&(p.in||'').slice(0,10)===today());
+async function pointer(lid,me,sens){const pos=await getPos();if(SY.qrOnly)return qrOp({op:sens,n:me.n,e:me.e||'',m:me.m||'',gps:pos});const o=JSON.parse(JSON.stringify(S.logs[lid]));o.pt=[...(o.pt||[])];const now=new Date().toISOString();
+ if(sens==='in')o.pt.push({id:uid(),n:me.n,e:me.e||'',m:me.m||'',in:now,gps:pos});
+ else{const i=o.pt.map(p=>p.n===me.n&&!p.out&&(p.in||'').slice(0,10)===today()).lastIndexOf(true);if(i>=0)o.pt[i]={...o.pt[i],out:now,gpsOut:pos}}
+ o.pt=o.pt.slice(-300);o.maj=today();save('logements',lid,o);sched(300)}
+async function upPhoto(l,b,comment){const b64=await toJpeg(b);const ug=String(l.ug||l.num||'ERBM');const j=await api({action:'photo',ug,name:'ERBM_'+ug+'_'+Date.now()+'.jpg',b64,kind:'ERBM',meta:{adresse:l.adresse||'',ts:Date.now(),comment}});return j.fileId}
+function tkHtml(l){const pres=presents(l),hist=(l.pt||[]).slice(-10).reverse();
+ return `<div class="sec" id="tk"><h3>🔧 Tâches intervenants & présence</h3>
+ <p style="margin:0 0 8px;font-size:13px;color:var(--mute)">Les sous-traitants scannent le QR du logement : arrivée, départ, et état de leurs travaux (photo obligatoire pour « Terminé »). Une tâche reste verrouillée 🔒 tant que celles d'avant ne sont pas terminées.</p>
+ <div class="tools" style="margin-top:0"><button class="b p" data-act="qrshow">🔳 QR code du logement</button></div>
+ <p style="margin:6px 0"><b>Présents maintenant :</b> ${pres.length?pres.map(p=>esc(p.n)+' ('+esc(p.m||'')+(p.e?' · '+esc(p.e):'')+') depuis '+esc(new Date(p.in).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}))).join(' · '):'personne'}</p>
+ ${TK.map((t,i)=>{const h=(i===0||TK[i-1].ph!==t.ph)?`<h3 class="cklot">${esc(t.ph)}</h3>`:'';const c=tkS(l,t),lk=c.st==='todo'?tkLock(l,t):[];
+  return h+`<div class="ckh" style="padding:6px 0;border-bottom:1px solid var(--line)"><span>${esc(t.lib)} <span style="font-size:12px;color:var(--mute)">· ${esc(t.m)}</span>${lk.length?`<br><span style="font-size:12px;color:var(--red)">🔒 ${lk.map(esc).join(' · ')}</span>`:''}${c.by?`<br><span style="font-size:12px;color:var(--mute)">${esc(TKL[c.st])} · ${esc(c.by)}${c.ent?' ('+esc(c.ent)+')':''} · ${esc(fdate(c.upd||''))}</span>`:''}${(c.ph||[]).map(id=>` <a href="${esc(driveLink(id))}" target="_blank" rel="noopener">📷</a>`).join('')}</span><select data-tkadm="${t.id}" aria-label="${esc(t.lib)}" style="width:auto;min-height:38px;padding:4px 8px">${Object.entries(TKL).map(([k,v])=>`<option value="${k}" ${c.st===k?'selected':''} ${lk.length&&(k==='go'||k==='ok')?'disabled':''}>${v}</option>`).join('')}</select></div>`}).join('')}
+ ${hist.length?`<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:600">Derniers pointages (${(l.pt||[]).length})</summary>${hist.map(p=>`<p style="margin:4px 0;font-size:14px">${esc(new Date(p.in).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}))} → ${p.out?esc(new Date(p.out).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})):'<b>présent</b>'} · ${esc(p.n)} · ${esc(p.m||'')}${p.e?' · '+esc(p.e):''}${p.gps?' · 📍 GPS':''}</p>`).join('')}</details>`:''}</div>`}
+/* QR code par logement */
+function loadScript(src,test){if(test())return Promise.resolve();return new Promise((ok,ko)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s)})}
+const loadJsPDF=()=>loadScript('https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js',()=>!!window.jspdf);
+const loadQR=()=>loadScript('https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',()=>!!window.QRCode);
+function qrUrl(lid){const c=conf();return location.origin+location.pathname+'#qr?u='+encodeURIComponent(c.u)+'&t='+encodeURIComponent(SY.qrKey)+'&l='+encodeURIComponent(lid)}
+const qrPret=()=>{const c=conf();if(!c.u||!c.t){toast('Réglez d\'abord la connexion au serveur (Réglages)');return false}if(!SY.qrKey){toast('Clé intervenant absente : mettez le serveur en version 5.2, puis touchez ⟳ Synchro');return false}return true};
+async function qrImg(txt){await loadQR();const d=document.createElement('div');d.style.cssText='position:fixed;left:-9999px;top:0';document.body.appendChild(d);new QRCode(d,{text:txt,width:600,height:600,correctLevel:QRCode.CorrectLevel.M});const c=d.querySelector('canvas');const u=c.toDataURL('image/png');d.remove();return u}
+async function showQR(lid){if(!qrPret())return;const l=S.logs[lid];if(!l)return;let u;try{u=await qrImg(qrUrl(lid))}catch(e){return toast('Générateur de QR indisponible (connexion ?)')}
+ const back=S.open,fiche=S.fiche;S.open=null;S.fiche=null;$('sheet').classList.add('on');
+ $('panel').innerHTML=`<div class="top"><h2>QR du logement</h2><button class="b" id="qrx">Fermer</button></div><div class="sec" style="text-align:center"><img src="${u}" alt="QR code du logement" style="width:min(320px,80vw)"><p><b>${esc(lname(l))}</b><br>${esc(l.cite||'')}</p><p style="font-size:14px;color:var(--mute)">À coller sur la porte du logement. Le scan donne : plans, fiche travaux du métier, pointage de présence, pointage des travaux.</p><div class="tools" style="justify-content:center"><button class="b p" id="qrdl">Télécharger l'image</button></div><p class="note warn" style="text-align:left">Ce QR contient la clé du chantier : ne le donnez qu'aux intervenants du chantier.</p></div>`;
+ $('qrdl').onclick=async()=>{const b=await (await fetch(u)).blob();if(!dl('QR_'+(l.ug||l.num||'logement')+'.png',b))toast('Téléchargement impossible ici')};
+ $('qrx').onclick=()=>{if(back&&S.logs[back]){S.open=back;S.fiche=fiche;renderPanel()}else $('sheet').classList.remove('on');render()}}
+async function qrPlanche(){if(!qrPret())return;const L=logArr();if(!L.length)return toast('Aucun logement');toast('Génération de '+L.length+' QR codes…');
+ try{await loadQR();await loadJsPDF();const {jsPDF}=window.jspdf,doc=new jsPDF({unit:'mm',format:'a4'});const clean=t=>String(t??'').replace(/[‘’]/g,"'").replace(/[–—]/g,'-').replace(/ | /g,' ').replace(/[^\x00-\xFF€]/g,'-');
+  let i=0;for(const l of L){const k=i%12;if(i&&!k)doc.addPage();const x=10+(k%3)*65,y=10+Math.floor(k/3)*70;doc.addImage(await qrImg(qrUrl(l.id)),'PNG',x+7.5,y,50,50);
+   doc.setFont('helvetica','bold');doc.setFontSize(9);doc.text(clean((l.ug?'UG '+l.ug:'')+(l.num?'  N° '+l.num:'')),x+32.5,y+54,{align:'center'});doc.setFont('helvetica','normal');doc.setFontSize(8);doc.text(doc.splitTextToSize(clean((l.adresse||'')+(l.cite?' - '+l.cite:'')),60).slice(0,2),x+32.5,y+58,{align:'center'});doc.setFontSize(7);doc.text('Plans - fiche travaux - pointage',x+32.5,y+66,{align:'center'});i++}
+  await downloads.save({filename:'planche-QR-ERBM.pdf',data:doc.output('blob')});toast('Planche QR prête')}catch(e){toast('Planche QR impossible pour le moment')}}
+/* vue intervenant (après scan du QR) */
+function vQR(){const l0=S.logs[QR.l];if(!l0)return `<div class="empty"><h2>Chargement du logement…</h2><p>${SY.err?esc(SY.err)+'<br><br>Code de ce téléphone : <b>'+esc(conf().d)+'</b> — à donner au conducteur de travaux pour autorisation.':'Connexion au serveur en cours.'}</p></div>`;
+ const l={id:QR.l,...l0},me=meGet();
+ if(!me||!me.n||!me.m)return `<div class="card"><h3>${esc(lname(l))}</h3><p>Identifiez-vous une seule fois sur ce téléphone.</p><div class="grid"><label>Nom et prénom<input id="qn" value="${esc((me||{}).n||'')}"></label><label>Entreprise<input id="qe" value="${esc((me||{}).e||'')}"></label><label>Métier<select id="qm">${METIERS.map(m=>`<option ${(me||{}).m===m?'selected':''}>${esc(m)}</option>`).join('')}</select></label></div><div class="tools"><button class="b p" data-act="qrme">Valider</button></div></div>`;
+ const pres=presents(l),moi=pres.find(p=>p.n===me.n),mine=TK.filter(t=>t.m===me.m),open=mine.filter(t=>!['ok','np'].includes(tkS(l,t).st)),pend=mine.filter(t=>tkS(l,t).st==='go'&&tkS(l,t).upd!==today());
+ const actionable=open.filter(t=>tkS(l,t).st==='go'||!tkLock(l,t).length);const canLeave=!pend.length&&(!actionable.length||mine.some(t=>tkS(l,t).upd===today()));const am=(l.vte||{}).am||'non renseigné';
+ const cons=['cons_e','cons_g','cons_w'].map(id=>TK.find(t=>t.id===id).lib.replace('Consignation ','')+(tkDone(l,id)?' ✅':' ❌')).join(' · ');
+ const F=INTERV.includes(me.m)?ficheData(l,me.m):null;
+ return `<div class="hero"><div><h2>${esc(lname(l))}</h2><p>${esc(l.cite||'')}${l.type?' · '+esc(l.type):''} · ${esc((P[l.parcours]||{}).nom||'')}</p><p>${esc(me.n)} · ${esc(me.m)}${me.e?' · '+esc(me.e):''}</p></div></div>
+ <div class="card"><h3>📍 Présence</h3>${moi?`<p style="margin:0 0 8px">Pointé depuis <b>${esc(new Date(moi.in).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}))}</b>.</p><button class="b p" data-act="qrout" ${canLeave?'':'disabled style="opacity:.45"'}>🏁 Je pars</button>${canLeave?'':'<p class="note warn" style="margin:8px 0 0">Avant de partir, déclarez l\'état de vos travaux ci-dessous (en cours ou terminé).</p>'}`:`<button class="b p" data-act="qrin" style="min-height:56px;font-size:17px">📍 J'arrive dans le logement</button><p style="font-size:13px;color:var(--mute)">Pointage obligatoire avant tout travail. Heure et position GPS enregistrées.</p>`}
+  <p style="margin:10px 0 0;font-size:14px"><b>Présents :</b> ${pres.length?pres.map(p=>esc(p.n)+' ('+esc(p.m||'')+')').join(' · '):'personne'}</p></div>
+ <div class="card"><h3>⚠️ Sécurité</h3><p style="margin:0">Amiante : <b>${esc(am)}</b> · Plomb : <b>${esc((l.vte||{}).pb||'non renseigné')}</b><br>Consignations : ${cons}${l.loc&&l.loc.note?'<br>Accès / contraintes : '+esc(l.loc.note):''}</p></div>
+ <div class="card"><h3>🔧 Mes travaux (${esc(me.m)})</h3>${mine.length?mine.map(t=>{const c=tkS(l,t),lk=c.st==='todo'?tkLock(l,t):[];return `<div class="pa ${c.st==='ok'||c.st==='np'?'ok':c.st==='go'?'ph':''}"><div class="ckh"><b>${esc(t.lib)}</b><span class="pill ${c.st==='ok'||c.st==='np'?'g':c.st==='go'?'o':'b'}">${TKL[c.st]}</span></div>${lk.length?`<p style="margin:6px 0 0;color:var(--red);font-size:14px">🔒 ${lk.map(esc).join(' · ')}</p>`:''}${c.by?`<p style="margin:4px 0 0;font-size:13px;color:var(--mute)">${esc(c.by)} · ${esc(fdate(c.upd||''))}</p>`:''}
+  ${c.st==='ok'||c.st==='np'||lk.length?'':`<div class="tools" style="margin:8px 0 0">${c.st==='todo'?`<button class="b" data-tk="${t.id}|start" ${moi?'':'disabled style="opacity:.45"'}>Commencer</button>`:''}${c.st==='go'&&c.upd!==today()?`<button class="b" data-tk="${t.id}|cont" ${moi?'':'disabled style="opacity:.45"'}>Toujours en cours</button>`:''}<label class="b p" style="${moi?'':'opacity:.45;pointer-events:none'}">📷 Terminé (photo)<input type="file" accept="image/*" class="fhide" data-tkph="${t.id}" ${moi?'':'disabled'}></label></div>`}</div>`}).join(''):'<p style="margin:0;color:var(--mute)">Aucune tâche suivie pour ce métier.</p>'}${moi?'':'<p class="note" style="margin:8px 0 0">Pointez votre arrivée pour déclarer vos travaux.</p>'}</div>
+ <div class="card"><h3>🔎 Signaler une découverte</h3><p style="margin:0;font-size:14px;color:var(--mute)">Tuile cassée, fuite, bois pourri, fissure, amiante suspecté… Photo obligatoire, horodatée et géolocalisée.</p>${moi?decForm('qd'):'<p class="note" style="margin:8px 0 0">Pointez votre arrivée pour signaler une découverte.</p>'}</div>
+ <div class="card"><h3>🗂 Plan du logement</h3>${l.tech&&l.tech.planId?(l.tech.planKind==='pdf'?`<p><a href="${esc(driveLink(l.tech.planId))}" target="_blank" rel="noopener">Ouvrir le plan (PDF)</a></p>`:`<a href="${esc(driveLink(l.tech.planId))}" target="_blank" rel="noopener"><img src="${esc(blob(l.tech.planId))}" alt="Plan" style="max-width:100%;border:1px solid var(--line);border-radius:10px"></a>`):typePlansHtml(l)}</div>
+ <div class="card"><h3>📋 Fiche travaux · ${esc(me.m)}</h3>${F&&F.lines.length?`<div class="scroll"><table class="ft"><thead><tr><th>Désignation</th><th>Qté</th><th>U</th></tr></thead><tbody>${F.lines.map(x=>`<tr><td>${srcLbl(x)}${esc(x.d||'')}${x.com?'<br><span style="color:var(--mute)">'+esc(x.com)+'</span>':''}</td><td class="num">${esc(x.q)}</td><td>${esc(x.u||'')}</td></tr>`).join('')}</tbody></table></div>`:'<p style="margin:0;color:var(--mute)">Pas de ligne pour ce métier dans la fiche travaux.</p>'}${l.tech&&l.tech.note?`<p style="margin:8px 0 0"><b>Consignes :</b> ${esc(l.tech.note)}</p>`:''}</div>
+ <details class="card"><summary style="cursor:pointer;font-weight:700;color:var(--navy)">Avancement de tous les corps d'état</summary>${TK.map(t=>`<div class="mrow"><span>${esc(t.lib)} <small style="color:var(--mute)">${esc(t.m)}</small></span><b>${TKL[tkS(l,t).st]}</b></div>`).join('')}</details>
+ <div class="tools"><button class="b" data-act="qrid">Changer d'intervenant</button>${SY.qrOnly?'':`<button class="b" data-open="${l.id}">Fiche complète</button><button class="b" data-act="qrquit">Quitter le mode QR</button>`}</div><p class="sig">ERBM · conçu et développé par Saïd OUFQIR</p>`}
+async function qrTk(tid,a,file){const l={id:QR.l,...S.logs[QR.l]},me=meGet(),t=TK.find(x=>x.id===tid);if(!me||!t)return;if(!presents(l).some(p=>p.n===me.n))return toast('Pointez d\'abord votre arrivée');const lk=tkS(l,t).st==='todo'?tkLock(l,t):[];if(lk.length)return info('🔒 '+t.lib+' verrouillé :\n• '+lk.join('\n• '));
+ if(a==='start'||a==='cont'){try{await tkSet(QR.l,tid,'go',me)}catch(e){return}toast(a==='start'?'Tâche commencée':'Noté : toujours en cours');return render()}
+ if(a==='done'&&file){try{toast('Photo : tampon date + GPS…');const r=await stamp(file,[`${l.ug?'UG '+l.ug+' · ':''}${l.num?'N° '+l.num+' ':''}${l.adresse||''}`,t.lib+' terminé · '+me.n+(me.e?' ('+me.e+')':'')]);toast('Envoi de la photo…');const id=await upPhoto(l,r.blob,t.lib+' terminé');await tkSet(QR.l,tid,'ok',me,id);toast('Travail déclaré terminé');render()}catch(e){toast('Photo non envoyée : '+((e&&e.message)||e))}}}
+/* RDV GR / GPA */
+const RDVT=['GR · travaux','GPA','VTS / réception','Autre'],RDVS=['Prévu','Fait','Locataire absent','Reporté','Annulé'];
+function rdvHtml(l){const R=(l.rdv||[]).slice().sort((a,b)=>String(b.dt).localeCompare(String(a.dt)));const ir=etapes(l).indexOf('VTS / réception'),dr=ir>=0&&l.et&&l.et[ir],gpa=dr?addDays(dr,365):'';
+ return `<div class="sec" id="rdv"><h3>📅 RDV locataire · GR / GPA</h3>${dr?`<p class="note" style="margin:0 0 8px">Réception le ${esc(fdate(dr))} · GPA jusqu'au <b>${esc(new Date(gpa+'T12:00').toLocaleDateString('fr-FR'))}</b>${days(gpa)<0?' (échue)':' ('+days(gpa)+' j restants)'}</p>`:''}
+ ${R.map(r=>`<div class="res"><span><b>${esc(r.type)}</b> · ${esc(r.dt?new Date(r.dt).toLocaleString('fr-FR',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'')}<br><span style="font-size:13px;color:var(--mute)">${esc(r.obj||'')}${r.qui?' · '+esc(r.qui):''}</span></span><span class="pvc"><select data-rdvst="${r.id}" aria-label="Statut" style="width:auto;min-height:38px;padding:4px 8px">${RDVS.map(s=>`<option ${r.st===s?'selected':''}>${s}</option>`).join('')}</select><button class="b d" data-rdvdel="${r.id}" aria-label="Supprimer">✕</button></span></div>`).join('')}
+ <div class="grid" style="margin-top:8px;background:var(--bg2);padding:12px;border-radius:12px"><label>Type<select id="rvt">${RDVT.map(t=>`<option ${dr&&t==='GPA'?'selected':''}>${t}</option>`).join('')}</select></label><label>Date et heure<input type="datetime-local" id="rvd"></label><label>Intervenant<input id="rvq" placeholder="Ex. plombier · Ent. Dupont"></label><label style="grid-column:1/-1">Objet<input id="rvo" placeholder="Ex. pose faïence SDB · fuite sous évier (GPA)"></label><div style="grid-column:1/-1"><button class="b p" data-act="addrdv">Ajouter le RDV</button></div></div></div>`}
+function rdvAll(){const A=[];logArr().forEach(l=>(l.rdv||[]).forEach(r=>A.push({l,r})));return A}
+function rdvPlanHtml(){const A=rdvAll(),nowI=new Date().toISOString().slice(0,16),late=A.filter(o=>o.r.st==='Prévu'&&o.r.dt&&o.r.dt<nowI),fut=A.filter(o=>o.r.st==='Prévu'&&o.r.dt&&o.r.dt>=nowI).sort((a,b)=>a.r.dt.localeCompare(b.r.dt)),J={};fut.forEach(o=>(J[o.r.dt.slice(0,10)]??=[]).push(o));
+ const ln=o=>`<div class="res" data-open="${o.l.id}" style="cursor:pointer"><span><b>${esc(o.r.dt.slice(11,16))}</b> · ${esc(o.r.type)} · ${esc(lname(o.l))}<br><span style="font-size:13px;color:var(--mute)">${esc(o.r.obj||'')}${o.r.qui?' · '+esc(o.r.qui):''}${o.l.loc&&o.l.loc.nom?' · '+esc(o.l.loc.nom):''}${o.l.loc&&o.l.loc.tel?' · '+esc(o.l.loc.tel):''}</span></span></div>`;
+ const gpaN=logArr().filter(l=>{const i=etapes(l).indexOf('VTS / réception');return i>=0&&l.et&&l.et[i]&&days(addDays(l.et[i],365))>=0}).length;
+ return `<h2 style="margin:28px 0 8px">RDV GR & GPA</h2><p class="note">${gpaN} logement(s) sous GPA. ${A.filter(o=>o.r.st==='Locataire absent').length} absence(s) locataire tracée(s).</p><div class="tools">${fut.length?'<button class="b" data-act="rdvics">Exporter vers le calendrier (.ics)</button>':''}</div>${late.length?`<div class="sec"><h3 style="color:#c0392b">RDV passés sans compte rendu (${late.length})</h3>${late.map(ln).join('')}</div>`:''}${Object.keys(J).sort().map(d=>`<div class="sec"><h3>${esc(jourFr(d))} · ${J[d].length} RDV</h3>${J[d].map(ln).join('')}</div>`).join('')||'<p class="note">Aucun RDV GR ou GPA à venir. Ajoutez-les dans la fiche du logement.</p>'}`}
+function rdvIcs(){const A=rdvAll().filter(o=>o.r.st==='Prévu'&&o.r.dt);const z=n=>String(n).padStart(2,'0'),f=d=>`${d.getFullYear()}${z(d.getMonth()+1)}${z(d.getDate())}T${z(d.getHours())}${z(d.getMinutes())}00`,e=t=>String(t||'').replace(/[,;\\]/g,' ').replace(/\n/g,' ');
+ const ev=A.map(({l,r})=>{const d=new Date(r.dt),d2=new Date(d.getTime()+60*6e4);return ['BEGIN:VEVENT','UID:erbm-rdv-'+r.id+'@evolud','DTSTAMP:'+f(new Date()),'DTSTART;TZID=Europe/Paris:'+f(d),'DTEND;TZID=Europe/Paris:'+f(d2),'SUMMARY:'+e(r.type+' · '+(l.num?l.num+' ':'')+(l.adresse||'')),'LOCATION:'+e((l.num?l.num+' ':'')+(l.adresse||'')+' '+(l.cite||'')),'DESCRIPTION:'+e((r.obj||'')+' · '+(r.qui||'')+(l.loc&&l.loc.nom?' · '+l.loc.nom:'')+(l.loc&&l.loc.tel?' '+l.loc.tel:'')),'END:VEVENT'].join('\r\n')});
+ if(!dl('rdv-gr-gpa-erbm.ics',new Blob([['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Evolud//ERBM//FR',...ev,'END:VCALENDAR'].join('\r\n')],{type:'text/calendar'})))toast('Téléchargement impossible ici')}
+/* Balance plus-values / moins-values */
+const BST=['Proposé','Validé MOE','Refusé'];
+const balMt=x=>(x.sens==='-'?-1:1)*(+x.q||0)*(+x.p||0);
+const balV=l=>(l.bal||[]).filter(x=>x.st==='Validé MOE').reduce((s,x)=>s+balMt(x),0);
+function balHtml(l){const B=l.bal||[],a=B.filter(x=>x.st==='Proposé').reduce((s,x)=>s+balMt(x),0);
+ return `<div class="sec" id="bal"><h3>⚖️ Balance + / − · validée ${eur(balV(l))}${a?' · en attente '+eur(a):''}</h3>
+ ${B.map(x=>`<div class="res"><span><b style="color:${x.sens==='-'?'var(--red)':'var(--green)'}">${x.sens==='-'?'−':'+'} ${esc(x.d||x.c)}</b><br><span style="font-size:13px;color:var(--mute)">${x.c?esc(x.c)+' · ':''}${esc(String(x.q))} ${esc(x.u||'')} × ${eur(+x.p||0)} = <b>${eur(balMt(x))}</b>${x.motif?' · '+esc(x.motif):''} · ${esc(fdate(x.date))}</span></span><span class="pvc"><select data-balst="${x.id}" aria-label="Statut" style="width:auto;min-height:38px;padding:4px 8px">${BST.map(s=>`<option ${x.st===s?'selected':''}>${s}</option>`).join('')}</select><button class="b d" data-baldel="${x.id}" aria-label="Supprimer">✕</button></span></div>`).join('')}
+ <div class="grid" style="margin-top:8px;background:var(--bg2);padding:12px;border-radius:12px"><label>Sens<select id="bls"><option value="+">+ Plus-value (travaux en plus)</option><option value="-">− Moins-value (travaux en moins)</option></select></label><label>Code BPU ou libellé<input id="blc" list="bpulist" autocomplete="off" placeholder="Code BPU ou description"></label><label>Quantité<input id="blq" type="number" step="any" min="0" value="1"></label><label>PU HT (si hors BPU)<input id="blp" type="number" step="any" min="0" placeholder="auto avec un code BPU"></label><label style="grid-column:1/-1">Motif / justification<input id="blm" placeholder="Ex. voûtain effondré découvert au curage, ordre MOE du 12/11"></label><div style="grid-column:1/-1"><button class="b p" data-act="addbal">Ajouter à la balance</button></div></div></div>`}
+function vBalance(){const all=[];logArr().forEach(l=>(l.bal||[]).forEach(x=>all.push({l,x})));const sum=f=>all.filter(f).reduce((s,o)=>s+balMt(o.x),0);const L=logArr().filter(l=>(l.bal||[]).length);
+ const pv=sum(o=>o.x.sens!=='-'&&o.x.st==='Validé MOE'),mv=sum(o=>o.x.sens==='-'&&o.x.st==='Validé MOE'),att=sum(o=>o.x.st==='Proposé');
+ return `<h2>Balance plus-values / moins-values</h2><div class="kpis"><div class="kpi g"><b style="font-size:22px">${eur(pv)}</b><span>plus-values validées</span></div><div class="kpi r"><b style="font-size:22px">${eur(mv)}</b><span>moins-values validées</span></div><div class="kpi ${pv+mv>=0?'g':'r'}"><b style="font-size:22px">${eur(pv+mv)}</b><span>solde validé</span></div><div class="kpi o"><b style="font-size:22px">${eur(att)}</b><span>en attente MOE (${all.filter(o=>o.x.st==='Proposé').length} ligne(s))</span></div></div>
+ <div class="tools"><button class="b" data-act="csvbal">Export CSV</button><button class="b" data-go="tableau">← Tableau</button></div>
+ ${L.length?`<div class="scroll"><table class="ft"><thead><tr><th>Logement</th><th>+ validé</th><th>− validé</th><th>Solde</th><th>En attente</th></tr></thead><tbody>${L.map(l=>{const s=f=>l.bal.filter(f).reduce((a,x)=>a+balMt(x),0);return `<tr data-open="${l.id}" style="cursor:pointer"><td>${esc(lname(l))}</td><td class="num">${eur(s(x=>x.sens!=='-'&&x.st==='Validé MOE'))}</td><td class="num">${eur(s(x=>x.sens==='-'&&x.st==='Validé MOE'))}</td><td class="num"><b>${eur(s(x=>x.st==='Validé MOE'))}</b></td><td class="num">${eur(s(x=>x.st==='Proposé'))}</td></tr>`}).join('')}</tbody></table></div>`:'<p class="note">Aucune ligne. Ajoutez les plus et moins-values dans la fiche de chaque logement (section Balance).</p>'}<p class="sig">ERBM · conçu et développé par Saïd OUFQIR</p>`}
+/* Découvertes chantier (imprévus) : photo horodatée + GPS, passage en balance + */
+const DCAT=['Couverture (tuile cassée, fuite toiture)','Charpente','Plancher bois pourri','Voûtain / plancher bas','Maçonnerie / fissure','Réseaux (fuite, câblage dangereux)','Humidité / infiltration','Amiante suspecté','Autre'];
+const DGR=['À chiffrer','Urgent sécurité','Pour information'],DST=['Ouverte','En balance','Traitée'];
+async function decAdd(lid,who,files,cat,txt,grav){const l=S.logs[lid],ph=[];for(const f of files){toast('Photo '+(ph.length+1)+'/'+files.length+' : tampon + envoi…');const r=await stamp(f,[`${l.ug?'UG '+l.ug+' · ':''}${l.num?'N° '+l.num+' ':''}${l.adresse||''}`,'DÉCOUVERTE : '+cat]);ph.push({id:await upPhoto(l,r.blob,'Découverte '+cat),ts:r.ts,gps:r.pos})}
+ if(SY.qrOnly){const x={id:uid(),cat,txt,grav,ph};await qrOp({op:'dec',n:who.n,e:who.e||'',dec:x});return x}
+ const o=JSON.parse(JSON.stringify(S.logs[lid])),d={id:uid(),cat,txt,grav,st:'Ouverte',ph,date:today(),at:new Date().toISOString(),by:who.n+(who.e?' ('+who.e+')':'')};o.dec=[...(o.dec||[]),d];o.journal=[...(o.journal||[]),{d:today(),t:'Découverte : '+cat+' — '+txt+' ('+d.by+')'}];o.maj=today();save('logements',lid,o);sched(300);return d}
+function decCard(l,d,withLog){const urg=d.grav==='Urgent sécurité'||/amiante/i.test(d.cat);return `<div class="res" style="border-left:5px solid ${d.st==='Traitée'?'var(--green)':urg?'var(--red)':'var(--orange)'}"><span><b>${esc(d.cat)}</b> <span class="pill ${d.st==='Traitée'?'g':d.st==='En balance'?'b':'o'}">${esc(d.st)}</span>${urg&&d.st!=='Traitée'?' <span class="pill r">Urgent</span>':''}<br><span style="font-size:14px">${esc(d.txt)}</span><br><span style="font-size:13px;color:var(--mute)">${withLog?`<a href="#" data-open="${l.id}">${esc(lname(l))}</a> · `:''}${esc(new Date(d.at).toLocaleString('fr-FR'))} · ${esc(d.by||'')}${(d.ph||[]).some(p=>p.gps)?' · 📍 GPS':''}</span><span class="pths">${(d.ph||[]).map(p=>`<a href="${esc(driveLink(p.id))}" target="_blank" rel="noopener"><img src="${esc(blob(p.id))}" alt="Photo de la découverte"></a>`).join('')}</span></span><span class="pvc">${d.st==='Ouverte'?`<button class="b p" data-dec="${l.id}|${d.id}">➕ En balance</button>`:''}<select data-decst="${l.id}|${d.id}" aria-label="Statut" style="width:auto;min-height:38px;padding:4px 8px">${DST.map(s=>`<option ${d.st===s?'selected':''}>${s}</option>`).join('')}</select></span></div>`}
+const decForm=p=>`<div class="grid" style="margin-top:8px;background:var(--bg2);padding:12px;border-radius:12px"><label>Catégorie<select id="${p}c">${DCAT.map(c=>`<option>${esc(c)}</option>`).join('')}</select></label><label>Gravité<select id="${p}g">${DGR.map(c=>`<option>${c}</option>`).join('')}</select></label><label style="grid-column:1/-1">Constat<input id="${p}t" placeholder="Ex. 6 tuiles cassées versant rue, fuite au droit de la souche"></label><label style="grid-column:1/-1">Photos (obligatoire)<input type="file" id="${p}p" accept="image/*" multiple></label><div style="grid-column:1/-1"><button class="b p" data-act="${p==='dc'?'adddec':'qrdec'}">Enregistrer la découverte</button></div></div>`;
+function decHtml(l){const D=(l.dec||[]).slice().reverse();return `<div class="sec" id="dec"><h3>🔎 Découvertes chantier (${D.filter(d=>d.st==='Ouverte').length} ouverte(s))</h3><p style="margin:0 0 8px;font-size:13px;color:var(--mute)">Imprévu découvert en travaux : photo obligatoire, horodatée et géolocalisée. « En balance » la fait chiffrer en plus-value à faire valider par la MOE.</p>${D.map(d=>decCard(l,d)).join('')}${decForm('dc')}</div>`}
+async function decSubmit(p,lid,who){const files=[...(($(p+'p')||{}).files||[])],txt=($(p+'t')||{}).value?.trim()||'';if(!txt)return toast('Décrivez le constat');if(!files.length)return toast('Photo obligatoire');try{const d=await decAdd(lid,who,files,$(p+'c').value,txt,$(p+'g').value);toast('Découverte enregistrée');if(S.open)renderPanel();render();return d}catch(e){toast('Découverte non envoyée : '+((e&&e.message)||e))}}
+function decToBal(lid,did){const l=S.logs[lid],d=(l&&l.dec||[]).find(x=>x.id===did);if(!d)return;S.balDec={lid,did};if(S.open!==lid)openPanel(lid);setTimeout(()=>{const s=$('bal');if(!s)return;$('bls').value='+';$('blm').value='Découverte du '+new Date(d.at).toLocaleDateString('fr-FR')+' : '+d.cat+' — '+d.txt;s.scrollIntoView({behavior:'smooth',block:'start'});$('blc').focus();toast('Choisissez le code BPU et la quantité, puis « Ajouter à la balance »')},120)}
+function vDecouvertes(){const A=[];logArr().forEach(l=>(l.dec||[]).forEach(d=>A.push({l,d})));const F={open:['Ouvertes',o=>o.d.st==='Ouverte'],urg:['Urgentes',o=>(o.d.grav==='Urgent sécurité'||/amiante/i.test(o.d.cat))&&o.d.st!=='Traitée'],bal:['En balance',o=>o.d.st==='En balance'],all:['Toutes',()=>true]};const k=F[S.df]?S.df:'open';const L=A.filter(F[k][1]).sort((a,b)=>String(b.d.at).localeCompare(String(a.d.at)));
+ const balD=A.filter(o=>o.d.bal).reduce((s,o)=>{const x=(o.l.bal||[]).find(b=>b.id===o.d.bal);return s+(x?balMt(x):0)},0);
+ return `<h2 style="margin-bottom:6px">Découvertes chantier</h2><div class="kpis"><div class="kpi o"><b>${A.filter(F.open[1]).length}</b><span>ouvertes, à chiffrer</span></div><div class="kpi ${A.filter(F.urg[1]).length?'r':''}"><b>${A.filter(F.urg[1]).length}</b><span>urgentes / amiante</span></div><div class="kpi"><b>${A.filter(F.bal[1]).length}</b><span>en balance</span></div><div class="kpi g"><b style="font-size:22px">${eur(balD)}</b><span>chiffré en balance</span></div></div>
+ <div class="tools"><button class="b" data-act="csvdec">Export CSV</button><button class="b" data-go="balance">⚖️ Balance + / −</button></div>
+ <div class="chips" style="margin:0 0 12px">${Object.entries(F).map(([key,[t,f]])=>`<button class="b" data-df="${key}" style="min-height:38px;${k===key?'background:var(--navy);color:#fff;border-color:var(--navy)':''}">${t} (${A.filter(f).length})</button>`).join('')}</div>
+ ${L.length?L.map(o=>decCard(o.l,o.d,true)).join(''):'<p class="note">Aucune découverte dans cette liste. On les saisit dans la fiche du logement ou depuis le QR code.</p>'}<p class="sig">ERBM · conçu et développé par Saïd OUFQIR</p>`}
 /* modèle de fiche VTE ERBM : Lot ; Libellé ; champs (q, loc, dim, photo, choix:A|B) ; code BPU */
 const MODDEF=`GENERALITES / Infos ; VT faite par BBNE avec MOE ; choix:Oui|Non ;
 LOCALISATION MAISON / Infos ; ATH ou GR ; choix:ATH|GR ;
@@ -509,11 +847,13 @@ function loadLocal(){try{const d=JSON.parse(localStorage.getItem(LSK)||'null');i
 
 /* --- vues --- */
 function render(){
+ const qm=!!(QR||SY.qrOnly);$('nav').style.display=qm?'none':'';
+ if(qm){$('titre').textContent='ERBM · Intervenant';$('soustitre').textContent='Plans · fiche travaux · pointage';$('main').innerHTML=QR?vQR():'<div class="empty"><h2>Scannez le QR code du logement</h2><p>Ce téléphone est en mode intervenant : il s\'ouvre uniquement en scannant le QR code collé dans le logement.</p></div>';return}
  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===S.view));
  $('titre').textContent=S.cfg.nom||'ERBM';
  $('soustitre').textContent=[S.cfg.bailleur&&'Bailleur : '+S.cfg.bailleur,S.cfg.entreprise].filter(Boolean).join(' · ')||'Réhabilitation de cités minières';
  const m=$('main');const cc=conf();const banner=(!cc.u||!cc.t)?'<div class="note warn">Connexion au serveur Évolud non réglée : les données restent sur ce téléphone. Allez dans Réglages → Connexion.</div>':SY.err?'<div class="note warn">Synchro : '+esc(SY.err)+'</div>':'';
- m.innerHTML=banner+({tableau:vTableau,logements:vLogements,planning:vPlanning,tiroirs:vTiroirs,reserves:vReserves,reglages:vReglages}[S.view]||vTableau)();
+ m.innerHTML=banner+({tableau:vTableau,logements:vLogements,planning:vPlanning,tiroirs:vTiroirs,reserves:vReserves,reglages:vReglages,reseaux:vReseaux,decouvertes:vDecouvertes,balance:vBalance}[S.view]||vTableau)();
  if(S.open)renderPanel();
 }
 /* --- planning des VTE, relié aux logements --- */
@@ -530,7 +870,7 @@ function vPlanning(){const L=logArr();const now=new Date().toISOString().slice(0
  <div class="grid"><label>À partir du<input type="date" id="pv_d" value="${esc(c.d||new Date().toISOString().slice(0,10))}"></label><label>VTE par jour<input type="number" id="pv_n" min="1" max="20" value="${esc(c.n||6)}"></label><label>Première visite<input type="time" id="pv_h" value="${esc(c.h||'08:30')}"></label><label>Durée d'une visite (min)<input type="number" id="pv_m" min="15" step="5" value="${esc(c.m||60)}"></label><label>Parcours<select id="pv_p"><option value="">Tous</option><option value="TIR">Opérations tiroir</option><option value="GR">GR · site occupé</option></select></label><label>Visite avec<input id="pv_w" value="${esc(c.w||'')}" placeholder="Ex. Saïd + MOE"></label></div>
  <div class="tools"><button class="b p" data-act="planvt">Planifier ${sans.length} logement(s)</button>${aPlan.length?'<button class="b" data-act="planics">Exporter vers le calendrier (.ics)</button><button class="b d" data-act="planclear">Effacer les RDV non faits</button>':''}</div></div>
  ${retard.length?`<div class="sec"><h3 style="color:#c0392b">RDV passés, VTE non saisie (${retard.length})</h3>${retard.map(ligne).join('')}</div>`:''}
- ${Object.keys(jours).sort().filter(d=>d>=now.slice(0,10)).map(d=>`<div class="sec"><h3>${esc(jourFr(d))} · ${jours[d].length} VTE</h3>${jours[d].sort((a,b)=>a.vte.rdv.localeCompare(b.vte.rdv)).map(ligne).join('')}</div>`).join('')||'<p class="note">Aucune VTE planifiée à venir.</p>'}`}
+ ${Object.keys(jours).sort().filter(d=>d>=now.slice(0,10)).map(d=>`<div class="sec"><h3>${esc(jourFr(d))} · ${jours[d].length} VTE</h3>${jours[d].sort((a,b)=>a.vte.rdv.localeCompare(b.vte.rdv)).map(ligne).join('')}</div>`).join('')||'<p class="note">Aucune VTE planifiée à venir.</p>'}${rdvPlanHtml()}`}
 async function planifierVT(){if(readonly)return toast('Lecture seule');const d0=$('pv_d').value,n=Math.max(1,+$('pv_n').value||6),h=$('pv_h').value||'08:30',m=Math.max(15,+$('pv_m').value||60),pf=$('pv_p').value,w=$('pv_w').value.trim();
  if(!d0)return toast('Choisissez une date de départ');S.cfg={...S.cfg,planvt:{d:d0,n,h,m,w}};saveCfg();
  const L=logArr().filter(l=>!vtFaite(l)&&!l.vte?.rdv&&(!pf||l.parcours===pf)).sort((a,b)=>(a.adresse||'').localeCompare(b.adresse||'','fr')||String(a.num).localeCompare(String(b.num),'fr',{numeric:true}));
@@ -567,21 +907,29 @@ function vTableau(){
  const ringBig=(p)=>{const r=30,c=2*Math.PI*r;return `<svg class="ringbig" width="78" height="78" viewBox="0 0 78 78"><circle cx="39" cy="39" r="${r}" fill="none" stroke="rgba(255,255,255,.2)" stroke-width="8"/>${p?`<circle cx="39" cy="39" r="${r}" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 39 39)" stroke-linecap="round"/>`:''}<text x="39" y="44" text-anchor="middle" font-size="17" font-weight="800" fill="#fff">${p}%</text></svg>`};
  const jr=d=>new Date(d).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'});
  const kpi=(v,lab,c,go)=>`<a class="kpi ${c||''}" ${go?`href="#${go}"`:''} style="text-decoration:none;color:inherit"><b>${v}</b><span>${lab}</span></a>`;
- return `<div class="hero">${ringBig(avg)}<div><h2>${esc(S.cfg.nom||'Chantier ERBM')}</h2><p>${L.length} logements · ${gr.length} GR · ${ti.length} tiroirs${S.cfg.bailleur?' · '+esc(S.cfg.bailleur):''}</p><p>${rec} réceptionné${rec>1?'s':''} · avancement moyen ${avg} %</p></div></div>
- <div class="kpis">${kpi(`${vtF.length}<small style="font-size:15px;color:var(--mute)">/${L.length}</small>`,'VTE faites','g','planning')}${kpi(rdv7.length,'VTE dans les 7 jours','v','planning')}${kpi(rdvRet.length,'RDV VTE en retard',rdvRet.length?'r':'','planning')}${kpi(bloq.length,'logements avec bloquant',bloq.length?'r':'')}${kpi(ro,'réserves ouvertes',ro?'o':'','reserves')}${kpi(libres+'/'+tirArr().length,'tiroirs libres','','tiroirs')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(mtot)}</span>`,'montant HT engagé')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(pva)}</span>`,pvn+' provision(s) à valider','o')}</div>
+ const AL=L.map(l=>({l,a:alerte(l)})),rouges=AL.filter(o=>o.a.lv===2),oranges=AL.filter(o=>o.a.lv===1);
+ const pas=L.reduce((s,l)=>{const p=paStats(l);s.n+=p.n;s.d+=p.d;s.nc+=p.nc;return s},{n:0,d:0,nc:0});const DM=allDem(),dDue=DM.filter(o=>cDue(o.d)).length;
+ const presT=[];L.forEach(l=>presents(l).forEach(p=>presT.push({l,p})));const decO=L.reduce((s,l)=>s+(l.dec||[]).filter(d=>d.st==='Ouverte').length,0);const balT=L.reduce((s,l)=>s+balV(l),0);
+ const pc=`<div class="card pc"><h3>🎖 Poste de commandement</h3><div class="chips" style="margin-bottom:10px"><span class="chip" style="background:#fbe0e0;color:var(--red)"><b>${rouges.length}</b>rouge</span><span class="chip" style="background:#fde9d7;color:#a34a00"><b>${oranges.length}</b>orange</span><span class="chip" style="background:#dff3e0;color:#1b5e20"><b>${L.length-rouges.length-oranges.length}</b>vert</span><span class="chip"><b>${presT.length}</b>intervenant(s) pointé(s)</span></div>
+ ${rouges.slice(0,6).map(o=>`<div class="line" data-open="${o.l.id}"><span class="t"><b>${esc((o.l.num?'N° '+o.l.num+' ':'')+(o.l.adresse||''))}</b><small>${o.a.R.map(esc).join(' · ')}</small></span><span class="pill r">Rouge</span></div>`).join('')}${rouges.length>6?`<p style="margin:6px 0 0;font-size:13px;opacity:.8">+ ${rouges.length-6} autre(s) en rouge</p>`:''}
+ ${presT.length?`<p style="margin:10px 0 0;font-size:14px;opacity:.9">Sur site : ${presT.slice(0,8).map(o=>esc(o.p.n)+' ('+esc(o.p.m||'')+') · '+esc(o.l.num?'N° '+o.l.num+' ':'')+esc(o.l.adresse||'')).join(' · ')}</p>`:''}
+ <div class="tools" style="margin:12px 0 0"><button class="b" data-act="briefing">📋 Ordre du jour</button><button class="b" data-act="sitrep">📡 SITREP hebdo</button><button class="b" data-act="cible">🎯 Objectifs de la semaine</button></div></div>`;
+ return `<div class="hero">${ringBig(avg)}<div><h2>${esc(S.cfg.nom||'Chantier ERBM')}</h2><p>${L.length} logements · ${gr.length} GR · ${ti.length} tiroirs${S.cfg.bailleur?' · '+esc(S.cfg.bailleur):''}</p><p>${rec} réceptionné${rec>1?'s':''} · avancement moyen ${avg} %</p></div></div>${pc}
+ <div class="kpis">${kpi(`${vtF.length}<small style="font-size:15px;color:var(--mute)">/${L.length}</small>`,'VTE faites','g','planning')}${kpi(rdv7.length,'VTE dans les 7 jours','v','planning')}${kpi(rdvRet.length,'RDV VTE en retard',rdvRet.length?'r':'','planning')}${kpi(bloq.length,'logements avec bloquant',bloq.length?'r':'')}${kpi(ro,'réserves ouvertes',ro?'o':'','reserves')}${kpi(libres+'/'+tirArr().length,'tiroirs libres','','tiroirs')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(mtot)}</span>`,'montant HT engagé')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(pva)}</span>`,pvn+' provision(s) à valider','o')}${kpi(pas.d+'<small style="font-size:15px;color:var(--mute)">/'+pas.n+'</small>','points d\'arrêt levés'+(pas.nc?' · '+pas.nc+' NC':''),pas.nc?'r':'g')}${kpi(dDue,'relances concessionnaires dues',dDue?'r':'','reseaux')}${kpi(decO,'découvertes à chiffrer',decO?'o':'','decouvertes')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(balT)}</span>`,'balance + / − validée',balT<0?'r':'g','balance')}</div>
  <div class="grid2">
  <div class="card"><h3>⛔ Bloquants VTE <a class="more" href="#logements">${bloq.length}</a></h3>${bloq.length?bloq.slice(0,8).map(o=>`<div class="line" data-open="${o.l.id}"><span class="t"><b>${esc((o.l.num?'N° '+o.l.num+' ':'')+(o.l.adresse||''))}</b><small>${o.y.B.map(esc).join(' · ')}</small></span><span class="pill r">${o.y.B.length}</span></div>`).join(''):'<p class="mut" style="margin:0;color:var(--mute)">Aucun bloquant relevé.</p>'}</div>
  <div class="card"><h3>📅 Prochaines VTE <a class="more" href="#planning">Planning ›</a></h3>${rdvRet.length?`<p style="margin:0 0 6px"><span class="pill r">${rdvRet.length} en retard</span></p>`:''}${rdvAv.length?rdvAv.slice(0,6).map(l=>`<div class="line" data-open="${l.id}"><span class="h">${esc(l.vte.rdv.slice(11,16))}</span><span class="t"><b>${esc((l.num?'N° '+l.num+' ':'')+(l.adresse||''))}</b><small>${esc(jr(l.vte.rdv))} · ${esc(l.type||'')}${l.loc?.nom?' · '+esc(l.loc.nom):''}</small></span></div>`).join(''):`<p style="margin:0;color:var(--mute)">Aucune VTE planifiée. ${aPlan} logement(s) à planifier.</p>`}</div>
  <div class="card"><h3>📦 Commandes à lancer</h3><div class="chips"><span class="chip"><b>${cnt(/escalier/)}</b>escaliers</span><span class="chip"><b>${cnt(/velux/)}</b>Velux</span><span class="chip"><b>${cnt(/fenetre/)}</b>fenêtres / PF</span><span class="chip"><b>${cnt(/porte bs/)}</b>portes BS</span><span class="chip"><b>${cnt(/pompe a chaleur/)}</b>PAC</span><span class="chip"><b>${cnt(/exterieurs|portail/)}</b>portails / clôtures</span></div>
   <div class="tools" style="margin:12px 0 0"><label class="b p">🤖 Robot Dalux<input type="file" id="daluxbulk" accept="application/pdf,.pdf" multiple class="fhide"></label><button class="b" data-act="csvsyn">Synthèse VTE (CSV)</button></div></div>
- <div class="card"><h3>💶 Finances</h3><div class="mrow"><span>Montant HT des fiches travaux</span><b>${eur(mtot)}</b></div><div class="mrow"><span>dont GR · site occupé</span><b>${eur(mgr)}</b></div><div class="mrow"><span>dont opérations tiroir</span><b>${eur(mti)}</b></div><div class="mrow"><span>Logements en VTS / réceptionnés</span><b>${eur(mrec)}</b></div><div class="mrow"><span>Provisions validées</span><b>${eur(pvok)}</b></div><div class="mrow"><span>Provisions à valider</span><b style="color:var(--orange)">${eur(pva)}</b></div></div>
+ <div class="card"><h3>💶 Finances</h3><div class="mrow"><span>Montant HT des fiches travaux</span><b>${eur(mtot)}</b></div><div class="mrow"><span>dont GR · site occupé</span><b>${eur(mgr)}</b></div><div class="mrow"><span>dont opérations tiroir</span><b>${eur(mti)}</b></div><div class="mrow"><span>Logements en VTS / réceptionnés</span><b>${eur(mrec)}</b></div><div class="mrow"><span>Provisions validées</span><b>${eur(pvok)}</b></div><div class="mrow"><span>Provisions à valider</span><b style="color:var(--orange)">${eur(pva)}</b></div><div class="mrow"><span><a href="#balance">Balance + / − validée ›</a></span><b style="color:${balT<0?'var(--red)':'var(--green)'}">${eur(balT)}</b></div><div class="mrow"><span>Montant avec balance</span><b>${eur(mtot+balT)}</b></div></div>
  <div class="card"><h3>📈 Avancement GR</h3><div class="bars">${bars(gr,'GR')}</div></div>
  <div class="card"><h3>📈 Avancement tiroirs</h3><div class="bars">${bars(ti,'TIR')}</div></div>
  <div class="card"><h3>⚠️ À surveiller <a class="more">${alerts.length}</a></h3>${alerts.length?alerts.slice(0,8).map(a=>`<div class="line" data-open="${a.l.id}"><span class="t"><b>${esc(lname(a.l))}</b><small>${esc(a.t)}</small></span><span class="pill ${a.late?'r':'o'}">${a.late?'Retard':'Bientôt'}</span></div>`).join(''):'<p style="margin:0;color:var(--mute)">Rien à signaler.</p>'}</div>
  <div class="card"><h3>🗂 Plans des logements <a class="more" href="#reglages">Réglages ›</a></h3><p style="margin:0">${Object.keys(tk).length-sansPlan.length}/${Object.keys(tk).length} types ont leur plan.${sansPlan.length?` <span class="pill o">Sans plan : ${sansPlan.map(esc).join(', ')}</span>`:' <span class="pill g">Complet</span>'}</p></div>
  </div>
- <div class="card"><h3>🏘 Carte de la cité</h3>${Object.entries(cites).map(([c,arr])=>`<div class="cite"><p style="margin:0 0 6px;font-weight:700;color:var(--navy)">${esc(c)} <span style="font-weight:400;color:var(--mute);font-size:13px">· ${arr.filter(recu).length}/${arr.length} réceptionnés</span></p><div class="tiles">${arr.map(l=>`<button class="tile" data-open="${l.id}" style="background:${tileColor(l)}" title="${esc(lname(l)+' — '+etat(l))}">${esc(l.num||'?')}<i>${l.parcours==='GR'?'GR':'TIR'}</i></button>`).join('')}</div></div>`).join('')}
- <div class="legend"><span style="--c:#c9cfdb">Pas commencé</span><span style="--c:color-mix(in srgb,var(--brick) 50%,#c9d8f2)">Début</span><span style="--c:var(--brick)">Bien avancé</span><span style="--c:var(--slate)">Réceptionné</span></div></div>`;
+ <div class="card"><h3>🏘 Carte de la cité <span class="seg"><button class="${S.map!=='al'?'on':''}" data-map="av">Avancement</button><button class="${S.map==='al'?'on':''}" data-map="al">Alerte</button></span></h3>${Object.entries(cites).map(([c,arr])=>`<div class="cite"><p style="margin:0 0 6px;font-weight:700;color:var(--navy)">${esc(c)} <span style="font-weight:400;color:var(--mute);font-size:13px">· ${arr.filter(recu).length}/${arr.length} réceptionnés</span></p><div class="tiles">${arr.map(l=>`<button class="tile" data-open="${l.id}" style="background:${S.map==='al'?ALC[alerte(l).lv]:tileColor(l)}" title="${esc(lname(l)+' — '+etat(l))}">${esc(l.num||'?')}<i>${l.parcours==='GR'?'GR':'TIR'}</i></button>`).join('')}</div></div>`).join('')}
+ ${S.map==='al'?'<div class="legend"><span style="--c:var(--green)">RAS</span><span style="--c:var(--orange)">À surveiller</span><span style="--c:var(--red)">Bloqué / urgent</span></div>':'<div class="legend"><span style="--c:#c9cfdb">Pas commencé</span><span style="--c:color-mix(in srgb,var(--brick) 50%,#c9d8f2)">Début</span><span style="--c:var(--brick)">Bien avancé</span><span style="--c:var(--slate)">Réceptionné</span></div>'}</div>
+ <p class="sig">ERBM · conçu et développé par Saïd OUFQIR</p>`;
 }
 function ring(l){const p=pct(l),r=22,c=2*Math.PI*r;return `<svg class="prog" viewBox="0 0 56 56"><circle cx="28" cy="28" r="${r}" fill="none" stroke="var(--bg2)" stroke-width="6"/><circle cx="28" cy="28" r="${r}" fill="none" stroke="${p>=100?'var(--slate)':'var(--brick)'}" stroke-width="6" stroke-dasharray="${c*p/100} ${c}" transform="rotate(-90 28 28)" stroke-linecap="round"/><text x="28" y="32" text-anchor="middle" font-size="13" font-weight="700" fill="currentColor" font-family="Archivo">${p}%</text></svg>`}
 function vLogements(){
@@ -589,9 +937,9 @@ function vLogements(){
  const q=S.q.toLowerCase();
  const L=all.filter(l=>(!S.fp||l.parcours===S.fp)&&(!S.fc||(l.cite||'Sans cité')===S.fc)&&(!S.fe||etat(l)===S.fe)&&(!q||[l.ug,l.num,l.adresse,l.cite,l.loc?.nom,l.tranche].join(' ').toLowerCase().includes(q)));
  const ets=[...new Set([...P.GR.etapes,...P.TIR.etapes,'Terminé'])];
- return `<div class="tools"><input id="q" placeholder="Chercher un UG, une adresse, un locataire" value="${esc(S.q)}"><select id="fp"><option value="">Tous parcours</option><option value="GR" ${S.fp==='GR'?'selected':''}>GR · site occupé</option><option value="TIR" ${S.fp==='TIR'?'selected':''}>Opération tiroir</option></select><select id="fc"><option value="">Toutes cités</option>${cs.map(c=>`<option ${S.fc===c?'selected':''}>${esc(c)}</option>`).join('')}</select><select id="fe"><option value="">Toutes étapes</option>${ets.map(e=>`<option ${S.fe===e?'selected':''}>${esc(e)}</option>`).join('')}</select><button class="b p" data-act="new">+ Logement</button></div>
+ return `<div class="tools"><input id="q" placeholder="Chercher un UG, une adresse, un locataire" value="${esc(S.q)}"><select id="fp"><option value="">Tous parcours</option><option value="GR" ${S.fp==='GR'?'selected':''}>GR · site occupé</option><option value="TIR" ${S.fp==='TIR'?'selected':''}>Opération tiroir</option></select><select id="fc"><option value="">Toutes cités</option>${cs.map(c=>`<option ${S.fc===c?'selected':''}>${esc(c)}</option>`).join('')}</select><select id="fe"><option value="">Toutes étapes</option>${ets.map(e=>`<option ${S.fe===e?'selected':''}>${esc(e)}</option>`).join('')}</select><button class="b p" data-act="new">+ Logement</button><button class="b" data-act="qrplanche">🔳 Planche QR (PDF)</button></div>
  <p class="sub" style="color:var(--mute);font-size:14px">${L.length} logement${L.length>1?'s':''}</p>
- ${L.length?`<div class="list">${L.map(l=>`<button class="item" data-open="${l.id}">${ring(l)}<span><span class="t">${esc(lname(l))}</span><br><span class="s">${esc(l.cite||'')}${l.loc?.nom?' · '+esc(l.loc.nom):''} · ${esc(etat(l))}${resOuv(l).length?' · '+resOuv(l).length+' réserve(s)':''}${montant(l)?' · '+eur(montant(l)):''}</span></span><span class="badge ${l.parcours==='GR'?'gr':''}">${P[l.parcours]?.court||'?'}</span></button>`).join('')}</div>`:'<p class="empty">Aucun logement ne correspond.</p>'}`;
+ ${L.length?`<div class="list">${L.map(l=>`<button class="item" data-open="${l.id}">${ring(l)}<span><span class="t"><span class="alv" style="background:${ALC[alerte(l).lv]}"></span>${esc(lname(l))}</span><br><span class="s">${esc(l.cite||'')}${l.loc?.nom?' · '+esc(l.loc.nom):''} · ${esc(etat(l))}${resOuv(l).length?' · '+resOuv(l).length+' réserve(s)':''}${montant(l)?' · '+eur(montant(l)):''}</span></span><span class="badge ${l.parcours==='GR'?'gr':''}">${P[l.parcours]?.court||'?'}</span></button>`).join('')}</div>`:'<p class="empty">Aucun logement ne correspond.</p>'}`;
 }
 function vTiroirs(){
  const T=tirArr();
@@ -633,13 +981,20 @@ function vReglages(){
  <h2 style="margin:28px 0 8px">Autres types de provisions</h2>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Une provision par ligne. Vous pouvez ajouter son code BPU après un point-virgule, il sera proposé automatiquement : <code>Plancher voûtain;VOUT01</code></p>
  <textarea data-cfg="provs" style="min-height:180px">${esc(S.cfg.provs||PROVDEF.join('\n'))}</textarea>
+ <h2 style="margin:28px 0 8px">Points d'arrêt</h2>
+ <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Une ligne par point : <code>Phase ; Libellé ; TOUS, GR ou ATH ; ce que la photo doit montrer</code>. La nature d'un logement vient de la VTE (« ATH ou GR »), sinon de son type. Une phase contenant « fermeture » verrouille le placo, une phase « chape » ou « carrelage » verrouille les sols.</p>
+ <textarea data-cfg="pamod" style="min-height:220px;font-size:14px">${esc(S.cfg.pamod||PADEF)}</textarea>
+ <h2 style="margin:28px 0 8px">Concessionnaires et QR codes</h2>
+ <div class="grid"><label>Délai de relance concessionnaires (jours)<input data-cfg="relance" type="number" min="1" value="${esc(S.cfg.relance||7)}"></label></div>
+ <div class="tools"><button class="b p" data-act="qrplanche">🔳 Planche de QR codes de tous les logements (PDF)</button></div>
+ <p style="font-size:13px;color:var(--mute)">Chaque QR ouvre la vue intervenant du logement : plans, fiche travaux de son métier sans prix, pointage d'arrivée et de départ, déclaration des travaux et des découvertes. Il contient la clé du chantier : à ne donner qu'aux intervenants.</p>
  <h2 style="margin:28px 0 8px">BPU du marché · ${S.bpu.length} code${S.bpu.length>1?'s':''}</h2>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Copiez le BPU depuis Excel et collez-le ici. Colonnes dans l'ordre : Code · Désignation · Unité · Prix unitaire HT · Intervenant (facultatif, sinon deviné d'après la désignation). Un code déjà présent est mis à jour.</p>
  <textarea id="bpuimp" placeholder="MEXT01	Fenêtre PVC 2 vantaux	U	780,00"></textarea>
  <div class="tools"><button class="b p" data-act="bpuimport">Importer le BPU</button>${S.bpu.length?'<button class="b" data-act="bpuview">Voir le BPU</button><button class="b d" data-act="bpuclear">Vider le BPU</button>':''}</div>
  <div id="bpuview"></div>
  <h2 style="margin:28px 0 8px">Exporter</h2>
- <div class="tools"><button class="b" data-act="csv">Tableau d'avancement (CSV pour Excel)</button><button class="b" data-act="csvpv">Provisions VTE (CSV)</button><button class="b" data-act="csvft">Fiches travaux détaillées (CSV)</button><button class="b" data-act="csvres">Liste des réserves (CSV)</button></div>
+ <div class="tools"><button class="b" data-act="csv">Tableau d'avancement (CSV pour Excel)</button><button class="b" data-act="csvpv">Provisions VTE (CSV)</button><button class="b" data-act="csvft">Fiches travaux détaillées (CSV)</button><button class="b" data-act="csvres">Liste des réserves (CSV)</button><button class="b" data-act="csvpa">Points d'arrêt (CSV)</button><button class="b" data-act="csvcn">Concessionnaires (CSV)</button><button class="b" data-act="csvpt">Pointages et heures (CSV)</button><button class="b" data-act="csvtk">Tâches intervenants (CSV)</button><button class="b" data-act="csvdec">Découvertes (CSV)</button><button class="b" data-act="csvbal">Balance + / − (CSV)</button></div>
  <textarea id="out" readonly style="display:none"></textarea>
  <h2 style="margin:28px 0 8px">Connexion au serveur Évolud</h2>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Reprise automatiquement d'Évolud quand c'est possible. Sinon, saisissez l'adresse du serveur et la clé du chantier une seule fois sur ce téléphone.</p>
@@ -675,7 +1030,8 @@ function renderPanel(){
   <label>Déménagement aller<input type="date" data-f="tir.du" value="${esc(l.tir?.du||'')}"></label>
   <label>Retour prévu<input type="date" data-f="tir.au" value="${esc(l.tir?.au||'')}"></label>
  </div>${tiroirs.length?'':'<p class="note" style="margin:10px 0 0">Ajoutez d\'abord les logements tiroirs dans l\'onglet Tiroirs.</p>'}</div>`:''}
- <div class="sec"><h3>Étapes · ${esc(p.nom)}</h3><ol class="steps">${p.etapes.map((e,i)=>`<li class="${l.et&&l.et[i]?'done':''} ${i===ci?'cur':''}"><button class="ck" data-step="${i}" aria-label="${esc(e)}">${l.et&&l.et[i]?'✓':''}</button><span>${esc(e)}</span><input type="date" data-sd="${i}" value="${esc(l.et&&l.et[i]||'')}" aria-label="Date ${esc(e)}"></li>`).join('')}</ol></div>
+ <div class="sec"><h3>Étapes · ${esc(p.nom)}</h3><ol class="steps">${p.etapes.map((e,i)=>`<li class="${l.et&&l.et[i]?'done':''} ${i===ci?'cur':''}"><button class="ck" data-step="${i}" aria-label="${esc(e)}">${l.et&&l.et[i]?'✓':''}</button><span>${esc(e)}${!(l.et&&l.et[i])&&gate(l,i).length?' 🔒':''}</span><input type="date" data-sd="${i}" value="${esc(l.et&&l.et[i]||'')}" aria-label="Date ${esc(e)}"></li>`).join('')}</ol></div>
+ ${(()=>{const L1={id,...l};return paHtml(L1)+tkHtml(L1)+decHtml(L1)+rdvHtml(L1)+cnHtml(L1)+balHtml(L1)})()}
  <div class="sec"><h3>${l.parcours==='GR'?'Prestations':'Corps d\'état'}</h3><p style="margin:0 0 8px;font-size:13px;color:var(--mute)">Touchez un lot pour le faire passer : à faire → en cours → fait → non prévu.</p><div class="lots">${p.lots.map(n=>{const s=(l.lots||{})[n]||0;return `<button class="lot s${s}" data-lot="${esc(n)}"><span>${esc(n)}</span><em>${LOTST[s]}</em></button>`}).join('')}</div></div>
  <div class="sec" id="vte"><h3>VTE · provisions ${l.vte?.ok?'<span class="badge ok" style="vertical-align:2px">VTE validée</span>':''}${l.dalux?'<span class="badge" style="vertical-align:2px;margin-left:6px">VT Dalux</span>':''}</h3>
   ${daluxHtml(l)}${synthHtml(l)}
@@ -812,6 +1168,26 @@ async function chargeEvolud(){
 function addLog(r,demo){const id=uid();const l={ug:r[0]||'',num:r[1]||'',adresse:r[2]||'',cite:r[3]||'',tranche:r[4]||'',type:r[5]||'',parcours:/tir/i.test(r[6]||'')?'TIR':'GR',loc:{nom:r[7]||'',tel:r[8]||''},et:{},lots:{},res:[],journal:[],maj:today()};if(demo)l.demo=true;save('logements',id,l);return id}
 async function act(a){
  if(a==='sync'){SY.err='';sync()}
+ /* --- poste de commandement, QR, RDV, balance, découvertes --- */
+ if(a==='briefing')return showText('Ordre du jour',txtBriefing());
+ if(a==='sitrep')return showText('SITREP hebdomadaire',txtSitrep());
+ if(a==='cible')return showText('Objectifs de la semaine',txtCible());
+ if(a==='preuve')return dossierPreuve(S.logs[S.open]);
+ if(a==='qrshow')return showQR(S.open);
+ if(a==='qrplanche')return qrPlanche();
+ if(a==='rdvics')return rdvIcs();
+ if(a==='qrme'){const n=$('qn').value.trim(),e=$('qe').value.trim(),m=$('qm').value;if(!n)return toast('Indiquez votre nom');meSet({n,e,m});if(SY.qrOnly){SY.conf={...SY.conf,n:n+' · '+(e||m)};persistLocal()}return render()}
+ if(a==='qrid'){meSet(null);return render()}
+ if(a==='qrquit'){QR=null;location.hash='tableau';return render()}
+ if(a==='qrin'){const me=meGet();if(!me)return;toast('Pointage en cours (GPS)…');try{await pointer(QR.l,me,'in')}catch(e){return}toast('Arrivée pointée');return render()}
+ if(a==='qrout'){const me=meGet();if(!me)return;toast('Pointage en cours (GPS)…');try{await pointer(QR.l,me,'out')}catch(e){return}toast('Départ pointé. Bonne route.');return render()}
+ if(a==='qrdec'){const me=meGet();if(!me||!QR)return;return decSubmit('qd',QR.l,me)}
+ if(a==='adddec'){if(readonly)return toast('Lecture seule');return decSubmit('dc',S.open,{n:(SY.conf||{}).n||S.cfg.cdt||'Conducteur',e:S.cfg.entreprise||''})}
+ if(a==='addrdv'){if(readonly)return toast('Lecture seule');const dt=$('rvd').value;if(!dt)return toast('Choisissez la date et l\'heure');const r={id:uid(),type:$('rvt').value,dt,qui:$('rvq').value.trim(),obj:$('rvo').value.trim(),st:'Prévu'};return upd(l=>{l.rdv=[...(l.rdv||[]),r];l.journal=[...(l.journal||[]),{d:today(),t:'RDV '+r.type+' fixé au '+new Date(dt).toLocaleString('fr-FR')+(r.obj?' : '+r.obj:'')}]})}
+ if(a==='addbal'){if(readonly)return toast('Lecture seule');const v=$('blc').value.trim(),q=parseFloat(String($('blq').value).replace(',','.'))||0;if(!v)return toast('Code BPU ou description obligatoire');if(!q)return toast('Quantité obligatoire');
+  const b=bpuMap()[v]||S.bpu.find(x=>x.c.toLowerCase()===v.toLowerCase());const p=b?+b.p||0:parseFloat(String($('blp').value).replace(',','.'))||0;if(!p)return toast('Prix unitaire introuvable : saisissez le PU HT');
+  const x={id:uid(),sens:$('bls').value,c:b?b.c:'',d:b?b.d:v,u:b?b.u:'',p,q,motif:$('blm').value.trim(),st:'Proposé',date:today()};const link=S.balDec&&S.balDec.lid===S.open?S.balDec.did:null;S.balDec=null;
+  return upd(l=>{l.bal=[...(l.bal||[]),x];if(link)l.dec=(l.dec||[]).map(d=>d.id===link?{...d,st:'En balance',bal:x.id}:d);l.journal=[...(l.journal||[]),{d:today(),t:'Balance '+(x.sens==='-'?'−':'+')+' '+eur(Math.abs(balMt(x)))+' : '+x.d}]})}
  if(a==='cflink'){const c=conf();if(!c.u||!c.t)return toast('Réglez d\'abord la connexion');const url=location.origin+location.pathname+'#setup?u='+encodeURIComponent(c.u)+'&t='+encodeURIComponent(c.t);try{if(navigator.share){await navigator.share({title:'Évolud · ERBM',text:'Installe l\'appli ERBM :',url});return}}catch(e){if(e&&e.name==='AbortError')return}try{await navigator.clipboard.writeText(url);toast('Lien copié')}catch(e){prompt('Copiez ce lien :',url)}return}
  if(a==='cfsave'){SY.conf={u:$('cfu').value.trim(),t:$('cft').value.trim(),n:$('cfn').value.trim()};persistLocal();toast('Test de la connexion…');try{await api({action:'erbm',since:Date.now(),records:[]});SY.err='';toast('Connexion OK');sync()}catch(e){SY.err=String(e.message||e);toast(SY.err)}render()}
  if(a==='planvt')return planifierVT();
@@ -840,11 +1216,18 @@ async function act(a){
   toast('Exemple chargé');render()}
  if(a==='cleardemo'){if(!(await ask('Retirer tous les logements et tiroirs d\'exemple ?')))return;for(const[id,l]of Object.entries(S.logs))if(l.demo)await del('logements',id);for(const[id,t]of Object.entries(S.tirs))if(t.demo)await del('tiroirs',id);if(S.bpu.some(b=>b.demo)){S.bpu=S.bpu.filter(b=>!b.demo);await saveBpu()}toast('Exemples retirés');render()}
  if(a==='import'){if(readonly)return toast('Lecture seule');const txt=$('imp').value.trim();if(!txt)return toast('Collez d\'abord des lignes');let n=0;txt.split(/\r?\n/).forEach((line,i)=>{const c=line.split(line.includes('\t')?'\t':';').map(s=>s.trim());if(!c.join(''))return;if(i===0&&/adresse|parcours|code/i.test(line))return;addLog(c);n++});$('imp').value='';toast(n+' logement(s) importé(s)');render()}
- if(a==='csv'||a==='csvres'||a==='csvft'||a==='csvpv'||a==='csvsyn'){let rows;if(a==='csvsyn'){rows=[['Code UG','N°','Adresse','Cité','Type','Parcours','Étape en cours','Date VTE','VTE faite par','VT Dalux','Diag amiante','Bloquants','Nb bloquants','Commandes à lancer','À anticiper','Intervenants','Provisions validées HT','Provisions à valider HT','Montant logement HT','Lignes sans prix']];const f=n=>String(Math.round(n*100)/100).replace('.',',');logArr().forEach(l=>{const Y=synth(l);rows.push([l.ug,l.num,l.adresse,l.cite,l.type,P[l.parcours]?.court,etat(l),l.vte?.date||'',l.vte?.par||'',l.dalux?(l.dalux.statut||'oui'):'',l.vte?.am||'',Y.B.join(' | '),Y.B.length,Y.C.join(' | '),Y.A.join(' | '),Y.lots.join(', '),f(provMt(l)),f(provAv(l)),f(montant(l)),Y.sansPrix])})}else if(a==='csv'){rows=[['Code UG','N°','Adresse','Cité','Tranche','Type','Parcours','Locataire','Téléphone','Étape en cours','Avancement %','Montant HT','Réserves ouvertes','Tiroir','Retour prévu']];logArr().forEach(l=>{const t=l.tir?.id&&S.tirs[l.tir.id];rows.push([l.ug,l.num,l.adresse,l.cite,l.tranche,l.type,P[l.parcours]?.nom,l.loc?.nom,l.loc?.tel,etat(l),pct(l),String(Math.round(montant(l)*100)/100).replace('.',','),resOuv(l).length,t?(t.num?'N° '+t.num+' ':'')+(t.adresse||''):'',l.tir?.au||''])})}else if(a==='csvpv'){rows=[['Code UG','Adresse','Cité','Parcours','Date','Provision','Pièce','Code BPU','Désignation','Unité','Quantité','PU HT','Montant HT','Statut','Constat']];logArr().forEach(l=>(l.prov||[]).forEach(x=>rows.push([l.ug,l.adresse,l.cite,P[l.parcours]?.court,x.date,x.type,x.piece,x.c,x.d,x.u,String(x.q).replace('.',','),String(x.p).replace('.',','),String(Math.round(ligneMt(x)*100)/100).replace('.',','),PST[x.st||'av'],x.com])))}else if(a==='csvft'){rows=[['Code UG','Adresse','Cité','Parcours','Code BPU','Désignation','Unité','Quantité','PU HT','Montant HT']];logArr().forEach(l=>(l.ft||[]).forEach(x=>rows.push([l.ug,l.adresse,l.cite,P[l.parcours]?.court,x.c,x.d,x.u,String(x.q).replace('.',','),String(x.p).replace('.',','),String(Math.round(ligneMt(x)*100)/100).replace('.',',')])))}else{rows=[['Code UG','N°','Adresse','Cité','Réserve','Lot','Date','État','Levée le']];logArr().forEach(l=>(l.res||[]).forEach(r=>rows.push([l.ug,l.num,l.adresse,l.cite,r.txt,r.lot,r.date,r.etat,r.lev||''])))}
+ if(a==='csv'||a==='csvres'||a==='csvft'||a==='csvpv'||a==='csvsyn'||a==='csvpa'||a==='csvcn'||a==='csvpt'||a==='csvtk'||a==='csvdec'||a==='csvbal'){let rows;const nb=n=>String(Math.round(n*100)/100).replace('.',',');const dt=s=>s?new Date(s).toLocaleString('fr-FR'):'';
+  if(a==='csvpa'){rows=[['Code UG','N°','Adresse','Cité','Nature','Phase','Point d\'arrêt','Statut','Nb photos','Validé par','Le','Constat / motif']];logArr().forEach(l=>paOf(l).forEach(m=>{const c=paSt(l,m);rows.push([l.ug,l.num,l.adresse,l.cite,natOf(l),m.ph,m.lib,PAL[c.st],(c.ph||[]).length,c.by||'',dt(c.at),c.com||''])}))}
+  else if(a==='csvcn'){rows=[['Code UG','N°','Adresse','Cité','Concessionnaire','Objet','Référence','Statut','Date demande','Prochaine relance','Nb relances','RDV','Bloquante','Note']];allDem().forEach(({l,d})=>rows.push([l.ug,l.num,l.adresse,l.cite,d.conc,d.objet,d.ref||'',d.st,d.dDem||'',cOpen(d)?d.dRel||'':'',(d.hist||[]).filter(h=>/relance/i.test(h.t)).length,d.dRdv||'',d.bloq?'oui':'non',d.note||'']))}
+  else if(a==='csvpt'){rows=[['Code UG','N°','Adresse','Cité','Nom','Entreprise','Métier','Date','Arrivée','Départ','Durée (h)','GPS arrivée']];logArr().forEach(l=>(l.pt||[]).forEach(p=>{const h=p.out?(new Date(p.out)-new Date(p.in))/36e5:'';rows.push([l.ug,l.num,l.adresse,l.cite,p.n,p.e||'',p.m||'',p.in.slice(0,10),new Date(p.in).toLocaleTimeString('fr-FR'),p.out?new Date(p.out).toLocaleTimeString('fr-FR'):'',h===''?'':nb(h),p.gps?p.gps.lat+' '+p.gps.lng:''])}))}
+  else if(a==='csvtk'){rows=[['Code UG','N°','Adresse','Cité','Phase','Tâche','Métier','Statut','Par','Entreprise','Mis à jour le','Photos']];logArr().forEach(l=>TK.forEach(t=>{const c=tkS(l,t);rows.push([l.ug,l.num,l.adresse,l.cite,t.ph,t.lib,t.m,TKL[c.st],c.by||'',c.ent||'',c.upd||'',(c.ph||[]).length])}))}
+  else if(a==='csvdec'){rows=[['Code UG','N°','Adresse','Cité','Date','Catégorie','Gravité','Constat','Statut','Signalé par','Nb photos','GPS']];logArr().forEach(l=>(l.dec||[]).forEach(d=>{const g=(d.ph||[]).find(p=>p.gps);rows.push([l.ug,l.num,l.adresse,l.cite,dt(d.at),d.cat,d.grav,d.txt,d.st,d.by||'',(d.ph||[]).length,g?g.gps.lat+' '+g.gps.lng:''])}))}
+  else if(a==='csvbal'){rows=[['Code UG','N°','Adresse','Cité','Sens','Code BPU','Désignation','Unité','Quantité','PU HT','Montant HT signé','Statut','Motif','Date']];logArr().forEach(l=>(l.bal||[]).forEach(x=>rows.push([l.ug,l.num,l.adresse,l.cite,x.sens==='-'?'Moins-value':'Plus-value',x.c||'',x.d||'',x.u||'',String(x.q).replace('.',','),nb(+x.p||0),nb(balMt(x)),x.st,x.motif||'',x.date||''])))}
+  else if(a==='csvsyn'){rows=[['Code UG','N°','Adresse','Cité','Type','Parcours','Étape en cours','Date VTE','VTE faite par','VT Dalux','Diag amiante','Bloquants','Nb bloquants','Commandes à lancer','À anticiper','Intervenants','Provisions validées HT','Provisions à valider HT','Montant logement HT','Lignes sans prix']];const f=n=>String(Math.round(n*100)/100).replace('.',',');logArr().forEach(l=>{const Y=synth(l);rows.push([l.ug,l.num,l.adresse,l.cite,l.type,P[l.parcours]?.court,etat(l),l.vte?.date||'',l.vte?.par||'',l.dalux?(l.dalux.statut||'oui'):'',l.vte?.am||'',Y.B.join(' | '),Y.B.length,Y.C.join(' | '),Y.A.join(' | '),Y.lots.join(', '),f(provMt(l)),f(provAv(l)),f(montant(l)),Y.sansPrix])})}else if(a==='csv'){rows=[['Code UG','N°','Adresse','Cité','Tranche','Type','Parcours','Locataire','Téléphone','Étape en cours','Avancement %','Montant HT','Réserves ouvertes','Tiroir','Retour prévu']];logArr().forEach(l=>{const t=l.tir?.id&&S.tirs[l.tir.id];rows.push([l.ug,l.num,l.adresse,l.cite,l.tranche,l.type,P[l.parcours]?.nom,l.loc?.nom,l.loc?.tel,etat(l),pct(l),String(Math.round(montant(l)*100)/100).replace('.',','),resOuv(l).length,t?(t.num?'N° '+t.num+' ':'')+(t.adresse||''):'',l.tir?.au||''])})}else if(a==='csvpv'){rows=[['Code UG','Adresse','Cité','Parcours','Date','Provision','Pièce','Code BPU','Désignation','Unité','Quantité','PU HT','Montant HT','Statut','Constat']];logArr().forEach(l=>(l.prov||[]).forEach(x=>rows.push([l.ug,l.adresse,l.cite,P[l.parcours]?.court,x.date,x.type,x.piece,x.c,x.d,x.u,String(x.q).replace('.',','),String(x.p).replace('.',','),String(Math.round(ligneMt(x)*100)/100).replace('.',','),PST[x.st||'av'],x.com])))}else if(a==='csvft'){rows=[['Code UG','Adresse','Cité','Parcours','Code BPU','Désignation','Unité','Quantité','PU HT','Montant HT']];logArr().forEach(l=>(l.ft||[]).forEach(x=>rows.push([l.ug,l.adresse,l.cite,P[l.parcours]?.court,x.c,x.d,x.u,String(x.q).replace('.',','),String(x.p).replace('.',','),String(Math.round(ligneMt(x)*100)/100).replace('.',',')])))}else{rows=[['Code UG','N°','Adresse','Cité','Réserve','Lot','Date','État','Levée le']];logArr().forEach(l=>(l.res||[]).forEach(r=>rows.push([l.ug,l.num,l.adresse,l.cite,r.txt,r.lot,r.date,r.etat,r.lev||''])))}
   const csv='﻿'+rows.map(r=>r.map(v=>{v=String(v??'');return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(';')).join('\r\n');
-  const name=({csv:'avancement',csvres:'reserves',csvft:'fiches-travaux',csvpv:'provisions-vte',csvsyn:'synthese-vte'})[a]+'-erbm-'+today()+'.csv';
+  const name=({csv:'avancement',csvres:'reserves',csvft:'fiches-travaux',csvpv:'provisions-vte',csvsyn:'synthese-vte',csvpa:'points-arret',csvcn:'concessionnaires',csvpt:'pointages',csvtk:'taches-intervenants',csvdec:'decouvertes',csvbal:'balance'})[a]+'-erbm-'+today()+'.csv';
   if(downloads){try{await downloads.save({filename:name,data:csv});return}catch(e){}}
-  const o=$('out');o.style.display='block';o.value=csv;o.select();try{await navigator.clipboard.writeText(csv);toast('Copié : collez dans Excel')}catch(e){toast('Sélectionnez le texte et copiez-le')}}
+  const o=$('out');if(!o)return toast('Téléchargement impossible ici : exportez depuis Réglages');o.style.display='block';o.value=csv;o.select();try{await navigator.clipboard.writeText(csv);toast('Copié : collez dans Excel')}catch(e){toast('Sélectionnez le texte et copiez-le')}}
  if(a==='addres'){const t=$('rtxt').value.trim();if(!t)return toast('Décrivez la réserve');const lot=$('rlot').value;let photo='';const f=$('rph')?.files?.[0];if(f&&assets){try{toast('Envoi de la photo…');photo=(await assets.upload(f)).id}catch(e){toast('Photo non envoyée')}}upd(l=>{l.res=[...(l.res||[]),{id:uid(),txt:t,lot,date:today(),etat:'ouverte',photo}]})}
  if(a==='bpuimport'){if(readonly)return toast('Lecture seule');const txt=$('bpuimp').value.trim();if(!txt)return toast('Collez d\'abord les lignes du BPU');const m=bpuMap();let n=0;txt.split(/\r?\n/).forEach(line=>{const c=line.split(line.includes('\t')?'\t':';').map(x=>x.trim());if(!c[0])return;const p=parseFloat(String(c[3]||'').replace(/\s|€/g,'').replace(',','.'));if(isNaN(p))return;m[c[0]]={c:c[0],d:c[1]||'',u:c[2]||'',p,lot:INTERV.find(v=>v.toLowerCase()===(c[4]||'').toLowerCase())||(c[4]?guessLot(c[4]):'')};n++});if(!n)return toast('Aucune ligne lisible : vérifiez les colonnes');S.bpu=Object.values(m).sort((a,b)=>a.c.localeCompare(b.c,'fr',{numeric:true}));saveBpu();toast(n+' code(s) BPU importé(s)');render()}
  if(a==='bpuview'){$('bpuview').innerHTML=`<div class="scroll"><table class="ft"><thead><tr><th>Code</th><th>Désignation</th><th>U</th><th>PU HT</th></tr></thead><tbody>${S.bpu.map(b=>`<tr><td><b>${esc(b.c)}</b></td><td>${esc(b.d)}</td><td>${esc(b.u)}</td><td class="num">${eur(+b.p||0)}</td></tr>`).join('')}</tbody></table></div>`}
@@ -874,16 +1257,27 @@ function editTir(id,isNew){
 }
 
 document.addEventListener('click',e=>{
- const t=e.target.closest('[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon],[data-ptdel]');
+ const t=e.target.closest('[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon],[data-ptdel],[data-pa],[data-cn],[data-cnnew],[data-map],[data-cf],[data-df],[data-tk],[data-dec],[data-rdvdel],[data-baldel]');
  if(e.target===$('sheet')){closePanel();return}
  if(!t)return;
+ if(t.tagName==='A'&&t.dataset.open)e.preventDefault();
  if(t.dataset.act)return act(t.dataset.act);
+ if(t.dataset.pa){const [p,a]=t.dataset.pa.split('|');return paAct(p,a)}
+ if(t.dataset.cn){const [l,d,a]=t.dataset.cn.split('|');return cnAct(l,d,a)}
+ if(t.dataset.cnnew!==undefined){if(!logArr().length)return toast('Ajoutez d\'abord des logements');const [l,c,o]=t.dataset.cnnew.split('|');return editCn(l||logArr()[0].id,null,c?[c,o]:null)}
+ if(t.dataset.map){S.map=t.dataset.map;return render()}
+ if(t.dataset.cf){S.cf=t.dataset.cf;return render()}
+ if(t.dataset.df){S.df=t.dataset.df;return render()}
+ if(t.dataset.tk){const [id,a]=t.dataset.tk.split('|');return qrTk(id,a)}
+ if(t.dataset.dec){const [l,d]=t.dataset.dec.split('|');return decToBal(l,d)}
+ if(t.dataset.rdvdel){const r=t.dataset.rdvdel;return ask('Supprimer ce RDV ?').then(ok=>ok&&upd(l=>{l.rdv=(l.rdv||[]).filter(x=>x.id!==r)}))}
+ if(t.dataset.baldel){const r=t.dataset.baldel;return ask('Supprimer cette ligne de balance ?').then(ok=>ok&&upd(l=>{l.bal=(l.bal||[]).filter(x=>x.id!==r);l.dec=(l.dec||[]).map(d=>d.bal===r?{...d,st:'Ouverte',bal:''}:d)}))}
  if(t.dataset.ptdel){if(readonly)return toast('Lecture seule');const [k,i]=t.dataset.ptdel.split('|');return ask('Retirer ce plan du type '+k+' ?').then(ok=>{if(!ok)return;const P2={...plansT()};P2[k]=(P2[k]||[]).filter((_,j)=>j!==+i);if(!P2[k].length)delete P2[k];S.cfg={...S.cfg,plansType:P2};saveCfg();render()})}
  if(t.dataset.open)return openPanel(t.dataset.open);
  if(t.dataset.go){location.hash=t.dataset.go;return}
  if(t.dataset.edittir)return editTir(t.dataset.edittir,false);
  if(readonly&&S.open)return toast('Lecture seule');
- if(t.dataset.step){const i=+t.dataset.step;upd(l=>{l.et={...(l.et||{})};if(l.et[i])delete l.et[i];else l.et[i]=today()})}
+ if(t.dataset.step){const i=+t.dataset.step,l0=S.logs[S.open];if(!(l0.et&&l0.et[i])){const R=gate(l0,i);if(R.length)return info('⛔ Étape « '+etapes(l0)[i]+' » verrouillée :\n• '+R.join('\n• '))}upd(l=>{l.et={...(l.et||{})};if(l.et[i])delete l.et[i];else l.et[i]=today()})}
  if(t.dataset.lot){const n=t.dataset.lot;upd(l=>{l.lots={...(l.lots||{})};l.lots[n]=(((l.lots[n]||0)+1)%4)})}
  if(t.dataset.ckon){if(readonly)return toast('Lecture seule');const [id,v]=t.dataset.ckon.split('|');const on=v==='1';upd(l=>{l.chk={...(l.chk||{})};const cur=l.chk[id]||{};const it=modele().find(x=>x.id===id);l.chk[id]={...cur,on:cur.on===on?undefined:on,c:cur.c??it?.c??''};if(/remplacement-de-l-escalier|escalier-a-remplacer/.test(id)&&on&&cur.on!==on)l.esc={...(l.esc||{}),prevu:true}})}
  if(t.dataset.curdel!==undefined){const i=+t.dataset.curdel;upd(l=>{l.cur=(l.cur||[]).filter((_,k)=>k!==i)})}
@@ -904,7 +1298,13 @@ document.addEventListener('change',e=>{
  if(t.id==='daluxbulk')importDalux(t,false)
  if(t.dataset&&t.dataset.dalux1&&S.open)importDalux(t,true)
  if(t.dataset&&t.dataset.ptype)uploadTypePlan(t)
- if(t.dataset.sd&&S.open){const i=t.dataset.sd,v=t.value;upd(l=>{l.et={...(l.et||{})};if(v)l.et[i]=v;else delete l.et[i]})}
+ if(t.dataset.paph&&S.open)uploadPA(t);
+ if(t.dataset.tkph&&QR&&t.files&&t.files[0]){qrTk(t.dataset.tkph,'done',t.files[0]);t.value=''}
+ if(t.dataset.tkadm&&S.open){if(readonly)return toast('Lecture seule');const tid=t.dataset.tkadm,v=t.value,l0=S.logs[S.open],tt=TK.find(x=>x.id===tid);if((v==='go'||v==='ok')&&tkS(l0,tt).st==='todo'){const lk=tkLock(l0,tt);if(lk.length){renderPanel();return info('🔒 '+tt.lib+' verrouillé :\n• '+lk.join('\n• '))}}tkSet(S.open,tid,v,{n:(SY.conf||{}).n||S.cfg.cdt||'Conducteur',e:S.cfg.entreprise||''});return renderPanel()}
+ if(t.dataset.rdvst&&S.open){const id=t.dataset.rdvst,v=t.value;return upd(l=>{const r=(l.rdv||[]).find(x=>x.id===id);l.rdv=(l.rdv||[]).map(x=>x.id===id?{...x,st:v}:x);if(r)l.journal=[...(l.journal||[]),{d:today(),t:'RDV '+r.type+' du '+new Date(r.dt).toLocaleString('fr-FR')+' : '+v+(v==='Locataire absent'?' (trace conservée)':'')}]})}
+ if(t.dataset.balst&&S.open){const id=t.dataset.balst,v=t.value;return upd(l=>{l.bal=(l.bal||[]).map(x=>x.id===id?{...x,st:v,stDate:today()}:x)})}
+ if(t.dataset.decst){const [lid,did]=t.dataset.decst.split('|'),v=t.value;const o=JSON.parse(JSON.stringify(S.logs[lid]));o.dec=(o.dec||[]).map(d=>d.id===did?{...d,st:v}:d);o.maj=today();save('logements',lid,o);if(S.open)renderPanel();return render()}
+ if(t.dataset.sd&&S.open){const i=t.dataset.sd,v=t.value,l0=S.logs[S.open];if(v&&!(l0.et&&l0.et[i])){const R=gate(l0,+i);if(R.length){t.value='';return info('⛔ Étape « '+etapes(l0)[+i]+' » verrouillée :\n• '+R.join('\n• '))}}upd(l=>{l.et={...(l.et||{})};if(v)l.et[i]=v;else delete l.et[i]})}
  if(t.id==='pvt'){const c=t.selectedOptions[0]?.dataset.c;if(c)$('pvc').value=c}
  if(t.dataset.pvq!==undefined&&S.open){if(readonly)return toast('Lecture seule');const i=+t.dataset.pvq,q=parseFloat(String(t.value).replace(',','.'))||0;upd(l=>{l.prov=(l.prov||[]).map((x,k)=>k===i?{...x,q}:x)})}
  if(t.dataset.pvst!==undefined&&S.open){if(readonly)return toast('Lecture seule');const i=+t.dataset.pvst,st=t.value;upd(l=>{l.prov=(l.prov||[]).map((x,k)=>k===i?{...x,st}:x)})}
@@ -914,13 +1314,15 @@ document.addEventListener('change',e=>{
 });
 document.addEventListener('input',e=>{if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=$('q');q.focus();q.setSelectionRange(pos,pos)}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('sheet').classList.contains('on'))closePanel();if(e.key==='Enter'&&e.target.id==='jtxt')act('addj');if(e.key==='Enter'&&e.target.id==='rtxt')act('addres')});
-function route(){const h=location.hash.slice(1);S.view=['tableau','logements','planning','tiroirs','reserves','reglages'].includes(h)?h:'tableau';render()}
+function route(){const h=location.hash.slice(1);S.view=['tableau','logements','planning','tiroirs','reserves','reglages','reseaux','decouvertes','balance'].includes(h)?h:'tableau';render()}
 addEventListener('hashchange',route);
 
 /* --- démarrage --- */
 loadLocal();
 /* lien d'installation : #setup?u=…/exec&t=clé[&n=nom] → règle la connexion une fois, puis efface le lien de l'adresse */
 try{const qs=location.hash.indexOf('setup?')>=0?location.hash.split('setup?')[1]:'';if(qs){const q=new URLSearchParams(qs),u=q.get('u')||'',t=q.get('t')||'';if(/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u)&&t){SY.conf={u,t,n:q.get('n')||(SY.conf||{}).n||''};SY.err='';persistLocal();setTimeout(()=>toast('Connexion au serveur réglée'),400)}history.replaceState(null,'',location.pathname+'#tableau')}}catch(e){}
+/* QR d'un logement : #qr?u=…/exec&t=clé&l=id → vue intervenant de ce logement */
+try{const h=location.hash;if(h.indexOf('qr?')>=0){const q=new URLSearchParams(h.split('qr?')[1]),u=q.get('u')||'',t=q.get('t')||'',lid=q.get('l')||'';if(/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec$/.test(u)&&t&&lid){QR={l:lid};if(!(SY.conf&&SY.conf.u&&SY.conf.t)){SY.conf={u,t,n:''};SY.qrOnly=true;SY.err=''}persistLocal()}}}catch(e){}
 if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 SY.det=detect();route();setSt();
 addEventListener('online',()=>sched(500));
