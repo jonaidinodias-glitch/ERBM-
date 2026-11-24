@@ -1424,7 +1424,12 @@ document.addEventListener('change',e=>{
  if(t.dataset.cfg){S.cfg[t.dataset.cfg]=t.value.trim();saveCfg();render()}
  if(t.id==='fp'){S.fp=t.value;render()}if(t.id==='fc'){S.fc=t.value;render()}if(t.id==='fe'){S.fe=t.value;render()}
 });
-document.addEventListener('input',e=>{if(e.target.id==='vq'){S.vq=e.target.value;const pos=e.target.selectionStart;render();const q=$('vq');if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(x){}}return}if(e.target.id==='q'){S.q=e.target.value;const pos=e.target.selectionStart;render();const q=$('q');q.focus();q.setSelectionRange(pos,pos)}});
+/* recherche : on garde le champ en place (le clavier du téléphone ne repasse plus en lettres) */
+document.addEventListener('input',e=>{const id=e.target.id;if(id!=='vq'&&id!=='q')return;if(id==='vq')S.vq=e.target.value;else S.q=e.target.value;
+ const inp=e.target,m=$('main'),olds=[...m.children],k=olds.findIndex(c=>c.contains(inp));
+ const t=document.createElement('div');t.innerHTML=(id==='q'?vLogements():vVT());const ban=olds.length&&olds[0].classList.contains('warn')?1:0;const nn=[...t.children];
+ const news=ban?[olds[0],...nn]:nn;if(k<0||news.length<=k||!news[k].querySelector('#'+id)){const pos=inp.selectionStart;render();const q=$(id);if(q){q.focus();try{q.setSelectionRange(pos,pos)}catch(x){}}return}
+ olds.forEach((c,i)=>{if(i!==k&&!(ban&&i===0))c.remove()});news.forEach((c,i)=>{if(ban&&i===0)return;if(i<k)m.insertBefore(c,olds[k]);else if(i>k)m.appendChild(c)})});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('sheet').classList.contains('on'))closePanel();if(e.key==='Enter'&&e.target.id==='jtxt')act('addj');if(e.key==='Enter'&&e.target.id==='rtxt')act('addres')});
 function route(){const h=location.hash.slice(1);S.view=['tableau','logements','vt','planning','tiroirs','reserves','reglages','reseaux','decouvertes','balance'].includes(h)?h:'tableau';render()}
 addEventListener('hashchange',route);
