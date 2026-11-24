@@ -5,3 +5,6 @@
 
 /sw.js
   Cache-Control: no-cache
+
+/*.mjs
+  Content-Type: text/javascript; charset=utf-8
