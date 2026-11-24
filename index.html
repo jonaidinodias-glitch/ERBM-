@@ -264,12 +264,15 @@ function typePlansHtml(l){const k=typeKey(l.type),L=plansOf(l);if(!k)return '<p 
 async function upPlanFile(f,ug){const b64=await toJpeg(f,2400);const name='ERBM_PLAN_'+String(ug).replace(/[^\w-]/g,'_')+'_'+Date.now()+'.jpg';const j=await api({action:'photo',ug:'PLANS',name,b64,kind:'ERBM',meta:{ts:Date.now(),comment:'Plan ERBM '+ug}});return j.fileId}
 function addTypePlan(k,id,label){const P2={...plansT()};P2[k]=[...(P2[k]||[]),{id,label:label||''}];S.cfg={...S.cfg,plansType:P2};saveCfg()}
 async function uploadTypePlan(input){const k=input.dataset.ptype,fs=[...(input.files||[])];if(!fs.length)return;if(readonly)return toast('Lecture seule');let n=0;for(const f of fs){toast('Envoi du plan '+k+'…');try{addTypePlan(k,await upPlanFile(f,k),f.name.replace(/\.\w+$/,'').replace(/^TYPE_[^_]+_*/,''));n++}catch(e){toast('Plan non envoyé : '+(e.message||e));break}}input.value='';if(n)toast(n+' plan(s) ajouté(s) au type '+k);render()}
-async function uploadPlansBulk(input){const fs=[...(input.files||[])];if(!fs.length)return;if(readonly)return toast('Lecture seule');const byUg={};logArr().forEach(l=>{if(l.ug)byUg[String(l.ug)]=l});let nt=0,nl=0;const skip=[];
- for(const f of fs){const nm=f.name;let m=nm.match(/^TYPE_([^_.]+)(?:_+(.*?))?\.\w+$/i);
-  try{if(m){toast('Envoi '+nm+'…');const k=m[1].toUpperCase();addTypePlan(k,await upPlanFile(f,k),(m[2]||'').trim());nt++;continue}
-   m=nm.match(/^UG_?(\d+)/i);if(m&&byUg[m[1]]){toast('Envoi '+nm+'…');const lid=byUg[m[1]].id;const id=await upPlanFile(f,m[1]);const c=JSON.parse(JSON.stringify(S.logs[lid]));c.tech={...(c.tech||{}),planId:id,planKind:'img',planSt:'brouillon',planDate:''};c.maj=today();save('logements',lid,c);nl++;continue}
-   skip.push(nm)}catch(e){toast('Arrêt : '+(e.message||e));break}}
- input.value='';toast(`${nt} plan(s) de type, ${nl} plan(s) de logement${skip.length?' · ignorés : '+skip.length:''}`);render()}
+async function uploadPlansBulk(input){const fs=[...(input.files||[])];if(!fs.length)return;if(readonly)return toast('Lecture seule');const byUg={};logArr().forEach(l=>{if(l.ug)byUg[String(l.ug)]=l});let nt=0,nl=0,deja=0;const skip=[],rate=[];
+ for(let n=0;n<fs.length;n++){const f=fs[n],nm=f.name;let m=nm.match(/^TYPE_([^_.]+)(?:_+(.*?))?\.\w+$/i);
+  try{if(m){const k=m[1].toUpperCase(),lab=(m[2]||'').trim();if((plansT()[k]||[]).some(x=>(x.label||'')===lab)){deja++;continue}
+    toast(`Plan ${n+1}/${fs.length} : ${k}…`);addTypePlan(k,await upPlanFile(f,k),lab);nt++;continue}
+   m=nm.match(/^UG_?(\d+)/i);if(m&&byUg[m[1]]){const lid=byUg[m[1]].id;if(S.logs[lid].tech?.planId){deja++;continue}
+    toast(`Plan ${n+1}/${fs.length} : UG ${m[1]}…`);const id=await upPlanFile(f,m[1]);const c=JSON.parse(JSON.stringify(S.logs[lid]));c.tech={...(c.tech||{}),planId:id,planKind:'img',planSt:'brouillon',planDate:''};c.maj=today();save('logements',lid,c);nl++;continue}
+   skip.push(nm)}catch(e){rate.push(nm)}}
+ input.value='';render();
+ await ask(`${nt+nl} plan(s) envoyé(s)${deja?` · ${deja} déjà en place (ignorés)`:''}${rate.length?` · ${rate.length} en échec : relancez l'envoi groupé avec les mêmes fichiers, seuls ceux qui manquent repartiront`:''}${skip.length?` · ${skip.length} fichier(s) au nom non reconnu`:''}.`)}
 function vPlansType(){const L=logArr(),cnt={};L.forEach(l=>{const k=typeKey(l.type);if(k)cnt[k]=(cnt[k]||0)+1});const P2=plansT();const keys=[...new Set([...Object.keys(cnt),...Object.keys(P2)])].sort((a,b)=>a.localeCompare(b,'fr',{numeric:true}));const sans=keys.filter(k=>cnt[k]&&!(P2[k]||[]).length);
  return `<h2 style="margin:28px 0 8px">Plans par type de logement</h2>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Un plan joint à un type s'affiche dans la fiche de tous les logements de ce type (« ATH · S19 DROITE » utilise le plan S19). Un plan joint directement à un logement passe avant. Envoi groupé : noms de fichiers <code>TYPE_L10.jpg</code>, <code>TYPE_P12_proposition 01.jpg</code> (plan de type) ou <code>UG_130429.jpg</code> (plan d'un logement).</p>
