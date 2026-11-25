@@ -474,6 +474,7 @@ function alerte(l){const R=[],O=[];if(curIdx(l)>=etapes(l).length)return {lv:0,R
  if(resOuv(l).some(r=>r.date&&days(r.date)<-15))O.push('Réserve ouverte depuis plus de 15 j');
  if(l.esc&&l.esc.prevu&&!l.esc.cmd)O.push('Escalier pas commandé');
  if(l.diag&&(l.diag.nonvis||[]).length)O.push('Diag amiante incomplet (zones non visitées) : complément à demander');
+ {const B=l.bail||{};if(B.contentieux)R.push('Locataire en contentieux');if(/refus/i.test(B.orient||''))O.push('Locataire en '+B.orient.toLowerCase()+' : travaux à confirmer avec M&C');const mo=(l.moe||[]).filter(p=>p.st!=='Levé').length;if(mo)O.push(mo+' remarque(s) MOE à lever')}
  {const P=l.plan;if(P){const late=(P.items||[]).filter(x=>!x.j&&plSt(l,x)==='late').length;if(late)O.push(late+' tâche(s) du planning en retard');const J=P.jal||{};if(J.livr&&J.livr<today()&&!recu(l))R.push('Livraison prévue le '+fdate(J.livr)+' dépassée')}}
  {const nr=((l.diag||{}).ana||[]).filter(a=>a.lvl==='R').length;if(nr)R.push(nr+' constat(s) bloquant(s) diag × travaux');if(!l.diag&&(l.diagNo||[]).length)R.push('Aucun diag amiante : travaux interdits')}
  if(l.diag&&l.diag.win&&!l.amPlan&&l.mx&&l.mx.demFab&&!mxPose(l.mx))R.push('Menuiseries en commande mais appuis amiantés : mode opératoire SS4 à valider avant la pose');
@@ -983,6 +984,34 @@ function planHtml(l){const P=l.plan;if(!P)return '';const J=P.jal||{},t=today();
  <details><summary style="cursor:pointer;font-size:14px">Voir les ${it.length} ligne(s) du planning</summary><table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:6px">${it.map(x=>{const s=plSt(l,x);return `<tr style="border-top:1px solid var(--line)"><td style="padding:4px 6px;white-space:nowrap">${esc(x.d?jourC(x.d):'')}</td><td style="padding:4px 6px">${x.free?'<i>':''}${esc(x.t)}${x.free?'</i>':''}</td><td style="padding:4px 6px;white-space:nowrap;color:${PLC[s][1]};font-weight:600">${PLC[s][0]}</td></tr>`}).join('')}</table></details></div>`}
 /* vue visuelle façon tableau de planning (une ligne par logement, un post-it par tâche) — Saïd OUFQIR */
 /* ===== Cadence de livraison — objectif vs réel vs planning — Saïd OUFQIR ===== */
+const fdY=d=>d?new Date(d+'T12:00').toLocaleDateString('fr-FR'):'';
+/* ===== Situation bailleur (TBD), rotations tiroirs et prescriptions MOE — Saïd OUFQIR ===== */
+const ORC=o=>/refus/i.test(o)?'var(--red)':/^OT/.test(o)?'#2E6BD6':/mutation/i.test(o)?'var(--orange)':/vide/i.test(o)?'var(--green)':'var(--mute)';
+function bailHtml(l){const B=l.bail,M=(l.moe||[]),V=l.tirVers;if(!B&&!M.length&&!V)return '';const byUg={};logArr().forEach(x=>{if(x.ug)byUg[String(x.ug)]=x});
+ const lk=(ug,adr)=>byUg[ug]?`<a href="#" data-open="${byUg[ug].id}">${esc(adr)}</a>`:esc(adr);
+ return `<div class="sec" id="bail"><h3>🏠 Situation bailleur et MOE</h3>
+ ${B?`<p style="margin:0 0 6px;font-size:14px">${B.orient?`<span class="badge" style="background:${ORC(B.orient)};color:#fff">${esc(B.orient)}</span> `:''}${B.etatUG?esc(B.etatUG)+' · ':''}${B.parcBail?'TBD : '+esc(B.parcBail):''}${B.contentieux?' · <b style="color:var(--red)">CONTENTIEUX</b>':''}</p>
+ <p style="margin:0 0 6px;font-size:14px">${B.choixPlan?'Plan choisi : <b>'+esc(B.choixPlan)+'</b> · ':''}${B.sanit?'Sanitaire : <b>'+esc(B.sanit)+'</b> · ':''}${B.parasit?'Parasitaire à traiter : <b>'+esc(B.parasit)+'</b>':''}</p>`:''}
+ ${B&&B.rot&&(B.rot.tours||[]).length?`<p style="margin:0 0 6px;font-size:14px">🔁 <b>Logement tiroir</b>${B.rot.plan?' (plan '+esc(B.rot.plan)+')':''} : ${B.rot.tours.map(t=>`tour ${t.tour} → ménage du ${lk(t.ug,t.adr)}${t.dep?' · départ '+esc(fdate(t.dep)):''}${t.ret?' · retour '+esc(fdate(t.ret)):''}`).join(' · ')}</p>`:''}
+ ${V?`<p style="margin:0 0 6px;font-size:14px">🔁 Le ménage part en tiroir au ${lk(V.ug,V.adr)} (tour ${esc(V.tour)})</p>`:''}
+ ${M.map((p,i)=>`<div class="res"><span><b>MOE ${esc(p.n)}</b> · ${esc(p.t)}<br><span style="font-size:12px;color:var(--mute)">${esc(p.src||'')} · ${esc(p.st)}</span></span>${p.st!=='Levé'?`<button class="b" data-moelev="${l.id}|${i}" style="min-height:34px">Lever</button>`:'<span class="badge ok">Levé</span>'}</div>`).join('')}</div>`}
+function moeHtml(){const M=S.cfg.moe;if(!M)return '';
+ return `<div class="card"><h3>📋 Prescriptions MOA / MOE <span style="font-weight:400;font-size:13px;color:var(--mute)">· réunion n° ${esc(M.n)} du ${esc(fdate(M.date))}</span></h3>
+ <p style="margin:0 0 8px;font-size:14px">OS le <b>${esc(fdY(M.os))}</b> · objectif réception <b>${esc(fdY(M.objRecep))}</b> · cadence contractuelle <b>${esc(M.cadMois)} logements / mois</b> à partir de ${esc(fdY(M.cadDeb))} · M&C souhaite <b>${esc(M.liv2026)} livraisons en 2026</b></p>
+ <details><summary style="cursor:pointer"><b>Choix et prescriptions générales</b> (${(M.gen||[]).length})</summary>${(M.gen||[]).map(g=>`<div class="res"><span><b>${esc(g[0])} · ${esc(g[1])}</b><br><span style="font-size:14px">${esc(g[2])}</span></span></div>`).join('')}</details>
+ <details><summary style="cursor:pointer"><b>Visas en cours</b> (${(M.visas||[]).length})</summary>${(M.visas||[]).map(g=>`<div class="res"><span><b>${esc(g[0])} · ${esc(g[1])}</b><br><span style="font-size:14px">${esc(g[2])}</span></span></div>`).join('')}</details>
+ ${(M.diag||[]).map(g=>`<p style="margin:6px 0 0;font-size:14px;color:var(--red)"><b>Diags ${esc(g[0])}</b> : ${esc(g[1])}</p>`).join('')}</div>`}
+async function importBail(input){const f=input.files&&input.files[0];if(!f)return;input.value='';if(readonly)return toast('Lecture seule');let o;try{o=JSON.parse(await f.text())}catch(e){return info('Fichier illisible.')}
+ if(o.app!=='erbm-bail')return info('Ce fichier n\'est pas un import bailleur / MOE ERBM.');
+ const byUg=()=>{const m={};logArr().forEach(l=>{if(l.ug)m[String(l.ug)]=l});return m};let add=0,n=0,fx=0;
+ (o.add||[]).forEach(a=>{if(byUg()[a.ug])return;const id=uid();save('logements',id,{ug:a.ug,num:a.num,adresse:a.adresse,cite:a.cite||'',tranche:a.tranche||'',type:a.type||'',parcours:a.parcours||'GR',loc:{nom:'',tel:''},et:{},lots:{},res:[],journal:[{d:today(),t:'Ajouté depuis le TBD du bailleur'}],maj:today()});add++});
+ const M=byUg();Object.entries(o.fix||{}).forEach(([ug,f])=>{const l=M[ug];if(!l)return;const c=JSON.parse(JSON.stringify(S.logs[l.id]));Object.assign(c,f);c.maj=today();save('logements',l.id,c);fx++});
+ const vers={};Object.entries(o.logs||{}).forEach(([ug,b])=>((b.rot||{}).tours||[]).forEach(t=>{if(t.ug)vers[t.ug]={ug,adr:(M[ug]?(M[ug].num+' '+M[ug].adresse):ug),tour:t.tour}}));
+ Object.values(byUg()).forEach(l=>{const ug=String(l.ug),b=(o.logs||{})[ug],mp=((o.moe||{}).logs||{})[ug]||[];if(!b&&!mp.length&&!vers[ug])return;const c=JSON.parse(JSON.stringify(S.logs[l.id]));
+  if(b)c.bail=b;if(vers[ug])c.tirVers=vers[ug];if(mp.length){const old=c.moe||[];mp.forEach(p=>{if(!old.some(x=>x.n===p.n&&x.t===p.t))old.push(p)});c.moe=old}c.maj=today();save('logements',l.id,c);n++});
+ if(o.moe){const {logs,...g}=o.moe;S.cfg.moe=g;saveCfg()}render();
+ const L=logArr();info(`Import bailleur / MOE : ${n} logement(s) mis à jour.`+(add?`\n${add} logement ajouté (15 rue de Roye).`:'')+(fx?`\n${fx} parcours corrigé(s).`:'')+`\n${L.filter(l=>/refus/i.test((l.bail||{}).orient||'')).length} logement(s) en refus · ${L.filter(l=>(l.bail||{}).contentieux).length} en contentieux · ${L.filter(l=>(l.moe||[]).some(p=>p.st!=='Levé')).length} avec remarque MOE ouverte.`)}
+
 function cadHtml(){const L=logArr();if(!L.length)return '';const cad=parseFloat(String(S.cfg.cad||'1').replace(',','.'))||1,deb=S.cfg.cadDeb||'2026-11-16';
  const recD=L.map(l=>{const i=etapes(l).indexOf('Réception');return i>=0&&l.et&&l.et[i]?String(l.et[i]).slice(0,10):null}).filter(Boolean).sort();
  const plD=L.map(l=>((l.plan||{}).jal||{}).livr).filter(Boolean).sort();const t=today();
@@ -1001,6 +1030,8 @@ function cadHtml(){const L=logArr();if(!L.length)return '';const cad=parseFloat(
  <div class="res"><span>Objectif à ce jour<br><b style="font-size:22px">${obj}</b></span></div>
  <div class="res"><span>${ecart>=0?'Avance':'Retard'}<br><b style="font-size:22px;color:${ecart>=0?'var(--green)':'var(--red)'}">${ecart>=0?'+':''}${ecart} logt</b></span></div>
  <div class="res"><span>Fin au rythme visé<br><b style="font-size:18px">${esc(fin.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}))}</b></span></div></div>
+ ${(()=>{const M=S.cfg.moe;if(!M||!M.objRecep)return '';const wl=Math.max(1,(new Date(M.objRecep+'T12:00')-new Date())/(7*864e5)),need=reste/wl,lateM=Math.round((fin-new Date(M.objRecep+'T12:00'))/(30.4*864e5));
+  return `<div style="margin:8px 0;padding:10px 12px;border-radius:10px;border:2px solid ${need>cad?'var(--red)':'var(--green)'}"><b>Objectif contractuel : réception le ${esc(fdY(M.objRecep))}</b> (OS du ${esc(fdY(M.os))}, ${esc(M.cadMois)} logements / mois prévus au CR MOE).<br>Pour tenir : <b>${need.toFixed(1).replace('.',',')} logements / semaine</b> à partir d'aujourd'hui.${need>cad?` <b style="color:var(--red)">Au rythme de ${String(cad).replace('.',',')} / semaine, retard d'environ ${lateM} mois sur la réception.</b>`:' Rythme suffisant.'}</div>`})()}
  ${svg}<p style="font-size:13px;color:var(--mute);margin:4px 0">Gris pointillé = objectif · bleu = livraisons prévues au planning (${plD.length}, dont ${plFut} à venir) · vert = livrés (étape « Réception » cochée). Fin calculée sans congés.</p>
  <div class="grid" style="margin-top:6px"><label>Objectif (logements / semaine)<input data-cfg="cad" inputmode="decimal" value="${esc(String(S.cfg.cad||'1'))}"></label><label>Début de la cadence<input type="date" data-cfg="cadDeb" value="${esc(deb)}"></label></div></div>`}
 
@@ -1258,7 +1289,7 @@ function vTableau(){
  ${presT.length?`<p style="margin:10px 0 0;font-size:14px;opacity:.9">Sur site : ${presT.slice(0,8).map(o=>esc(o.p.n)+' ('+esc(o.p.m||'')+') · '+esc(o.l.num?'N° '+o.l.num+' ':'')+esc(o.l.adresse||'')).join(' · ')}</p>`:''}
  <div class="tools" style="margin:12px 0 0"><button class="b" data-act="briefing">📋 Ordre du jour</button><button class="b" data-act="sitrep">📡 SITREP hebdo</button><button class="b" data-act="cible">🎯 Objectifs de la semaine</button></div></div>`;
  return `<div class="hero">${ringBig(avg)}<div><h2>${esc(S.cfg.nom||'Chantier ERBM')}</h2><p>${L.length} logements · ${gr.length} GR · ${ti.length} tiroirs${S.cfg.bailleur?' · '+esc(S.cfg.bailleur):''}</p><p>${rec} réceptionné${rec>1?'s':''} · avancement moyen ${avg} %</p></div></div>${pc}
- <div class="tools"><button class="b" data-go="balance">⚖️ Balance + / −</button><button class="b" data-go="cr">📋 CR coordination</button><button class="b" data-go="penalites">💶 Pénalités ST</button><button class="b" data-go="insertion">👷 Heures d'insertion${S.ins?` · ${Math.round(insRows().reduce((t,x)=>t+x.re,0)/(S.ins.obj||1)*100)} %`:''}</button></div>
+ <div class="tools"><button class="b" data-go="balance">⚖️ Balance + / −</button><button class="b" data-go="cr">📋 CR coordination</button><button class="b" data-go="penalites">💶 Pénalités ST</button><button class="b" data-go="insertion">👷 Heures d'insertion${S.ins?` · ${Math.round(insRows().reduce((t,x)=>t+x.re,0)/(S.ins.obj||1)*100)} %`:''}</button></div>${moeHtml()}
  <div class="kpis">${kpi(`${vtF.length}<small style="font-size:15px;color:var(--mute)">/${L.length}</small>`,'VTE faites','g','planning')}${kpi(rdv7.length,'VTE dans les 7 jours','v','planning')}${kpi(rdvRet.length,'RDV VTE en retard',rdvRet.length?'r':'','planning')}${kpi(bloq.length,'logements avec bloquant',bloq.length?'r':'')}${kpi(ro,'réserves ouvertes',ro?'o':'','reserves')}${kpi(libres+'/'+tirArr().length,'tiroirs libres','','tiroirs')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(mtot)}</span>`,'montant HT engagé')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(pva)}</span>`,pvn+' provision(s) à valider','o')}${kpi(pas.d+'<small style="font-size:15px;color:var(--mute)">/'+pas.n+'</small>','points d\'arrêt levés'+(pas.nc?' · '+pas.nc+' NC':''),pas.nc?'r':'g')}${kpi(dDue,'relances concessionnaires dues',dDue?'r':'','reseaux')}${kpi(decO,'découvertes à chiffrer',decO?'o':'','decouvertes')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(balT)}</span>`,'balance + / − validée',balT<0?'r':'g','balance')}</div>
  <div class="grid2">
  <div class="card"><h3>⛔ Bloquants VTE <a class="more" href="#logements">${bloq.length}</a></h3>${bloq.length?bloq.slice(0,8).map(o=>`<div class="line" data-open="${o.l.id}"><span class="t"><b>${esc((o.l.num?'N° '+o.l.num+' ':'')+(o.l.adresse||''))}</b><small>${o.y.B.map(esc).join(' · ')}</small></span><span class="pill r">${o.y.B.length}</span></div>`).join(''):'<p class="mut" style="margin:0;color:var(--mute)">Aucun bloquant relevé.</p>'}</div>
@@ -1332,6 +1363,9 @@ function vReglages(){
  <h2 style="margin:28px 0 8px">Bons de commande et BPU complet</h2>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Choisissez le fichier préparé (.json) : il charge le BPU complet du marché et remplit la fiche travaux de chaque logement avec son bon de commande (codes, quantités, prix, corps d'état). Les lignes ajoutées à la main sont conservées. ${logArr().filter(l=>l.bdc).length} logement(s) ont déjà leur bon de commande.</p>
  <div class="tools"><label class="b p">📥 Importer les bons de commande (.json)<input type="file" class="fhide bdcfile" accept=".json,application/json"></label></div>
+ <h2 style="margin:28px 0 8px">Bailleur et MOE</h2>
+ <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Fichier préparé depuis le TBD du bailleur et le CR de réunion client (.json) : orientation de chaque logement (OT, refus, mutation…), rotations des logements tiroirs, parasitaires, remarques MOE par logement, choix de coloris et matériaux, visas, calendrier contractuel. Aucun nom de locataire n'est importé.</p>
+ <div class="tools"><label class="b p">📥 Importer bailleur / MOE (.json)<input type="file" class="fhide bailfile" accept=".json,application/json"></label></div>
  <h2 style="margin:28px 0 8px">Planning travaux</h2>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Chaque semaine, exportez le planning depuis Ubikey en Excel (.xlsx) et choisissez-le ici, sans rien modifier. L'appli lit directement : tâches datées par logement et par entreprise, OPR, livraisons et points de vigilance. Il alimente l'onglet Planning (programme de la semaine par ST, retards, jalons) et la fiche de chaque logement. Réimporter un nouveau planning remplace l'ancien.</p>
  <div class="tools"><label class="b p">📥 Importer le planning Ubikey (.xlsx)<input type="file" class="fhide planfile" accept=".xlsx,.json,application/json,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label></div>
@@ -1393,7 +1427,7 @@ function renderPanel(){
   <label>Retour prévu<input type="date" data-f="tir.au" value="${esc(l.tir?.au||'')}"></label>
  </div>${tiroirs.length?'':'<p class="note" style="margin:10px 0 0">Ajoutez d\'abord les logements tiroirs dans l\'onglet Tiroirs.</p>'}</div>`:''}
  <div class="sec"><h3>Étapes · ${esc(p.nom)}</h3><ol class="steps">${p.etapes.map((e,i)=>`<li class="${l.et&&l.et[i]?'done':''} ${i===ci?'cur':''}"><button class="ck" data-step="${i}" aria-label="${esc(e)}">${l.et&&l.et[i]?'✓':''}</button><span>${esc(e)}${!(l.et&&l.et[i])&&gate(l,i).length?' 🔒':''}</span><input type="date" data-sd="${i}" value="${esc(l.et&&l.et[i]||'')}" aria-label="Date ${esc(e)}"></li>`).join('')}</ol></div>
- ${(()=>{const L1={id,...l};return planHtml(L1)+mxHtml(L1)+paHtml(L1)+tkHtml(L1)+decHtml(L1)+rdvHtml(L1)+cnHtml(L1)+balHtml(L1)})()}
+ ${(()=>{const L1={id,...l};return bailHtml(L1)+planHtml(L1)+mxHtml(L1)+paHtml(L1)+tkHtml(L1)+decHtml(L1)+rdvHtml(L1)+cnHtml(L1)+balHtml(L1)})()}
  <div class="sec"><h3>${l.parcours==='GR'?'Prestations':'Corps d\'état'}</h3><p style="margin:0 0 8px;font-size:13px;color:var(--mute)">Touchez un lot pour le faire passer : à faire → en cours → fait → non prévu.</p><div class="lots">${p.lots.map(n=>{const s=(l.lots||{})[n]||0;return `<button class="lot s${s}" data-lot="${esc(n)}"><span>${esc(n)}</span><em>${LOTST[s]}</em></button>`}).join('')}</div></div>
  <div class="sec" id="vte"><h3>VTE · provisions ${l.vte?.ok?'<span class="badge ok" style="vertical-align:2px">VTE validée</span>':''}${l.dalux?'<span class="badge" style="vertical-align:2px;margin-left:6px">VT Dalux</span>':''}</h3>
   ${daluxHtml(l)}${synthHtml(l)}
@@ -1625,7 +1659,7 @@ function editTir(id,isNew){
 }
 
 document.addEventListener('click',e=>{
- const t=e.target.closest('[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon],[data-ptdel],[data-pa],[data-cn],[data-cnnew],[data-map],[data-cf],[data-df],[data-tk],[data-dec],[data-rdvdel],[data-baldel],[data-vf],[data-vtgo],[data-pw],[data-progcopy],[data-gw]');
+ const t=e.target.closest('[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon],[data-ptdel],[data-pa],[data-cn],[data-cnnew],[data-map],[data-cf],[data-df],[data-tk],[data-dec],[data-rdvdel],[data-baldel],[data-vf],[data-vtgo],[data-pw],[data-progcopy],[data-gw],[data-moelev]');
  if(e.target===$('sheet')){closePanel();return}
  if(!t)return;
  if(t.tagName==='A'&&t.dataset.open)e.preventDefault();
@@ -1633,6 +1667,7 @@ document.addEventListener('click',e=>{
  if(t.dataset.pa){const [p,a]=t.dataset.pa.split('|');return paAct(p,a)}
  if(t.dataset.cn){const [l,d,a]=t.dataset.cn.split('|');return cnAct(l,d,a)}
  if(t.dataset.cnnew!==undefined){if(!logArr().length)return toast('Ajoutez d\'abord des logements');const [l,c,o]=t.dataset.cnnew.split('|');return editCn(l||logArr()[0].id,null,c?[c,o]:null)}
+ if(t.dataset.moelev){e.preventDefault();if(readonly)return toast('Lecture seule');const [lid,i]=t.dataset.moelev.split('|');const c=JSON.parse(JSON.stringify(S.logs[lid]));if(c.moe&&c.moe[+i]){c.moe[+i].st='Levé';c.moe[+i].lev=today();c.journal=[...(c.journal||[]),{d:today(),t:'Remarque MOE '+c.moe[+i].n+' levée'}];c.maj=today();save('logements',lid,c);renderPanel&&S.open&&renderPanel();render()}return}
  if(t.dataset.gw!==undefined){const v=t.dataset.gw;S.gw=v==='-1'?(S.gw||0)-1:v==='+1'?(S.gw||0)+1:+v;return render()}
  if(t.dataset.pw!==undefined){const v=t.dataset.pw;S.pw=v==='-1'?(S.pw||0)-1:v==='+1'?(S.pw||0)+1:+v;return render()}
  if(t.dataset.progcopy){e.preventDefault();e.stopPropagation();const en=t.dataset.progcopy;return showText('Programme '+en,progTxt(en))}
@@ -1677,6 +1712,7 @@ document.addEventListener('change',e=>{
  if(t.classList&&t.classList.contains('diagpdf'))return uploadDiagPdfs(t);
  if(t.classList&&t.classList.contains('crfile'))return importCR(t);
  if(t.classList&&t.classList.contains('planfile'))return importPlan(t);
+ if(t.classList&&t.classList.contains('bailfile'))return importBail(t);
  if(t.classList&&t.classList.contains('insfile'))return importIns(t);
  if(t.dataset.paph&&S.open)uploadPA(t);
  if(t.dataset.tkph&&QR&&t.files&&t.files[0]){qrTk(t.dataset.tkph,'done',t.files[0]);t.value=''}
