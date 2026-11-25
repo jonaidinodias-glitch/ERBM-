@@ -186,11 +186,11 @@ const P={
   lots:['Curage / démolition','Gros œuvre / maçonnerie','Couverture / zinguerie','Menuiseries extérieures','Isolation / plâtrerie','Électricité','Plomberie / sanitaires','Chauffage / VMC','Menuiseries intérieures','Revêtements de sol','Peinture','Façade / ravalement','Extérieurs / VRD']}
 };
 const LOTST=['À faire','En cours','Fait','Non prévu'];
-const S={logs:{},tirs:{},cfg:{},bpu:[],view:'tableau',open:null,q:'',fp:'',fe:'',fc:''};
+const S={logs:{},tirs:{},cfg:{},bpu:[],ins:null,view:'tableau',open:null,q:'',fp:'',fe:'',fc:''};
 let readonly=false;
 /* ---------- stockage local + synchro serveur Évolud (action « erbm ») ---------- */
 const LSK='evolud_erbm_v1',ME='erbm';
-let SY={dirty:{},since:0,conf:{},bc:{},dead:{},cfgU:0,bpuU:0,last:0,err:''};
+let SY={dirty:{},since:0,conf:{},bc:{},dead:{},cfgU:0,bpuU:0,insU:0,last:0,err:''};
 const blob=id=>id?'https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w1600':'';
 const driveLink=id=>'https://drive.google.com/file/d/'+encodeURIComponent(id)+'/view';
 /* --- import des visites techniques Dalux (PDF) --- */
@@ -361,6 +361,7 @@ function recOf(key){
   const u=o._u||Date.now(),d={id:key,type:k==='L'?'logement':'tiroir',updatedAt:u,v:o};
   if(k==='L'){d.ug=o.ug||'';d.adresse=o.adresse||'';d.cite=o.cite||'';d.parcours=(P[o.parcours]||{}).court||'';d.etape=etat(o);d.montant=Math.round(montant(o)*100)/100}else{d.adresse=(o.num?'N° '+o.num+' ':'')+(o.adresse||'')}
   return [{c:ME,id:key,updatedAt:u,data:d}]}
+ if(key==='C:ins')return S.ins?[{c:ME,id:key,updatedAt:SY.insU||Date.now(),data:{id:key,type:'insertion',updatedAt:SY.insU||Date.now(),v:S.ins}}]:[];
  if(key==='C:cfg')return [{c:ME,id:key,updatedAt:SY.cfgU||Date.now(),data:{id:key,type:'config',updatedAt:SY.cfgU||Date.now(),v:S.cfg}}];
  if(key==='B:bpu'){const U=SY.bpuU||Date.now(),N=80,n=Math.max(1,Math.ceil(S.bpu.length/N)),out=[];for(let i=0;i<Math.max(n,SY.bpuN||0);i++){const id='B:'+i;out.push({c:ME,id,updatedAt:U,data:{id,type:'bpu',updatedAt:U,i,n,v:i<n?S.bpu.slice(i*N,i*N+N):[]}})}SY.bpuN=n;return out}
  return []}
@@ -372,6 +373,7 @@ function applyRecs(recs){
    if(d.deleted){if(loc&&(loc._u||0)<=U){delete store[id];ch=true}SY.dead[key]=U;return}
    if(!loc||(loc._u||0)<U||!SY.dirty[key]){if(!loc||(loc._u||0)!==U){store[id]={...d.v,_u:U};ch=true}}}
   else if(key==='C:cfg'){if(U>(SY.cfgU||0)&&!SY.dirty[key]){S.cfg={...(d.v||{})};SY.cfgU=U;ch=true}}
+  else if(key==='C:ins'){if(U>(SY.insU||0)&&!SY.dirty[key]){S.ins=d.v||null;SY.insU=U;ch=true}}
   else if(k==='B'){if(U>(SY.bpuU||0)&&!SY.dirty['B:bpu']){const g=SY.bc[U]||(SY.bc[U]={n:d.n,p:{}});g.p[d.i]=d.v||[]}}});
  Object.keys(SY.bc).map(Number).sort((a,b)=>b-a).forEach(U=>{const g=SY.bc[U];if(U>(SY.bpuU||0)&&Object.keys(g.p).length>=g.n){let all=[];for(let i=0;i<g.n;i++)all=all.concat(g.p[i]||[]);S.bpu=all;SY.bpuU=U;SY.bpuN=g.n;ch=true}});
  Object.keys(SY.bc).forEach(U=>{if(+U<=(SY.bpuU||0))delete SY.bc[U]});
@@ -381,11 +383,11 @@ async function sync(){
  const c=conf();if(!c.u||!c.t){SY.err='serveur non réglé';setSt();return}
  if(SY.qrOnly){if(!QR)return;syncing=true;SY.err='';setSt();try{const j=await api({action:'qrget',l:QR.l});if(j.l){S.logs={[QR.l]:{...j.l,_u:j.u}};S.cfg=j.cfg||{};SY.last=Date.now();persistLocal();if(!typing())render()}}catch(e){SY.err=String(e&&e.message||e).slice(0,140);if(!typing())render()}syncing=false;setSt();return}
  syncing=true;SY.err='';setSt();
- const keys=Object.keys(SY.dirty),sentU={};keys.forEach(k=>{sentU[k]=k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0)});
+ const keys=Object.keys(SY.dirty),sentU={};keys.forEach(k=>{sentU[k]=k==='C:ins'?SY.insU:k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0)});
  const records=[].concat(...keys.map(recOf));
  try{
   const j=await api({action:'erbm',since:SY.since||0,records});if(j.qrKey)SY.qrKey=j.qrKey;
-  keys.forEach(k=>{const now=k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0);if(now===sentU[k])delete SY.dirty[k]});
+  keys.forEach(k=>{const now=k==='C:ins'?SY.insU:k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0);if(now===sentU[k])delete SY.dirty[k]});
   const ch=applyRecs(j.records||[]);SY.since=j.now||Date.now();SY.last=Date.now();persistLocal();
   if(ch&&!typing())render();
  }catch(e){SY.err=String(e&&e.message||e).slice(0,140);if(/non autoris|bloqu/i.test(SY.err))readonly=false}
@@ -656,7 +658,7 @@ const ME_K='erbm_intervenant';
 const meGet=()=>{try{return JSON.parse(localStorage.getItem(ME_K)||'null')}catch(e){return null}};
 const meSet=v=>{try{localStorage.setItem(ME_K,JSON.stringify(v))}catch(e){}};
 const presents=l=>(l.pt||[]).filter(p=>!p.out&&(p.in||'').slice(0,10)===today());
-async function pointer(lid,me,sens){const pos=await getPos();if(SY.qrOnly)return qrOp({op:sens,n:me.n,e:me.e||'',m:me.m||'',gps:pos});const o=JSON.parse(JSON.stringify(S.logs[lid]));o.pt=[...(o.pt||[])];const now=new Date().toISOString();
+async function pointer(lid,me0,sens){const pos=await getPos();const me={...me0,m:(me0.m||'')+(me0.ins&&!/insertion/.test(me0.m||'')?' · insertion':'')};if(SY.qrOnly)return qrOp({op:sens,n:me.n,e:me.e||'',m:me.m||'',gps:pos});const o=JSON.parse(JSON.stringify(S.logs[lid]));o.pt=[...(o.pt||[])];const now=new Date().toISOString();
  if(sens==='in')o.pt.push({id:uid(),n:me.n,e:me.e||'',m:me.m||'',in:now,gps:pos});
  else{const i=o.pt.map(p=>p.n===me.n&&!p.out&&(p.in||'').slice(0,10)===today()).lastIndexOf(true);if(i>=0)o.pt[i]={...o.pt[i],out:now,gpsOut:pos}}
  o.pt=o.pt.slice(-300);o.maj=today();save('logements',lid,o);sched(300)}
@@ -664,10 +666,11 @@ async function upPhoto(l,b,comment){const b64=await toJpeg(b);const ug=String(l.
 function tkHtml(l){const pres=presents(l),hist=(l.pt||[]).slice(-10).reverse();
  return `<div class="sec" id="tk"><h3>🔧 Tâches intervenants & présence</h3>
  <p style="margin:0 0 8px;font-size:13px;color:var(--mute)">Les sous-traitants scannent le QR du logement : arrivée, départ, et état de leurs travaux (photo obligatoire pour « Terminé »). Une tâche reste verrouillée 🔒 tant que celles d'avant ne sont pas terminées.</p>
+ ${(l.ordre||l.planSol||l.lotsST)?`<p style="margin:0 0 8px;font-size:14px">${l.ordre?`<b>Ordre de passage n° ${esc(l.ordre)}</b>`:''}${l.planSol?`${l.ordre?' · ':''}Plan retenu : <b>${esc(l.planSol)}</b>`:''}${l.lotsST?`<br><span style="color:var(--mute)">${Object.entries(l.lotsST).map(([k,v])=>esc(k)+' : '+esc(v)).join(' · ')}</span>`:''}</p>`:''}
  <div class="tools" style="margin-top:0"><button class="b p" data-act="qrshow">🔳 QR code du logement</button></div>
  <p style="margin:6px 0"><b>Présents maintenant :</b> ${pres.length?pres.map(p=>esc(p.n)+' ('+esc(p.m||'')+(p.e?' · '+esc(p.e):'')+') depuis '+esc(new Date(p.in).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}))).join(' · '):'personne'}</p>
  ${TK.map((t,i)=>{const h=(i===0||TK[i-1].ph!==t.ph)?`<h3 class="cklot">${esc(t.ph)}</h3>`:'';const c=tkS(l,t),lk=c.st==='todo'?tkLock(l,t):[];
-  return h+`<div class="ckh" style="padding:6px 0;border-bottom:1px solid var(--line)"><span>${esc(t.lib)} <span style="font-size:12px;color:var(--mute)">· ${esc(t.m)}</span>${lk.length?`<br><span style="font-size:12px;color:var(--red)">🔒 ${lk.map(esc).join(' · ')}</span>`:''}${c.by?`<br><span style="font-size:12px;color:var(--mute)">${esc(TKL[c.st])} · ${esc(c.by)}${c.ent?' ('+esc(c.ent)+')':''} · ${esc(fdate(c.upd||''))}</span>`:''}${(c.ph||[]).map(id=>` <a href="${esc(driveLink(id))}" target="_blank" rel="noopener">📷</a>`).join('')}</span><select data-tkadm="${t.id}" aria-label="${esc(t.lib)}" style="width:auto;min-height:38px;padding:4px 8px">${Object.entries(TKL).map(([k,v])=>`<option value="${k}" ${c.st===k?'selected':''} ${lk.length&&(k==='go'||k==='ok')?'disabled':''}>${v}</option>`).join('')}</select></div>`}).join('')}
+  return h+`<div class="ckh" style="padding:6px 0;border-bottom:1px solid var(--line)"><span>${esc(t.lib)} <span style="font-size:12px;color:var(--mute)">· ${esc((l.aff||{})[t.id]||t.m)}</span>${lk.length?`<br><span style="font-size:12px;color:var(--red)">🔒 ${lk.map(esc).join(' · ')}</span>`:''}${c.by?`<br><span style="font-size:12px;color:var(--mute)">${esc(TKL[c.st])} · ${esc(c.by)}${c.ent?' ('+esc(c.ent)+')':''} · ${esc(fdate(c.upd||''))}</span>`:''}${(c.ph||[]).map(id=>` <a href="${esc(driveLink(id))}" target="_blank" rel="noopener">📷</a>`).join('')}</span><select data-tkadm="${t.id}" aria-label="${esc(t.lib)}" style="width:auto;min-height:38px;padding:4px 8px">${Object.entries(TKL).map(([k,v])=>`<option value="${k}" ${c.st===k?'selected':''} ${lk.length&&(k==='go'||k==='ok')?'disabled':''}>${v}</option>`).join('')}</select></div>`}).join('')}
  ${hist.length?`<details style="margin-top:10px"><summary style="cursor:pointer;font-weight:600">Derniers pointages (${(l.pt||[]).length})</summary>${hist.map(p=>`<p style="margin:4px 0;font-size:14px">${esc(new Date(p.in).toLocaleString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}))} → ${p.out?esc(new Date(p.out).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'})):'<b>présent</b>'} · ${esc(p.n)} · ${esc(p.m||'')}${p.e?' · '+esc(p.e):''}${p.gps?' · 📍 GPS':''}</p>`).join('')}</details>`:''}</div>`}
 /* QR code par logement */
 function loadScript(src,test){if(test())return Promise.resolve();return new Promise((ok,ko)=>{const s=document.createElement('script');s.src=src;s.onload=ok;s.onerror=ko;document.head.appendChild(s)})}
@@ -689,8 +692,8 @@ async function qrPlanche(){if(!qrPret())return;const L=logArr();if(!L.length)ret
 /* vue intervenant (après scan du QR) */
 function vQR(){const l0=S.logs[QR.l];if(!l0)return `<div class="empty"><h2>Chargement du logement…</h2><p>${SY.err?esc(SY.err)+'<br><br>Code de ce téléphone : <b>'+esc(conf().d)+'</b> — à donner au conducteur de travaux pour autorisation.':'Connexion au serveur en cours.'}</p></div>`;
  const l={id:QR.l,...l0},me=meGet();
- if(!me||!me.n||!me.m)return `<div class="card"><h3>${esc(lname(l))}</h3><p>Identifiez-vous une seule fois sur ce téléphone.</p><div class="grid"><label>Nom et prénom<input id="qn" value="${esc((me||{}).n||'')}"></label><label>Entreprise<input id="qe" value="${esc((me||{}).e||'')}"></label><label>Métier<select id="qm">${METIERS.map(m=>`<option ${(me||{}).m===m?'selected':''}>${esc(m)}</option>`).join('')}</select></label></div><div class="tools"><button class="b p" data-act="qrme">Valider</button></div></div>`;
- const pres=presents(l),moi=pres.find(p=>p.n===me.n),mine=TK.filter(t=>t.m===me.m),open=mine.filter(t=>!['ok','np'].includes(tkS(l,t).st)),pend=mine.filter(t=>tkS(l,t).st==='go'&&tkS(l,t).upd!==today());
+ if(!me||!me.n||!me.m)return `<div class="card"><h3>${esc(lname(l))}</h3><p>Identifiez-vous une seule fois sur ce téléphone.</p><div class="grid"><label>Nom et prénom<input id="qn" value="${esc((me||{}).n||'')}"></label><label>Entreprise<input id="qe" list="qel" value="${esc((me||{}).e||'')}"><datalist id="qel">${[...new Set((S.cfg.st||[]).map(x=>x.ent))].map(e=>`<option value="${esc(e)}">`).join('')}</datalist></label><label style="flex-direction:row;align-items:center;gap:8px"><input type="checkbox" id="qins" style="width:auto;min-height:0" ${(me||{}).ins?'checked':''}> Je suis salarié(e) en parcours d'insertion</label><label>Métier<select id="qm">${METIERS.map(m=>`<option ${(me||{}).m===m?'selected':''}>${esc(m)}</option>`).join('')}</select></label></div><div class="tools"><button class="b p" data-act="qrme">Valider</button></div></div>`;
+ const pres=presents(l),moi=pres.find(p=>p.n===me.n),mine=TK.filter(t=>t.m===me.m||(me.e&&(l.aff||{})[t.id]&&String(l.aff[t.id]).toLowerCase().replace(/\W/g,'')===String(me.e).toLowerCase().replace(/\W/g,''))),open=mine.filter(t=>!['ok','np'].includes(tkS(l,t).st)),pend=mine.filter(t=>tkS(l,t).st==='go'&&tkS(l,t).upd!==today());
  const actionable=open.filter(t=>tkS(l,t).st==='go'||!tkLock(l,t).length);const canLeave=!pend.length&&(!actionable.length||mine.some(t=>tkS(l,t).upd===today()));const am=(l.vte||{}).am||'non renseigné';
  const cons=['cons_e','cons_g','cons_w'].map(id=>TK.find(t=>t.id===id).lib.replace('Consignation ','')+(tkDone(l,id)?' ✅':' ❌')).join(' · ');
  const F=INTERV.includes(me.m)?ficheData(l,me.m):null;
@@ -825,6 +828,53 @@ async function uploadDiagPdfs(input){const fs=[...(input.files||[])];input.value
   try{toast(`Diag ${i+1}/${fs.length} : UG ${ug}…`);const b64=await new Promise((ok,ko)=>{const r=new FileReader();r.onload=()=>ok(String(r.result).split(',')[1]);r.onerror=ko;r.readAsDataURL(f)});const j=await api({action:'photo',ug,name:f.name,b64,kind:'DIAG',mime:'application/pdf',meta:{ts:Date.now(),comment:'Diag amiante'}});
    const c=JSON.parse(JSON.stringify(S.logs[l.id]));const it={id:j.fileId,name:f.name,size:f.size};if(c.diag)c.diag={...c.diag,pdfs:[...(c.diag.pdfs||[]),it]};else c.diagPdfs=[...(c.diagPdfs||[]),it];/* sans analyse importée : pas de faux diag (le curage reste verrouillé) */c.maj=today();save('logements',l.id,c);n++}catch(e){rate.push(f.name)}}
  render();info(`${n} diag(s) PDF rangé(s) dans leur logement.`+(dbl?`\n${dbl} copie(s) identique(s) ignorée(s).`:'')+(deja?`\n${deja} déjà en place.`:'')+(inconnus.length?`\n${inconnus.length} fichier(s) sans UG reconnu.`:'')+(rate.length?`\n${rate.length} en échec (réseau ou serveur à mettre en version 5.4) : relancez avec les mêmes fichiers.`:''))}
+/* ===== Heures d'insertion — conçu par Saïd OUFQIR ===== */
+const nk=x=>String(x||'').toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/[^a-z0-9]/g,'');
+const hfmt=h=>h==null||h===''?'—':Math.round(h).toLocaleString('fr-FR')+' h';
+function insPointe(){const R={};logArr().forEach(l=>(l.pt||[]).forEach(p=>{if(!/insertion/i.test(p.m||'')||!p.in||!p.out)return;const h=Math.min(10,Math.max(0,(new Date(p.out)-new Date(p.in))/36e5));(R[nk(p.e)]??=[]).push({h,mois:p.in.slice(0,7),n:p.n})}));return R}
+function insRows(){const I=S.ins||{st:[]},P=insPointe();return I.st.map((x,i)=>{const saisi=Object.values(x.real||{}).reduce((a,b)=>a+(+b||0),0),pt=(P[nk(x.st)]||[]).reduce((a,b)=>a+b.h,0),re=saisi+pt,ref=x.hMar||0;
+ const al=[];if(x.hVal!=null&&x.hMar!=null&&x.hVal<x.hMar)al.push({lv:'R',t:'Engagement du ST inférieur au marché : '+hfmt(x.hMar-x.hVal)+' à faire valider'});
+ if(x.hVal&&x.mt&&x.hVal*25>x.mt*0.5)al.push({lv:'Y',t:'Heures validées incohérentes avec le montant du contrat ('+hfmt(x.hVal)+' pour '+eur(x.mt)+') : saisie à vérifier'});
+ else if(x.hVal!=null&&x.hMar&&x.hVal>x.hMar*3)al.push({lv:'Y',t:'Heures validées très supérieures au marché : à confirmer'});
+ if(x.hMar==null&&x.mt)al.push({lv:'O',t:'Heures du marché non connues (NC) : à obtenir'});
+ return {...x,i,saisi,pt,re,pc:ref?Math.round(re/ref*100):null,al}})}
+function vInsertion(){const I=S.ins;
+ if(!I)return `<div class="card"><h3>👷 Heures d'insertion</h3><p>Importez le fichier préparé (.json) avec les heures par sous-traitant.</p><div class="tools"><label class="b p">📥 Importer les heures d'insertion (.json)<input type="file" class="fhide insfile" accept=".json,application/json"></label></div></div>`;
+ const R=insRows(),tMar=R.reduce((a,x)=>a+(x.hMar||0),0),tVal=R.reduce((a,x)=>a+(x.hVal||0),0),tRe=R.reduce((a,x)=>a+x.re,0),obj=I.obj||0,reste=Math.max(0,obj-tRe),pc=obj?Math.min(100,Math.round(tRe/obj*100)):0;
+ const rouge=R.filter(x=>x.al.some(a=>a.lv==='R')),jaune=R.filter(x=>x.al.some(a=>a.lv==='Y'));const mois=new Date().toISOString().slice(0,7);
+ return `<div class="card"><h3>👷 Heures d'insertion · objectif BBNE ${hfmt(obj)}</h3>
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px">
+ <div class="res"><span>Réalisé (saisi + pointé)<br><b style="font-size:22px">${hfmt(tRe)}</b> · ${pc} %</span></div>
+ <div class="res"><span>Reste à faire<br><b style="font-size:22px;color:var(--red)">${hfmt(reste)}</b></span></div>
+ <div class="res"><span>Heures ST selon marché<br><b style="font-size:22px">${hfmt(tMar)}</b></span></div>
+ <div class="res"><span>Heures validées avec les ST<br><b style="font-size:22px">${hfmt(tVal)}</b></span></div></div>
+ <div style="height:12px;background:var(--bg2);border-radius:8px;margin:10px 0"><div style="height:12px;width:${pc}%;background:var(--green);border-radius:8px"></div></div>
+ <p style="font-size:14px;margin:4px 0">Heures couvertes par les ST selon marché : <b>${hfmt(tMar)}</b> sur ${hfmt(obj)} → <b>${hfmt(Math.max(0,obj-tMar))}</b> à porter par BBNE ou à négocier avec les ST.</p>
+ ${rouge.length||jaune.length?`<p style="font-size:14px;margin:4px 0"><b style="color:var(--red)">${rouge.length} engagement(s) ST sous le marché</b> · <b style="color:#bf8f00">${jaune.length} saisie(s) à vérifier</b></p>`:''}</div>
+ <div class="card"><h3>➕ Saisir des heures réalisées</h3><div class="grid"><label>Sous-traitant<select id="insst">${R.map(x=>`<option value="${x.i}">${esc(x.st)} · ${esc(x.lot)}</option>`).join('')}</select></label><label>Mois<input id="insm" type="month" value="${mois}"></label><label>Heures<input id="insh" type="number" inputmode="decimal" min="0" step="0.5"></label></div><div class="tools"><button class="b p" data-act="insadd">Enregistrer</button></div>
+ <p style="font-size:13px;color:var(--mute);margin:4px 0 0">Les heures pointées par QR code (intervenant coché « en parcours d'insertion ») s'ajoutent automatiquement. Une saisie remplace celle du même mois pour ce ST.</p></div>
+ ${R.map(x=>`<div class="card" style="border-left:5px solid ${x.al.some(a=>a.lv==='R')?'var(--red)':x.al.length?'#bf8f00':'var(--green)'}"><h3 style="margin:0">${esc(x.st)} <span style="font-weight:400;color:var(--mute)">· ${esc(x.lot)}${x.mt?' · '+eur(x.mt):''}</span></h3>
+  <p style="margin:4px 0;font-size:14px">Marché : <b>${hfmt(x.hMar)}</b> · Validé ST : <b>${hfmt(x.hVal)}</b> · Réalisé : <b>${hfmt(x.re)}</b>${x.pt?` (dont ${hfmt(x.pt)} pointées)`:''}${x.pc!=null?` · <b>${x.pc} %</b>`:''}</p>
+  ${Object.keys(x.real||{}).length?`<p style="margin:2px 0;font-size:13px;color:var(--mute)">${Object.entries(x.real).sort().map(([m,h])=>esc(m)+' : '+hfmt(h)).join(' · ')}</p>`:''}
+  ${x.al.map(a=>`<p style="margin:2px 0;font-size:13px;color:${a.lv==='R'?'var(--red)':a.lv==='Y'?'#bf8f00':'var(--orange)'}">⚠ ${esc(a.t)}</p>`).join('')}</div>`).join('')}
+ <div class="tools"><button class="b" data-act="csvins">⬇️ Export CSV</button><label class="b">📥 Réimporter (.json)<input type="file" class="fhide insfile" accept=".json,application/json"></label></div>
+ <p class="sig">ERBM · heures d'insertion · conçu et développé par Saïd OUFQIR</p>`}
+async function importIns(input){const f=input.files&&input.files[0];if(!f)return;input.value='';if(readonly)return toast('Lecture seule');let o;try{o=JSON.parse(await f.text())}catch(e){return info('Fichier illisible.')}
+ if(o.app!=='erbm-ins'||!Array.isArray(o.st))return info('Ce fichier n\'est pas un import d\'heures d\'insertion ERBM.');
+ const old={};((S.ins||{}).st||[]).forEach(x=>old[nk(x.st)+'|'+nk(x.lot)]=x.real||{});
+ S.ins={obj:o.obj||0,mtBBNE:o.mtBBNE||0,st:o.st.map(x=>({...x,real:{...(old[nk(x.st)+'|'+nk(x.lot)]||{}),...(x.real||{})}}))};saveIns();render();info(`${o.st.length} sous-traitant(s) importé(s). Objectif BBNE : ${hfmt(o.obj)}. Les heures déjà saisies sont conservées.`)}
+
+function stAnnuaire(){const L=S.cfg.st||[];if(!L.length)return '';const tel=t=>String(t||'').replace(/[^\d+]/g,'');
+ return `<details class="card" style="margin-top:8px"><summary style="cursor:pointer;font-weight:700">📇 Annuaire chantier · ${L.length} contact(s)</summary>${L.map(x=>`<div class="res"><span><b>${esc(x.ent)}</b> · ${esc(x.lot||'')}<br><span style="font-size:14px">${esc(x.contact||'')}${x.tel?` · <a href="tel:${esc(tel(x.tel))}">📞 ${esc(x.tel)}</a>`:''}${x.mail?` · <a href="mailto:${esc(x.mail)}">✉️</a>`:''}</span></span></div>`).join('')}</details>`}
+async function importCR(input){const f=input.files&&input.files[0];if(!f)return;input.value='';if(readonly)return toast('Lecture seule');let o;try{o=JSON.parse(await f.text())}catch(e){return info('Fichier illisible.')}
+ if(o.app!=='erbm-cr'||!o.logs)return info('Ce fichier n\'est pas un import de CR de coordination ERBM.');
+ const byUg={};logArr().forEach(l=>{if(l.ug)byUg[String(l.ug)]=l});let n=0,vt=0,rdv=0,af=0;const inc=[];
+ Object.entries(o.logs).forEach(([ug,d])=>{const l=byUg[ug];if(!l){inc.push(ug);return}const c=JSON.parse(JSON.stringify(S.logs[l.id]));
+  if(d.ordre)c.ordre=d.ordre;if(d.plan)c.planSol=d.plan;if(d.aff){c.aff={...(c.aff||{}),...d.aff};af++}if(d.lots)c.lotsST={...(c.lotsST||{}),...d.lots};
+  if(d.vtOk&&!vtFaite(c)){c.vte={...(c.vte||{}),ok:true,okSrc:'CR'};vt++}if(d.vtRdv&&!(c.vte||{}).rdv&&!vtFaite(c)){c.vte={...(c.vte||{}),rdv:d.vtRdv+'T08:00'};rdv++}
+  if(JSON.stringify(c)!==JSON.stringify(S.logs[l.id])){c.maj=today();save('logements',l.id,c);n++}});
+ if(Array.isArray(o.st)&&o.st.length)S.cfg.st=o.st;S.cfg.cr={src:o.src||'',date:today()};saveCfg();render();
+ info(`CR importé : ${n} logement(s) mis à jour.\n${(o.st||[]).length} contact(s) dans l'annuaire.\n${vt} VT marquée(s) faite(s), ${rdv} VT planifiée(s).\n${af} logement(s) avec entreprise prévue par tâche.`+(inc.length?`\n${inc.length} UG inconnu(s).`:''))}
 async function importDiag(input){const f=input.files&&input.files[0];if(!f)return;input.value='';if(readonly)return toast('Lecture seule');let o;try{o=JSON.parse(await f.text())}catch(e){return info('Fichier illisible.')}
  if(!o||o.app!=='erbm-diag'||!o.logs)return info('Ce fichier n\'est pas un fichier de diags ERBM.');
  const byUg={};logArr().forEach(l=>{if(l.ug)byUg[String(l.ug).trim()]=l});let n=0,p=0,ci=0,w=0,nv=0;const abs=[];
@@ -936,9 +986,10 @@ function save(coll,id,obj){obj._u=Date.now();S[coll==='logements'?'logs':'tirs']
 function flush(){}
 async function del(coll,id){const k=(coll==='logements'?'L:':'T:')+id;delete S[coll==='logements'?'logs':'tirs'][id];SY.dead[k]=Date.now();SY.dirty[k]=1;persistLocal();setSt();sched()}
 async function saveBpu(){SY.bpuU=Date.now();SY.dirty['B:bpu']=1;persistLocal();setSt();sched()}
+function saveIns(){SY.insU=Date.now();SY.dirty['C:ins']=1;persistLocal();setSt();sched(2500)}
 async function saveCfg(){SY.cfgU=Date.now();SY.dirty['C:cfg']=1;persistLocal();setSt();sched(2500)}
-function persistLocal(){try{localStorage.setItem(LSK,JSON.stringify({logs:S.logs,tirs:S.tirs,cfg:S.cfg,bpu:S.bpu,SY:{...SY,det:undefined}}))}catch(e){SY.err='mémoire du téléphone pleine'}}
-function loadLocal(){try{const d=JSON.parse(localStorage.getItem(LSK)||'null');if(d){S.logs=d.logs||{};S.tirs=d.tirs||{};S.cfg=d.cfg||{};S.bpu=d.bpu||[];SY={...SY,...(d.SY||{})}}}catch(e){}if(!SY.dev){SY.dev='ERBM-'+Math.random().toString(36).slice(2,8).toUpperCase()+Date.now().toString(36).slice(-4).toUpperCase();persistLocal()}}
+function persistLocal(){try{localStorage.setItem(LSK,JSON.stringify({logs:S.logs,tirs:S.tirs,cfg:S.cfg,bpu:S.bpu,ins:S.ins,SY:{...SY,det:undefined}}))}catch(e){SY.err='mémoire du téléphone pleine'}}
+function loadLocal(){try{const d=JSON.parse(localStorage.getItem(LSK)||'null');if(d){S.logs=d.logs||{};S.tirs=d.tirs||{};S.cfg=d.cfg||{};S.bpu=d.bpu||[];S.ins=d.ins||null;SY={...SY,...(d.SY||{})}}}catch(e){}if(!SY.dev){SY.dev='ERBM-'+Math.random().toString(36).slice(2,8).toUpperCase()+Date.now().toString(36).slice(-4).toUpperCase();persistLocal()}}
 
 /* --- vues --- */
 function render(){
@@ -948,7 +999,7 @@ function render(){
  $('titre').textContent=S.cfg.nom||'ERBM';
  $('soustitre').textContent=[S.cfg.bailleur&&'Bailleur : '+S.cfg.bailleur,S.cfg.entreprise].filter(Boolean).join(' · ')||'Réhabilitation de cités minières';
  const m=$('main');const cc=conf();const banner=(!cc.u||!cc.t)?'<div class="note warn">Connexion au serveur Évolud non réglée : les données restent sur ce téléphone. Allez dans Réglages → Connexion.</div>':SY.err?'<div class="note warn">Synchro : '+esc(SY.err)+'</div>':'';
- m.innerHTML=banner+({tableau:vTableau,logements:vLogements,planning:vPlanning,tiroirs:vTiroirs,reserves:vReserves,reglages:vReglages,vt:vVT,reseaux:vReseaux,decouvertes:vDecouvertes,balance:vBalance}[S.view]||vTableau)();
+ m.innerHTML=banner+({tableau:vTableau,logements:vLogements,planning:vPlanning,tiroirs:vTiroirs,reserves:vReserves,reglages:vReglages,vt:vVT,reseaux:vReseaux,decouvertes:vDecouvertes,balance:vBalance,insertion:vInsertion}[S.view]||vTableau)();
  if(S.open)renderPanel();
 }
 /* --- planning des VTE, relié aux logements --- */
@@ -1010,6 +1061,7 @@ function vTableau(){
  ${presT.length?`<p style="margin:10px 0 0;font-size:14px;opacity:.9">Sur site : ${presT.slice(0,8).map(o=>esc(o.p.n)+' ('+esc(o.p.m||'')+') · '+esc(o.l.num?'N° '+o.l.num+' ':'')+esc(o.l.adresse||'')).join(' · ')}</p>`:''}
  <div class="tools" style="margin:12px 0 0"><button class="b" data-act="briefing">📋 Ordre du jour</button><button class="b" data-act="sitrep">📡 SITREP hebdo</button><button class="b" data-act="cible">🎯 Objectifs de la semaine</button></div></div>`;
  return `<div class="hero">${ringBig(avg)}<div><h2>${esc(S.cfg.nom||'Chantier ERBM')}</h2><p>${L.length} logements · ${gr.length} GR · ${ti.length} tiroirs${S.cfg.bailleur?' · '+esc(S.cfg.bailleur):''}</p><p>${rec} réceptionné${rec>1?'s':''} · avancement moyen ${avg} %</p></div></div>${pc}
+ <div class="tools"><button class="b" data-go="balance">⚖️ Balance + / −</button><button class="b" data-go="insertion">👷 Heures d'insertion${S.ins?` · ${Math.round(insRows().reduce((t,x)=>t+x.re,0)/(S.ins.obj||1)*100)} %`:''}</button></div>
  <div class="kpis">${kpi(`${vtF.length}<small style="font-size:15px;color:var(--mute)">/${L.length}</small>`,'VTE faites','g','planning')}${kpi(rdv7.length,'VTE dans les 7 jours','v','planning')}${kpi(rdvRet.length,'RDV VTE en retard',rdvRet.length?'r':'','planning')}${kpi(bloq.length,'logements avec bloquant',bloq.length?'r':'')}${kpi(ro,'réserves ouvertes',ro?'o':'','reserves')}${kpi(libres+'/'+tirArr().length,'tiroirs libres','','tiroirs')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(mtot)}</span>`,'montant HT engagé')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(pva)}</span>`,pvn+' provision(s) à valider','o')}${kpi(pas.d+'<small style="font-size:15px;color:var(--mute)">/'+pas.n+'</small>','points d\'arrêt levés'+(pas.nc?' · '+pas.nc+' NC':''),pas.nc?'r':'g')}${kpi(dDue,'relances concessionnaires dues',dDue?'r':'','reseaux')}${kpi(decO,'découvertes à chiffrer',decO?'o':'','decouvertes')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(balT)}</span>`,'balance + / − validée',balT<0?'r':'g','balance')}</div>
  <div class="grid2">
  <div class="card"><h3>⛔ Bloquants VTE <a class="more" href="#logements">${bloq.length}</a></h3>${bloq.length?bloq.slice(0,8).map(o=>`<div class="line" data-open="${o.l.id}"><span class="t"><b>${esc((o.l.num?'N° '+o.l.num+' ':'')+(o.l.adresse||''))}</b><small>${o.y.B.map(esc).join(' · ')}</small></span><span class="pill r">${o.y.B.length}</span></div>`).join(''):'<p class="mut" style="margin:0;color:var(--mute)">Aucun bloquant relevé.</p>'}</div>
@@ -1083,6 +1135,10 @@ function vReglages(){
  <h2 style="margin:28px 0 8px">Bons de commande et BPU complet</h2>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Choisissez le fichier préparé (.json) : il charge le BPU complet du marché et remplit la fiche travaux de chaque logement avec son bon de commande (codes, quantités, prix, corps d'état). Les lignes ajoutées à la main sont conservées. ${logArr().filter(l=>l.bdc).length} logement(s) ont déjà leur bon de commande.</p>
  <div class="tools"><label class="b p">📥 Importer les bons de commande (.json)<input type="file" class="fhide bdcfile" accept=".json,application/json"></label></div>
+ <h2 style="margin:28px 0 8px">Sous-traitants et CR de coordination</h2>
+ <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Choisissez le fichier préparé depuis le CR de coordination (.json) : annuaire des entreprises, ordre de passage (« selon planning »), solution de plan retenue, VT faites ou planifiées, et entreprise prévue pour chaque tâche du logement. Rien n'est effacé, aucune tâche n'est validée à votre place.${(S.cfg.cr||{}).src?` Dernier import : <b>${esc(S.cfg.cr.src)}</b> le ${esc(fdate(S.cfg.cr.date))}.`:''}</p>
+ <div class="tools"><label class="b p">📥 Importer le CR de coordination (.json)<input type="file" class="fhide crfile" accept=".json,application/json"></label></div>
+ ${stAnnuaire()}
  <h2 style="margin:28px 0 8px">Diags amiante</h2>
  <p style="color:var(--mute);font-size:15px;margin:0 0 8px">Choisissez le fichier préparé (.json) : il renseigne le diag amiante de chaque logement (présence / absence, matériaux, zones non visitées) et règle les verrous de curage et de pose des menuiseries. ${logArr().filter(l=>l.diag).length} logement(s) ont leur diag · ${logArr().filter(l=>!(l.vte||{}).am).length} sans diag.</p>
  <div class="tools"><label class="b p">📥 Importer les diags amiante (.json)<input type="file" class="fhide diagfile" accept=".json,application/json"></label><label class="b">📄 Envoi groupé des diags (PDF)<input type="file" class="fhide diagpdf" accept="application/pdf,.pdf" multiple></label></div>
@@ -1282,9 +1338,10 @@ async function act(a){
  if(a==='qrshow')return showQR(S.open);
  if(a==='qrplanche')return qrPlanche();
  if(a==='rdvics')return rdvIcs();
- if(a==='qrme'){const n=$('qn').value.trim(),e=$('qe').value.trim(),m=$('qm').value;if(!n)return toast('Indiquez votre nom');meSet({n,e,m});if(SY.qrOnly){SY.conf={...SY.conf,n:n+' · '+(e||m)};persistLocal()}return render()}
+ if(a==='qrme'){const n=$('qn').value.trim(),e=$('qe').value.trim(),m=$('qm').value,ins=!!($('qins')&&$('qins').checked);if(!n)return toast('Indiquez votre nom');meSet({n,e,m,ins});if(SY.qrOnly){SY.conf={...SY.conf,n:n+' · '+(e||m)};persistLocal()}return render()}
  if(a==='qrid'){meSet(null);return render()}
  if(a==='retour')return retour();
+ if(a==='insadd'){if(readonly)return toast('Lecture seule');const i=+$('insst').value,m=$('insm').value,h=parseFloat(String($('insh').value).replace(',','.'));if(!m||!(h>=0))return toast('Indiquez le mois et les heures');const x=S.ins.st[i];x.real={...(x.real||{}),[m]:h};saveIns();render();return toast('Heures enregistrées')}
  if(a==='qrquit'){QR=null;location.hash='tableau';return render()}
  if(a==='qrin'){const me=meGet();if(!me)return;toast('Pointage en cours (GPS)…');try{await pointer(QR.l,me,'in')}catch(e){return}toast('Arrivée pointée');return render()}
  if(a==='qrout'){const me=meGet();if(!me)return;toast('Pointage en cours (GPS)…');try{await pointer(QR.l,me,'out')}catch(e){return}toast('Départ pointé. Bonne route.');return render()}
@@ -1323,7 +1380,7 @@ async function act(a){
   toast('Exemple chargé');render()}
  if(a==='cleardemo'){if(!(await ask('Retirer tous les logements et tiroirs d\'exemple ?')))return;for(const[id,l]of Object.entries(S.logs))if(l.demo)await del('logements',id);for(const[id,t]of Object.entries(S.tirs))if(t.demo)await del('tiroirs',id);if(S.bpu.some(b=>b.demo)){S.bpu=S.bpu.filter(b=>!b.demo);await saveBpu()}toast('Exemples retirés');render()}
  if(a==='import'){if(readonly)return toast('Lecture seule');const txt=$('imp').value.trim();if(!txt)return toast('Collez d\'abord des lignes');let n=0;txt.split(/\r?\n/).forEach((line,i)=>{const c=line.split(line.includes('\t')?'\t':';').map(s=>s.trim());if(!c.join(''))return;if(i===0&&/adresse|parcours|code/i.test(line))return;addLog(c);n++});$('imp').value='';toast(n+' logement(s) importé(s)');render()}
- if(a==='csv'||a==='csvres'||a==='csvft'||a==='csvpv'||a==='csvsyn'||a==='csvpa'||a==='csvcn'||a==='csvpt'||a==='csvtk'||a==='csvdec'||a==='csvbal'){let rows;const nb=n=>String(Math.round(n*100)/100).replace('.',',');const dt=s=>s?new Date(s).toLocaleString('fr-FR'):'';
+ if(a==='csv'||a==='csvres'||a==='csvft'||a==='csvpv'||a==='csvsyn'||a==='csvpa'||a==='csvcn'||a==='csvpt'||a==='csvtk'||a==='csvdec'||a==='csvbal'||a==='csvins'){let rows;const nb=n=>String(Math.round(n*100)/100).replace('.',',');const dt=s=>s?new Date(s).toLocaleString('fr-FR'):'';
   if(a==='csvpa'){rows=[['Code UG','N°','Adresse','Cité','Nature','Phase','Point d\'arrêt','Statut','Nb photos','Validé par','Le','Constat / motif']];logArr().forEach(l=>paOf(l).forEach(m=>{const c=paSt(l,m);rows.push([l.ug,l.num,l.adresse,l.cite,natOf(l),m.ph,m.lib,PAL[c.st],(c.ph||[]).length,c.by||'',dt(c.at),c.com||''])}))}
   else if(a==='csvcn'){rows=[['Code UG','N°','Adresse','Cité','Concessionnaire','Objet','Référence','Statut','Date demande','Prochaine relance','Nb relances','RDV','Bloquante','Note']];allDem().forEach(({l,d})=>rows.push([l.ug,l.num,l.adresse,l.cite,d.conc,d.objet,d.ref||'',d.st,d.dDem||'',cOpen(d)?d.dRel||'':'',(d.hist||[]).filter(h=>/relance/i.test(h.t)).length,d.dRdv||'',d.bloq?'oui':'non',d.note||'']))}
   else if(a==='csvpt'){rows=[['Code UG','N°','Adresse','Cité','Nom','Entreprise','Métier','Date','Arrivée','Départ','Durée (h)','GPS arrivée']];logArr().forEach(l=>(l.pt||[]).forEach(p=>{const h=p.out?(new Date(p.out)-new Date(p.in))/36e5:'';rows.push([l.ug,l.num,l.adresse,l.cite,p.n,p.e||'',p.m||'',p.in.slice(0,10),new Date(p.in).toLocaleTimeString('fr-FR'),p.out?new Date(p.out).toLocaleTimeString('fr-FR'):'',h===''?'':nb(h),p.gps?p.gps.lat+' '+p.gps.lng:''])}))}
@@ -1331,8 +1388,9 @@ async function act(a){
   else if(a==='csvdec'){rows=[['Code UG','N°','Adresse','Cité','Date','Catégorie','Gravité','Constat','Statut','Signalé par','Nb photos','GPS']];logArr().forEach(l=>(l.dec||[]).forEach(d=>{const g=(d.ph||[]).find(p=>p.gps);rows.push([l.ug,l.num,l.adresse,l.cite,dt(d.at),d.cat,d.grav,d.txt,d.st,d.by||'',(d.ph||[]).length,g?g.gps.lat+' '+g.gps.lng:''])}))}
   else if(a==='csvbal'){rows=[['Code UG','N°','Adresse','Cité','Sens','Code BPU','Désignation','Unité','Quantité','PU HT','Montant HT signé','Statut','Motif','Date']];logArr().forEach(l=>(l.bal||[]).forEach(x=>rows.push([l.ug,l.num,l.adresse,l.cite,x.sens==='-'?'Moins-value':'Plus-value',x.c||'',x.d||'',x.u||'',String(x.q).replace('.',','),nb(+x.p||0),nb(balMt(x)),x.st,x.motif||'',x.date||''])))}
   else if(a==='csvsyn'){rows=[['Code UG','N°','Adresse','Cité','Type','Parcours','Étape en cours','Date VTE','VTE faite par','VT Dalux','Diag amiante','Bloquants','Nb bloquants','Commandes à lancer','À anticiper','Intervenants','Provisions validées HT','Provisions à valider HT','Montant logement HT','Lignes sans prix']];const f=n=>String(Math.round(n*100)/100).replace('.',',');logArr().forEach(l=>{const Y=synth(l);rows.push([l.ug,l.num,l.adresse,l.cite,l.type,P[l.parcours]?.court,etat(l),l.vte?.date||'',l.vte?.par||'',l.dalux?(l.dalux.statut||'oui'):'',l.vte?.am||'',Y.B.join(' | '),Y.B.length,Y.C.join(' | '),Y.A.join(' | '),Y.lots.join(', '),f(provMt(l)),f(provAv(l)),f(montant(l)),Y.sansPrix])})}else if(a==='csv'){rows=[['Code UG','N°','Adresse','Cité','Tranche','Type','Parcours','Locataire','Téléphone','Étape en cours','Avancement %','Montant HT','Réserves ouvertes','Tiroir','Retour prévu']];logArr().forEach(l=>{const t=l.tir?.id&&S.tirs[l.tir.id];rows.push([l.ug,l.num,l.adresse,l.cite,l.tranche,l.type,P[l.parcours]?.nom,l.loc?.nom,l.loc?.tel,etat(l),pct(l),String(Math.round(montant(l)*100)/100).replace('.',','),resOuv(l).length,t?(t.num?'N° '+t.num+' ':'')+(t.adresse||''):'',l.tir?.au||''])})}else if(a==='csvpv'){rows=[['Code UG','Adresse','Cité','Parcours','Date','Provision','Pièce','Code BPU','Désignation','Unité','Quantité','PU HT','Montant HT','Statut','Constat']];logArr().forEach(l=>(l.prov||[]).forEach(x=>rows.push([l.ug,l.adresse,l.cite,P[l.parcours]?.court,x.date,x.type,x.piece,x.c,x.d,x.u,String(x.q).replace('.',','),String(x.p).replace('.',','),String(Math.round(ligneMt(x)*100)/100).replace('.',','),PST[x.st||'av'],x.com])))}else if(a==='csvft'){rows=[['Code UG','Adresse','Cité','Parcours','Code BPU','Désignation','Unité','Quantité','PU HT','Montant HT']];logArr().forEach(l=>ftL(l).forEach(x=>rows.push([l.ug,l.adresse,l.cite,P[l.parcours]?.court,x.c,x.d,x.u,String(x.q).replace('.',','),String(x.p).replace('.',','),String(Math.round(ligneMt(x)*100)/100).replace('.',',')])))}else{rows=[['Code UG','N°','Adresse','Cité','Réserve','Lot','Date','État','Levée le']];logArr().forEach(l=>(l.res||[]).forEach(r=>rows.push([l.ug,l.num,l.adresse,l.cite,r.txt,r.lot,r.date,r.etat,r.lev||''])))}
+  if(a==='csvins'){rows=[['Lot','Sous-traitant','Montant HT','Heures marché','Heures validées ST','Heures saisies','Heures pointées','Réalisé','% marché','Alertes']];insRows().forEach(x=>rows.push([x.lot,x.st,x.mt||'',x.hMar??'',x.hVal??'',x.saisi,Math.round(x.pt*10)/10,Math.round(x.re*10)/10,x.pc??'',x.al.map(a=>a.t).join(' ; ')]))}
   const csv='﻿'+rows.map(r=>r.map(v=>{v=String(v??'');return /[;"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v}).join(';')).join('\r\n');
-  const name=({csv:'avancement',csvres:'reserves',csvft:'fiches-travaux',csvpv:'provisions-vte',csvsyn:'synthese-vte',csvpa:'points-arret',csvcn:'concessionnaires',csvpt:'pointages',csvtk:'taches-intervenants',csvdec:'decouvertes',csvbal:'balance'})[a]+'-erbm-'+today()+'.csv';
+  const name=({csv:'avancement',csvres:'reserves',csvft:'fiches-travaux',csvpv:'provisions-vte',csvsyn:'synthese-vte',csvpa:'points-arret',csvcn:'concessionnaires',csvpt:'pointages',csvtk:'taches-intervenants',csvdec:'decouvertes',csvbal:'balance',csvins:'heures-insertion'})[a]+'-erbm-'+today()+'.csv';
   if(downloads){try{await downloads.save({filename:name,data:csv});return}catch(e){}}
   const o=$('out');if(!o)return toast('Téléchargement impossible ici : exportez depuis Réglages');o.style.display='block';o.value=csv;o.select();try{await navigator.clipboard.writeText(csv);toast('Copié : collez dans Excel')}catch(e){toast('Sélectionnez le texte et copiez-le')}}
  if(a==='addres'){const t=$('rtxt').value.trim();if(!t)return toast('Décrivez la réserve');const lot=$('rlot').value;let photo='';const f=$('rph')?.files?.[0];if(f&&assets){try{toast('Envoi de la photo…');photo=(await assets.upload(f)).id}catch(e){toast('Photo non envoyée')}}upd(l=>{l.res=[...(l.res||[]),{id:uid(),txt:t,lot,date:today(),etat:'ouverte',photo}]})}
@@ -1411,6 +1469,8 @@ document.addEventListener('change',e=>{
  if(t.classList&&t.classList.contains('bdcfile'))return importBdc(t);
  if(t.classList&&t.classList.contains('diagfile'))return importDiag(t);
  if(t.classList&&t.classList.contains('diagpdf'))return uploadDiagPdfs(t);
+ if(t.classList&&t.classList.contains('crfile'))return importCR(t);
+ if(t.classList&&t.classList.contains('insfile'))return importIns(t);
  if(t.dataset.paph&&S.open)uploadPA(t);
  if(t.dataset.tkph&&QR&&t.files&&t.files[0]){qrTk(t.dataset.tkph,'done',t.files[0]);t.value=''}
  if(t.dataset.tkadm&&S.open){if(readonly)return toast('Lecture seule');const tid=t.dataset.tkadm,v=t.value,l0=S.logs[S.open],tt=TK.find(x=>x.id===tid);if((v==='go'||v==='ok')&&tkS(l0,tt).st==='todo'){const lk=tkLock(l0,tt);if(lk.length){renderPanel();return info('🔒 '+tt.lib+' verrouillé :\n• '+lk.join('\n• '))}}tkSet(S.open,tid,v,{n:(SY.conf||{}).n||S.cfg.cdt||'Conducteur',e:S.cfg.entreprise||''});return renderPanel()}
@@ -1435,7 +1495,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('sheet').classLis
 const VH=[];let vhBack=false;
 function majRetour(){const br=$('btnRetour');if(!br)return;const qm=!!(QR||SY.qrOnly),sh=$('sheet').classList.contains('on');br.style.display=(!qm&&(sh||S.open||S.view!=='tableau'))?'':'none'}
 try{new MutationObserver(majRetour).observe($('sheet'),{attributes:true,attributeFilter:['class']})}catch(e){}
-function route(){const h=location.hash.slice(1);S.view=['tableau','logements','vt','planning','tiroirs','reserves','reglages','reseaux','decouvertes','balance'].includes(h)?h:'tableau';if(!vhBack&&VH[VH.length-1]!==S.view)VH.push(S.view);vhBack=false;if(VH.length>30)VH.shift();render()}
+function route(){const h=location.hash.slice(1);S.view=['tableau','logements','vt','planning','tiroirs','reserves','reglages','reseaux','decouvertes','balance','insertion'].includes(h)?h:'tableau';if(!vhBack&&VH[VH.length-1]!==S.view)VH.push(S.view);vhBack=false;if(VH.length>30)VH.shift();render()}
 function retour(){if(S.open||$('sheet').classList.contains('on'))return closePanel();if(VH.length>1){VH.pop();vhBack=true;location.hash=VH[VH.length-1]}else if(S.view!=='tableau'){vhBack=true;VH.length=0;VH.push('tableau');location.hash='tableau'}}
 addEventListener('hashchange',route);
 
