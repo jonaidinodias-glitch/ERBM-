@@ -186,11 +186,11 @@ const P={
   lots:['Curage / démolition','Gros œuvre / maçonnerie','Couverture / zinguerie','Menuiseries extérieures','Isolation / plâtrerie','Électricité','Plomberie / sanitaires','Chauffage / VMC','Menuiseries intérieures','Revêtements de sol','Peinture','Façade / ravalement','Extérieurs / VRD']}
 };
 const LOTST=['À faire','En cours','Fait','Non prévu'];
-const S={logs:{},tirs:{},cfg:{},bpu:[],ins:null,pen:null,view:'tableau',open:null,q:'',fp:'',fe:'',fc:''};
+const S={logs:{},tirs:{},cfg:{},bpu:[],ins:null,pen:null,fin:null,view:'tableau',open:null,q:'',fp:'',fe:'',fc:''};
 let readonly=false;
 /* ---------- stockage local + synchro serveur Évolud (action « erbm ») ---------- */
 const LSK='evolud_erbm_v1',ME='erbm';
-let SY={dirty:{},since:0,conf:{},bc:{},dead:{},cfgU:0,bpuU:0,insU:0,penU:0,last:0,err:''};
+let SY={dirty:{},since:0,conf:{},bc:{},dead:{},cfgU:0,bpuU:0,insU:0,penU:0,finU:0,last:0,err:''};
 const blob=id=>id?'https://drive.google.com/thumbnail?id='+encodeURIComponent(id)+'&sz=w1600':'';
 const driveLink=id=>'https://drive.google.com/file/d/'+encodeURIComponent(id)+'/view';
 /* --- import des visites techniques Dalux (PDF) --- */
@@ -339,7 +339,7 @@ const downloads={save:async({filename,data})=>{if(!dl(filename,data))throw {code
 function toJpeg(file,max=1600){return new Promise((ok,ko)=>{const fr=new FileReader();fr.onload=()=>{const im=new Image();im.onload=()=>{const k=Math.min(1,max/Math.max(im.width,im.height));const c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);ok(c.toDataURL('image/jpeg',.82).split(',')[1])};im.onerror=ko;im.src=fr.result};fr.onerror=ko;fr.readAsDataURL(file)})}
 const assets={upload:async(file)=>{const l=S.open&&S.logs[S.open];const b64=await toJpeg(file);const ug=String((l&&(l.ug||l.num))||'ERBM');const name='ERBM_'+ug+'_'+Date.now()+'.jpg';const j=await api({action:'photo',ug,name,b64,kind:'ERBM',meta:{adresse:l?l.adresse:'',ts:Date.now(),comment:'ERBM'}});return {id:j.fileId,url:j.url}}};
 function conf(){const d=SY.det||{},c=SY.conf||{};return {u:c.u||d.u||'',t:c.t||d.t||'',d:c.d||d.d||SY.dev||'',n:c.n||d.n||''}}
-async function api(body){const c=conf();if(!c.u||!c.t)throw new Error('Connexion au serveur non réglée (Réglages)');const r=await fetch(c.u,{method:'POST',body:JSON.stringify(Object.assign({token:c.t,device:c.d,user:c.n?c.n+' (ERBM)':'ERBM'},body))});const j=await r.json();if(!j.ok)throw new Error(j.error||'erreur serveur');return j}
+async function api(body){const c=conf();if(!c.u||!c.t)throw new Error('Connexion au serveur non réglée (Réglages)');const r=await fetch(c.u,{method:'POST',body:JSON.stringify(Object.assign({token:c.t,device:c.d,user:c.n?c.n+' (ERBM)':'ERBM',finH:finLoc()},body))});const j=await r.json();if(!j.ok)throw new Error(j.error||'erreur serveur');if(body&&body.action==='erbm'){const was=finOK();finEtat(j);if(was&&!finOK()){finPurge();setTimeout(()=>{render();sync()},50)}}return j}
 function detect(){
  const out={},seen=new Set();
  const take=(o)=>{const ks=Object.keys(o);let url=null;for(const k of ks){const v=o[k];if(typeof v==='string'&&/^https:\/\/script\.google\.com\/macros\/s\/[\w-]+\/exec/.test(v))url=v}
@@ -361,6 +361,7 @@ function recOf(key){
   const u=o._u||Date.now(),d={id:key,type:k==='L'?'logement':'tiroir',updatedAt:u,v:o};
   if(k==='L'){d.ug=o.ug||'';d.adresse=o.adresse||'';d.cite=o.cite||'';d.parcours=(P[o.parcours]||{}).court||'';d.etape=etat(o);d.montant=Math.round(montant(o)*100)/100}else{d.adresse=(o.num?'N° '+o.num+' ':'')+(o.adresse||'')}
   return [{c:ME,id:key,updatedAt:u,data:d}]}
+ if(key==='C:fin')return S.fin?[{c:ME,id:key,updatedAt:SY.finU||Date.now(),data:{id:key,type:'finance',updatedAt:SY.finU||Date.now(),v:S.fin}}]:[];
  if(key==='C:pen')return S.pen?[{c:ME,id:key,updatedAt:SY.penU||Date.now(),data:{id:key,type:'penalites',updatedAt:SY.penU||Date.now(),v:S.pen}}]:[];
  if(key==='C:ins')return S.ins?[{c:ME,id:key,updatedAt:SY.insU||Date.now(),data:{id:key,type:'insertion',updatedAt:SY.insU||Date.now(),v:S.ins}}]:[];
  if(key==='C:cfg')return [{c:ME,id:key,updatedAt:SY.cfgU||Date.now(),data:{id:key,type:'config',updatedAt:SY.cfgU||Date.now(),v:S.cfg}}];
@@ -374,6 +375,7 @@ function applyRecs(recs){
    if(d.deleted){if(loc&&(loc._u||0)<=U){delete store[id];ch=true}SY.dead[key]=U;return}
    if(!loc||(loc._u||0)<U||!SY.dirty[key]){if(!loc||(loc._u||0)!==U){store[id]={...d.v,_u:U};ch=true}}}
   else if(key==='C:cfg'){if(U>(SY.cfgU||0)&&!SY.dirty[key]){S.cfg={...(d.v||{})};SY.cfgU=U;ch=true}}
+  else if(key==='C:fin'){if(U>(SY.finU||0)&&!SY.dirty[key]){S.fin=d.v||null;SY.finU=U;ch=true}}
   else if(key==='C:pen'){if(U>(SY.penU||0)&&!SY.dirty[key]){S.pen=d.v||null;SY.penU=U;ch=true}}
   else if(key==='C:ins'){if(U>(SY.insU||0)&&!SY.dirty[key]){S.ins=d.v||null;SY.insU=U;ch=true}}
   else if(k==='B'){if(U>(SY.bpuU||0)&&!SY.dirty['B:bpu']){const g=SY.bc[U]||(SY.bc[U]={n:d.n,p:{}});g.p[d.i]=d.v||[]}}});
@@ -385,11 +387,11 @@ async function sync(){
  const c=conf();if(!c.u||!c.t){SY.err='serveur non réglé';setSt();return}
  if(SY.qrOnly){if(!QR)return;syncing=true;SY.err='';setSt();try{const j=await api({action:'qrget',l:QR.l});if(j.l){S.logs={[QR.l]:{...j.l,_u:j.u}};S.cfg=j.cfg||{};SY.last=Date.now();persistLocal();if(!typing())render()}}catch(e){SY.err=String(e&&e.message||e).slice(0,140);if(!typing())render()}syncing=false;setSt();return}
  syncing=true;SY.err='';setSt();
- const keys=Object.keys(SY.dirty),sentU={};keys.forEach(k=>{sentU[k]=k==='C:pen'?SY.penU:k==='C:ins'?SY.insU:k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0)});
+ const keys=Object.keys(SY.dirty),sentU={};keys.forEach(k=>{sentU[k]=k==='C:fin'?SY.finU:k==='C:pen'?SY.penU:k==='C:ins'?SY.insU:k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0)});
  const records=[].concat(...keys.map(recOf));
  try{
   const j=await api({action:'erbm',since:SY.since||0,records});if(j.qrKey)SY.qrKey=j.qrKey;
-  keys.forEach(k=>{const now=k==='C:pen'?SY.penU:k==='C:ins'?SY.insU:k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0);if(now===sentU[k])delete SY.dirty[k]});
+  keys.forEach(k=>{const now=k==='C:fin'?SY.finU:k==='C:pen'?SY.penU:k==='C:ins'?SY.insU:k==='C:cfg'?SY.cfgU:k==='B:bpu'?SY.bpuU:(((k[0]==='L'?S.logs:S.tirs)[k.slice(2)]||{})._u||SY.dead[k]||0);if(now===sentU[k])delete SY.dirty[k]});
   const ch=applyRecs(j.records||[]);SY.since=j.now||Date.now();SY.last=Date.now();persistLocal();
   if(ch&&!typing())render();
  }catch(e){SY.err=String(e&&e.message||e).slice(0,140);if(/non autoris|bloqu/i.test(SY.err))readonly=false}
@@ -794,7 +796,7 @@ function mxCard(L){const cnt={};MXE.forEach(e=>cnt[e]=0);let any=0;L.forEach(l=>
  ${ret.length?`<p style="margin:10px 0 4px"><span class="pill r">${ret.length} pose(s) en retard</span></p>${ret.slice(0,6).map(l=>`<div class="line" data-open="${l.id}"><span class="t"><b>${esc((l.num?'N° '+l.num+' ':'')+(l.adresse||''))}</b><small>Pose prévue le ${esc(fdate(l.mx.poseTh))} · ${esc(mxEtape(l.mx))}</small></span><span class="pill r">+${mxRetard(l)} j</span></div>`).join('')}`:''}
  <div class="tools" style="margin:10px 0 0"><label class="b">📥 Mettre à jour depuis l'Excel<input type="file" class="fhide mxfile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label></div></div>`}
 /* ===== Bons de commande (BdC valant OS) + BPU complet : import du fichier préparé (.json) ===== */
-async function importBdc(input){const f=input.files&&input.files[0];if(!f)return;input.value='';if(readonly)return toast('Lecture seule');let o;try{o=JSON.parse(await f.text())}catch(e){return info('Fichier illisible : choisissez le fichier .json des bons de commande.')}
+async function importBdc(input){if(!finOK()){input.value='';return info('Import réservé : code financier requis (Réglages).')}const f=input.files&&input.files[0];if(!f)return;input.value='';if(readonly)return toast('Lecture seule');let o;try{o=JSON.parse(await f.text())}catch(e){return info('Fichier illisible : choisissez le fichier .json des bons de commande.')}
  if(!o||o.app!=='erbm-bdc'||!o.logs)return info('Ce fichier n\'est pas un fichier de bons de commande ERBM.');
  if(!(await ask(`Importer « ${o.src||f.name} » ?\n• BPU : ${(o.bpu||[]).length} articles (les codes existants sont mis à jour)\n• Bons de commande : ${Object.keys(o.logs).length} logements\nLa fiche travaux « base plan » de chaque logement est remplacée par son bon de commande. Les lignes ajoutées à la main sont conservées.`)))return;
  const m=bpuMap();(o.bpu||[]).forEach(b=>{if(b&&b.c)m[b.c]={...(m[b.c]||{}),...b}});S.bpu=Object.values(m).sort((a,b)=>String(a.c).localeCompare(String(b.c),'fr',{numeric:true}));saveBpu();
@@ -1200,9 +1202,29 @@ const chkLines=l=>{const m=bpuMap();return modele().filter(it=>{const v=(l.chk||
 const provMt=l=>(l.prov||[]).filter(x=>x.st==='ok').reduce((s,x)=>s+ligneMt(x),0)+(l.vte?.ok?chkLines(l).reduce((s,x)=>s+ligneMt(x),0):0);
 const provAv=l=>(l.prov||[]).filter(x=>x.st!=='ok'&&x.st!=='ko').reduce((s,x)=>s+ligneMt(x),0)+(l.vte?.ok?0:chkLines(l).reduce((s,x)=>s+ligneMt(x),0));
 /* montants visibles seulement sur les téléphones déverrouillés par le code financier (conçu par Saïd OUFQIR) */
-const finOK=()=>{try{return localStorage.getItem('erbm_fin')===(S.cfg.finH||'__')}catch(e){return false}};
+const finOK=()=>{try{const st=localStorage.getItem('erbm_fin_st');return st!=='non'&&!(st===null&&false)}catch(e){return false}};
 const eur=n=>finOK()?(Math.round(n*100)/100).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €':'••• €';
 const maskE=t=>finOK()?t:String(t).replace(/≈?\s?[\d\u202f\u00a0 .,]+\s?(k€|€)(\s?HT)?/g,'••• €');
+/* ===== Verrou financier réel (serveur) + pilotage financier — conçu par Saïd OUFQIR ===== */
+const finLoc=()=>{try{return localStorage.getItem('erbm_fin')||''}catch(e){return ''}};
+function finEtat(j){if(!j||j.finSet===undefined)return;try{localStorage.setItem('erbm_fin_st',!j.finSet?'libre':(j.fin?'ok':'non'));if(j.moi)localStorage.setItem('erbm_moi',JSON.stringify(j.moi));else if(j.finSet)localStorage.removeItem('erbm_moi')}catch(e){}}
+function finPurge(){S.ins=null;S.pen=null;S.fin=null;S.logs={};S.tirs={};S.bpu=[];SY.since=0;SY.cfgU=0;SY.bpuU=0;SY.bpuN=0;SY.insU=0;SY.penU=0;SY.finU=0;SY.bc={};SY.dirty={};persistLocal()}
+const finLockHtml=t=>`<div class="card" style="border-left:5px solid var(--orange)"><h3>🔒 ${esc(t)} : accès réservé</h3><p>Ces données financières ne sont envoyées qu'aux téléphones qui ont saisi le code financier.</p><div class="tools"><button class="b p" data-go="reglages">Saisir le code dans Réglages</button></div></div>`;
+function vFinance(){if(!finOK())return finLockHtml('Pilotage financier');const F=S.fin;
+ if(!F)return `<div class="card"><h3>💶 Pilotage financier (confidentiel)</h3><p>Importez le fichier préparé depuis le suivi ST (.json).</p><div class="tools"><label class="b p">📥 Importer le suivi financier (.json)<input type="file" class="fhide finfile" accept=".json,application/json"></label></div></div>`;
+ const k=v=>v==null?'—':Math.round(v/1000).toLocaleString('fr-FR')+' k€';const R=F.rows||[];const tot=R.find(x=>/^TOTAL/i.test(x.n))||{};
+ const nofdc=R.filter(x=>x.k==='ligne'&&/non achet/i.test(x.n)&&(x.obj||0)>1000&&!(x.fdc||0));const neg=R.filter(x=>x.k==='ligne'&&!/non achet/i.test(x.n)&&(x.ec||0)<-5000).sort((a,b)=>a.ec-b.ec);
+ const secs=[...new Set(R.map(x=>x.sec))];
+ return `<div class="card" style="border-left:5px solid var(--navy)"><h3>💶 Pilotage financier sous-traitance <span style="font-weight:400;font-size:13px;color:var(--mute)">· confidentiel · ${esc(F.src||'')} du ${esc(fdate(F.date))}</span></h3>
+ <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px"><div class="res"><span>Budget objectif<br><b style="font-size:20px">${k(tot.obj)}</b></span></div><div class="res"><span>Fin de chantier prévue<br><b style="font-size:20px">${k(tot.fdc)}</b></span></div><div class="res"><span>Écart affiché<br><b style="font-size:20px;color:${(tot.ec||0)>=0?'var(--green)':'var(--red)'}">${k(tot.ec)}</b></span></div></div>
+ ${nofdc.length?`<p style="margin:10px 0 4px;font-size:14px;color:var(--red)"><b>⚠ Écart non fiable : fin de chantier non renseignée</b> sur ${nofdc.length} poste(s) non achetés (${k(nofdc.reduce((a,x)=>a+(x.obj||0),0))} de budget compté comme gain) : ${nofdc.map(x=>esc(x.sec.toLowerCase())+' '+k(x.obj)).join(' · ')}</p>`:''}
+ ${neg.length?`<p style="margin:6px 0 4px;font-size:14px"><b>Dérives à traiter :</b> ${neg.map(x=>`<span style="color:var(--red)">${esc(x.n)} ${k(x.ec)}</span>`).join(' · ')}</p>`:''}</div>
+ ${secs.map(sec=>`<div class="card"><h3 style="margin:0 0 6px">${esc(sec)}</h3><table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="background:var(--navy);color:#fff"><th style="text-align:left;padding:4px">Poste</th><th style="text-align:right;padding:4px">Objectif</th><th style="text-align:right;padding:4px">Marché</th><th style="text-align:right;padding:4px">FDC</th><th style="text-align:right;padding:4px">Écart</th></tr>${R.filter(x=>x.sec===sec).map(x=>`<tr style="border-top:1px solid var(--line);${x.k==='total'?'font-weight:700;background:var(--bg2)':''}"><td style="padding:4px">${esc(x.n)}${x.sig==='O'?' <span class="badge ok">signé</span>':''}</td><td style="padding:4px;text-align:right">${k(x.obj)}</td><td style="padding:4px;text-align:right">${k(x.mar)}</td><td style="padding:4px;text-align:right">${k(x.fdc)}</td><td style="padding:4px;text-align:right;color:${(x.ec||0)<0?'var(--red)':(x.ec||0)>0?'var(--green)':'inherit'}">${k(x.ec)}</td></tr>`).join('')}</table></div>`).join('')}
+ <div class="tools"><label class="b">📥 Réimporter le suivi (.json)<input type="file" class="fhide finfile" accept=".json,application/json"></label></div>
+ <p class="sig">ERBM · pilotage financier confidentiel · conçu et développé par Saïd OUFQIR</p>`}
+async function importFin(input){const f=input.files&&input.files[0];if(!f)return;input.value='';if(!finOK())return info('Code financier requis.');let o;try{o=JSON.parse(await f.text())}catch(e){return info('Fichier illisible.')}
+ if(o.app!=='erbm-fin')return info('Ce fichier n\'est pas un suivi financier ERBM.');S.fin={src:o.src,date:o.date,rows:o.rows||[]};SY.finU=Date.now();SY.dirty['C:fin']=1;persistLocal();setSt();sched(1500);render();info(`Suivi financier importé : ${S.fin.rows.length} ligne(s). Visible uniquement avec le code financier.`)}
+
 async function finHash(pin){const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode('erbm|'+pin));return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('')}
 let _bm=null,_bmR=null,_bmN=-1;const bpuMap=()=>{if(_bmR!==S.bpu||_bmN!==S.bpu.length){_bm={};S.bpu.forEach(b=>_bm[b.c]=b);_bmR=S.bpu;_bmN=S.bpu.length}return _bm};
 /* lignes de la fiche travaux : une ligne de bon de commande ne garde que code + quantité, le reste vient du BPU */
@@ -1220,8 +1242,8 @@ async function del(coll,id){const k=(coll==='logements'?'L:':'T:')+id;delete S[c
 async function saveBpu(){SY.bpuU=Date.now();SY.dirty['B:bpu']=1;persistLocal();setSt();sched()}
 function saveIns(){SY.insU=Date.now();SY.dirty['C:ins']=1;persistLocal();setSt();sched(2500)}
 async function saveCfg(){SY.cfgU=Date.now();SY.dirty['C:cfg']=1;persistLocal();setSt();sched(2500)}
-function persistLocal(){try{localStorage.setItem(LSK,JSON.stringify({logs:S.logs,tirs:S.tirs,cfg:S.cfg,bpu:S.bpu,ins:S.ins,pen:S.pen,SY:{...SY,det:undefined}}))}catch(e){SY.err='mémoire du téléphone pleine'}}
-function loadLocal(){try{const d=JSON.parse(localStorage.getItem(LSK)||'null');if(d){S.logs=d.logs||{};S.tirs=d.tirs||{};S.cfg=d.cfg||{};S.bpu=d.bpu||[];S.ins=d.ins||null;S.pen=d.pen||null;SY={...SY,...(d.SY||{})}}}catch(e){}if(!SY.dev){SY.dev='ERBM-'+Math.random().toString(36).slice(2,8).toUpperCase()+Date.now().toString(36).slice(-4).toUpperCase();persistLocal()}}
+function persistLocal(){try{localStorage.setItem(LSK,JSON.stringify({logs:S.logs,tirs:S.tirs,cfg:S.cfg,bpu:S.bpu,ins:S.ins,pen:S.pen,fin:S.fin,SY:{...SY,det:undefined}}))}catch(e){SY.err='mémoire du téléphone pleine'}}
+function loadLocal(){try{const d=JSON.parse(localStorage.getItem(LSK)||'null');if(d){S.logs=d.logs||{};S.tirs=d.tirs||{};S.cfg=d.cfg||{};S.bpu=d.bpu||[];S.ins=d.ins||null;S.pen=d.pen||null;S.fin=d.fin||null;SY={...SY,...(d.SY||{})}}}catch(e){}if(!SY.dev){SY.dev='ERBM-'+Math.random().toString(36).slice(2,8).toUpperCase()+Date.now().toString(36).slice(-4).toUpperCase();persistLocal()}}
 
 /* --- vues --- */
 function render(){
@@ -1231,7 +1253,7 @@ function render(){
  $('titre').textContent=S.cfg.nom||'ERBM';
  $('soustitre').textContent=[S.cfg.bailleur&&'Bailleur : '+S.cfg.bailleur,S.cfg.entreprise].filter(Boolean).join(' · ')||'Réhabilitation de cités minières';
  const m=$('main');const cc=conf();const banner=(!cc.u||!cc.t)?'<div class="note warn">Connexion au serveur Évolud non réglée : les données restent sur ce téléphone. Allez dans Réglages → Connexion.</div>':SY.err?'<div class="note warn">Synchro : '+esc(SY.err)+'</div>':'';
- m.innerHTML=banner+({tableau:vTableau,logements:vLogements,planning:vPlanning,tiroirs:vTiroirs,reserves:vReserves,reglages:vReglages,vt:vVT,reseaux:vReseaux,decouvertes:vDecouvertes,balance:vBalance,insertion:vInsertion,penalites:vPenalites,cr:vCR}[S.view]||vTableau)();
+ m.innerHTML=banner+({tableau:vTableau,logements:vLogements,planning:vPlanning,tiroirs:vTiroirs,reserves:vReserves,reglages:vReglages,vt:vVT,reseaux:vReseaux,decouvertes:vDecouvertes,balance:vBalance,insertion:()=>finOK()?vInsertion():finLockHtml('Heures d\'insertion'),penalites:()=>finOK()?vPenalites():finLockHtml('Pénalités'),cr:vCR,finance:vFinance,balance:()=>finOK()?vBalance():finLockHtml('Balance + / −')}[S.view]||vTableau)();
  if(S.open)renderPanel();
 }
 /* --- planning des VTE, relié aux logements --- */
@@ -1293,7 +1315,7 @@ function vTableau(){
  ${presT.length?`<p style="margin:10px 0 0;font-size:14px;opacity:.9">Sur site : ${presT.slice(0,8).map(o=>esc(o.p.n)+' ('+esc(o.p.m||'')+') · '+esc(o.l.num?'N° '+o.l.num+' ':'')+esc(o.l.adresse||'')).join(' · ')}</p>`:''}
  <div class="tools" style="margin:12px 0 0"><button class="b" data-act="briefing">📋 Ordre du jour</button><button class="b" data-act="sitrep">📡 SITREP hebdo</button><button class="b" data-act="cible">🎯 Objectifs de la semaine</button></div></div>`;
  return `<div class="hero">${ringBig(avg)}<div><h2>${esc(S.cfg.nom||'Chantier ERBM')}</h2><p>${L.length} logements · ${gr.length} GR · ${ti.length} tiroirs${S.cfg.bailleur?' · '+esc(S.cfg.bailleur):''}</p><p>${rec} réceptionné${rec>1?'s':''} · avancement moyen ${avg} %</p></div></div>${pc}
- <div class="tools"><button class="b" data-go="balance">⚖️ Balance + / −</button><button class="b" data-go="cr">📋 CR coordination</button><button class="b" data-go="penalites">💶 Pénalités ST</button><button class="b" data-go="insertion">👷 Heures d'insertion${S.ins?` · ${Math.round(insRows().reduce((t,x)=>t+x.re,0)/(S.ins.obj||1)*100)} %`:''}</button></div>${moeHtml()}
+ <div class="tools"><button class="b" data-go="balance">⚖️ Balance + / −</button><button class="b" data-go="cr">📋 CR coordination</button>${finOK()?'<button class="b" data-go="finance">💶 Pilotage financier</button>':''}<button class="b" data-go="penalites">💶 Pénalités ST</button><button class="b" data-go="insertion">👷 Heures d'insertion${S.ins?` · ${Math.round(insRows().reduce((t,x)=>t+x.re,0)/(S.ins.obj||1)*100)} %`:''}</button></div>${moeHtml()}
  <div class="kpis">${kpi(`${vtF.length}<small style="font-size:15px;color:var(--mute)">/${L.length}</small>`,'VTE faites','g','planning')}${kpi(rdv7.length,'VTE dans les 7 jours','v','planning')}${kpi(rdvRet.length,'RDV VTE en retard',rdvRet.length?'r':'','planning')}${kpi(bloq.length,'logements avec bloquant',bloq.length?'r':'')}${kpi(ro,'réserves ouvertes',ro?'o':'','reserves')}${kpi(libres+'/'+tirArr().length,'tiroirs libres','','tiroirs')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(mtot)}</span>`,'montant HT engagé')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(pva)}</span>`,pvn+' provision(s) à valider','o')}${kpi(pas.d+'<small style="font-size:15px;color:var(--mute)">/'+pas.n+'</small>','points d\'arrêt levés'+(pas.nc?' · '+pas.nc+' NC':''),pas.nc?'r':'g')}${kpi(dDue,'relances concessionnaires dues',dDue?'r':'','reseaux')}${kpi(decO,'découvertes à chiffrer',decO?'o':'','decouvertes')}${kpi(`<span style="font-size:clamp(18px,4vw,22px)">${eur(balT)}</span>`,'balance + / − validée',balT<0?'r':'g','balance')}</div>
  <div class="grid2">
  <div class="card"><h3>⛔ Bloquants VTE <a class="more" href="#logements">${bloq.length}</a></h3>${bloq.length?bloq.slice(0,8).map(o=>`<div class="line" data-open="${o.l.id}"><span class="t"><b>${esc((o.l.num?'N° '+o.l.num+' ':'')+(o.l.adresse||''))}</b><small>${o.y.B.map(esc).join(' · ')}</small></span><span class="pill r">${o.y.B.length}</span></div>`).join(''):'<p class="mut" style="margin:0;color:var(--mute)">Aucun bloquant relevé.</p>'}</div>
@@ -1336,10 +1358,28 @@ function vReserves(){
  const row=x=>`<button class="item" data-open="${x.l.id}"><span class="badge ${x.r.etat==='levée'?'ok':''}">${x.r.etat==='levée'?'Levée':esc(fdate(x.r.date))}</span><span><span class="t">${esc(x.r.txt)}</span><br><span class="s">${esc(lname(x.l))}${x.r.lot?' · '+esc(x.r.lot):''}</span></span><span></span></button>`;
  return `<h2 style="margin-bottom:14px">${ouv.length} réserve${ouv.length>1?'s':''} ouverte${ouv.length>1?'s':''}</h2>${ouv.length?`<div class="list">${ouv.map(row).join('')}</div>`:'<p class="note">Aucune réserve ouverte.</p>'}${lev.length?`<details style="margin-top:20px"><summary style="cursor:pointer;font-weight:600">${lev.length} réserve(s) levée(s)</summary><div class="list" style="margin-top:10px">${lev.map(row).join('')}</div></details>`:''}`;
 }
-function finHtml(){const ok=finOK(),has=!!S.cfg.finH;return `<div class="card" style="border-left:5px solid ${ok?'var(--green)':'var(--orange)'}"><h3>🔒 Montants et données financières</h3>
- <p style="margin:0 0 8px;font-size:14px">${has?(ok?'Les montants sont <b>visibles</b> sur ce téléphone.':'Les montants sont <b>masqués</b> sur ce téléphone (affichés « ••• € »).'):'Aucun code financier défini : choisissez-en un. Ensuite, seuls les téléphones où il a été saisi verront les montants (bons de commande, balance, pénalités, insertion, estimations amiante).'}</p>
- <div class="tools" style="margin-top:0">${!has?'<button class="b p" data-act="finset">Définir le code financier</button>':ok?'<button class="b" data-act="finlock">Masquer sur ce téléphone</button><button class="b" data-act="finset">Changer le code</button>':'<button class="b p" data-act="finunlock">Afficher les montants (code)</button>'}</div>
- <p style="margin:6px 0 0;font-size:12px;color:var(--mute)">Les compagnons qui scannent un QR code ne voient jamais les prix. Ce verrou protège l'affichage sur les téléphones de l'équipe (chefs de chantier, MOE…).</p></div>`}
+/* ===== Accès nominatifs — conçu par Saïd OUFQIR ===== */
+const ROLES={admin:'Administrateur (tout)',fin:'Chiffres complets',ope:'Opérationnel (sans chiffres)'};
+const moiLoc=()=>{try{return JSON.parse(localStorage.getItem('erbm_moi')||'null')}catch(e){return null}};
+function finHtml(){const st=(()=>{try{return localStorage.getItem('erbm_fin_st')}catch(e){return null}})(),m=moiLoc(),on=st==='ok'||st==='non'||!!m;
+ const adm=m&&m.r==='admin';
+ return `<div class="card" style="border-left:5px solid ${finOK()?'var(--green)':'var(--orange)'}"><h3>👤 Mon accès</h3>
+ <p style="margin:0 0 8px;font-size:15px">${m?`Connecté : <b>${esc(m.n)}</b> · ${esc(ROLES[m.r]||m.r)}`:on?'Non connecté sur ce téléphone : <b>les montants ne sont pas reçus</b>.':'Connectez-vous avec votre code personnel. (Première mise en service : l\'administrateur crée son accès, puis ceux de l\'équipe.)'}</p>
+ <div class="tools" style="margin-top:0">${!on?'<button class="b p" data-act="acclogin">Me connecter avec mon code</button><button class="b" data-act="accinit">Première fois : créer l\'accès administrateur</button>':m?'<button class="b" data-act="accmoncode">Changer mon code</button><button class="b" data-act="acclogout">Déconnecter ce téléphone</button>':'<button class="b p" data-act="acclogin">Me connecter avec mon code</button>'}${adm?'<button class="b p" data-act="accgerer">Gérer les accès</button>':''}</div>
+ <p style="margin:6px 0 0;font-size:12px;color:var(--mute)">Chaque personne a son propre code. Seuls les accès « Chiffres complets » et l'administrateur reçoivent les prix, la balance, les pénalités, l'insertion et le pilotage financier : le serveur ne les envoie pas aux autres. Les compagnons (QR code) ne voient jamais de prix.</p>
+ ${S.accListe&&adm?`<div style="margin-top:10px">${S.accListe.map(u=>`<div class="res"><span><b>${esc(u.n)}</b>${u.moi?' (vous)':''}<br><span style="font-size:13px;color:var(--mute)">${esc(ROLES[u.r]||u.r)}</span></span>${u.moi?'':`<span style="display:flex;gap:6px"><select data-accrole="${esc(u.id)}" style="width:auto;min-height:36px;padding:2px 6px">${Object.entries(ROLES).map(([k,v])=>`<option value="${k}" ${u.r===k?'selected':''}>${esc(v)}</option>`).join('')}</select><button class="b" data-accdel="${esc(u.id)}" style="min-height:36px">Retirer</button></span>`}</div>`).join('')}
+ <div class="grid" style="margin-top:8px;background:var(--bg2);padding:10px;border-radius:10px"><label>Nom et fonction<input id="accN" placeholder="ex. Thibault AVELINE – patron de chantier"></label><label>Accès<select id="accR">${Object.entries(ROLES).filter(([k])=>k!=='admin').map(([k,v])=>`<option value="${k}">${esc(v)}</option>`).join('')}</select></label><label>Code personnel à lui transmettre (6 caractères min.)<input id="accC" placeholder="ex. TA-7Kp92"></label></div><div class="tools"><button class="b p" data-act="accajout">Créer l'accès</button></div></div>`:''}</div>`}
+async function accApi(op,o){return api(Object.assign({action:'acces',op},o||{}))}
+async function accAfterLogin(h,m){try{localStorage.setItem('erbm_fin',h);localStorage.setItem('erbm_moi',JSON.stringify(m));localStorage.setItem('erbm_fin_st',(m.r==='admin'||m.r==='fin')?'ok':'non')}catch(e){}if(Object.keys(SY.dirty).length){try{await sync()}catch(e){}}finPurge();render();toast('Bienvenue '+m.n+' : chargement…');return sync()}
+async function accAct(a,t){
+ if(a==='accinit'){const n=await askTxt('Votre nom (administrateur) :','ex. Saïd OUFQIR');if(!n)return;const c1=await askTxt('Votre code personnel (8 caractères minimum) :','code','password');if(!c1)return;if(c1.length<8)return info('Code trop court : 8 caractères minimum.');const c2=await askTxt('Confirmez le code :','code','password');if(c1!==c2)return info('Les deux codes ne correspondent pas.');const h=await finHash(c1);let j;try{j=await accApi('init',{h,n})}catch(e){return info('Création impossible : '+((e&&e.message)||e))}return accAfterLogin(h,j.moi)}
+ if(a==='acclogin'){const c=await askTxt('Votre code personnel :','code','password');if(!c)return;const h=await finHash(c);let j;try{j=await accApi('whoami',{finH:h})}catch(e){return info('Vérification impossible : '+((e&&e.message)||e))}if(!j.moi)return info('Code inconnu.');return accAfterLogin(h,j.moi)}
+ if(a==='acclogout'){if(Object.keys(SY.dirty).length)return info('Des modifications ne sont pas encore envoyées : faites une synchro d\'abord.');try{localStorage.removeItem('erbm_fin');localStorage.removeItem('erbm_moi');localStorage.setItem('erbm_fin_st','non')}catch(e){}S.accListe=null;finPurge();render();toast('Téléphone déconnecté');return sync()}
+ if(a==='accmoncode'){const c1=await askTxt('Nouveau code (8 caractères minimum) :','code','password');if(!c1)return;if(c1.length<8)return info('Code trop court.');const c2=await askTxt('Confirmez :','code','password');if(c1!==c2)return info('Les deux codes ne correspondent pas.');const h=await finHash(c1);try{await accApi('moncode',{h})}catch(e){return info((e&&e.message)||String(e))}try{localStorage.setItem('erbm_fin',h)}catch(e){}return info('Code changé.')}
+ if(a==='accgerer'){try{const j=await accApi('liste');S.accListe=j.liste;render()}catch(e){info((e&&e.message)||String(e))}return}
+ if(a==='accajout'){const n=$('accN').value.trim(),r=$('accR').value,c=$('accC').value.trim();if(!n||c.length<6)return info('Nom et code (6 caractères minimum) obligatoires.');const h=await finHash(c);try{await accApi('ajout',{h,n,r})}catch(e){return info((e&&e.message)||String(e))}const j=await accApi('liste');S.accListe=j.liste;render();return info(`Accès créé pour ${n} (${ROLES[r]}).\nCode à lui transmettre en privé : ${c}`)}
+}
+
 function vReglages(){
  const c=S.cfg;
  return finHtml()+`<h2 style="margin-bottom:12px">Chantier</h2><div class="grid">
@@ -1583,9 +1623,7 @@ async function act(a){
  if(a==='qrme'){const n=$('qn').value.trim(),e=$('qe').value.trim(),m=$('qm').value,ins=!!($('qins')&&$('qins').checked);if(!n)return toast('Indiquez votre nom');meSet({n,e,m,ins});if(SY.qrOnly){SY.conf={...SY.conf,n:n+' · '+(e||m)};persistLocal()}return render()}
  if(a==='qrid'){meSet(null);return render()}
  if(a==='retour')return retour();
- if(a==='finset'){if(readonly)return toast('Lecture seule');if(S.cfg.finH&&!finOK())return toast('Déverrouillez d\'abord');const c1=await askTxt('Nouveau code financier (6 caractères minimum) :','code','password');if(!c1)return;if(c1.length<6)return info('Code trop court : 6 caractères minimum.');const c2=await askTxt('Confirmez le code :','code','password');if(c1!==c2)return info('Les deux codes ne correspondent pas.');const h=await finHash(c1);S.cfg={...S.cfg,finH:h};saveCfg();try{localStorage.setItem('erbm_fin',h)}catch(e){}render();return info('Code financier enregistré. Les montants sont visibles sur ce téléphone et masqués sur les autres tant que le code n\'y est pas saisi.')}
- if(a==='finunlock'){const c=await askTxt('Code financier :','code','password');if(!c)return;const h=await finHash(c);if(h!==S.cfg.finH)return info('Code incorrect.');try{localStorage.setItem('erbm_fin',h)}catch(e){}render();return toast('Montants affichés')}
- if(a==='finlock'){try{localStorage.removeItem('erbm_fin')}catch(e){}render();return toast('Montants masqués')}
+ if(String(a).startsWith('acc'))return accAct(a);
  if(a==='penadd')return penAdd();
  if(a==='crgen')return crGen();
  if(a==='insadd'){if(readonly)return toast('Lecture seule');const i=+$('insst').value,m=$('insm').value,h=parseFloat(String($('insh').value).replace(',','.'));if(!m||!(h>=0))return toast('Indiquez le mois et les heures');const x=S.ins.st[i];x.real={...(x.real||{}),[m]:h};saveIns();render();return toast('Heures enregistrées')}
@@ -1670,7 +1708,7 @@ function editTir(id,isNew){
 }
 
 document.addEventListener('click',e=>{
- const t=e.target.closest('[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon],[data-ptdel],[data-pa],[data-cn],[data-cnnew],[data-map],[data-cf],[data-df],[data-tk],[data-dec],[data-rdvdel],[data-baldel],[data-vf],[data-vtgo],[data-pw],[data-progcopy],[data-gw],[data-moelev]');
+ const t=e.target.closest('[data-act],[data-open],[data-go],[data-step],[data-lot],[data-rlev],[data-rdel],[data-edittir],[data-ftdel],[data-pvdel],[data-curdel],[data-ckon],[data-ptdel],[data-pa],[data-cn],[data-cnnew],[data-map],[data-cf],[data-df],[data-tk],[data-dec],[data-rdvdel],[data-baldel],[data-vf],[data-vtgo],[data-pw],[data-progcopy],[data-gw],[data-moelev],[data-accdel]');
  if(e.target===$('sheet')){closePanel();return}
  if(!t)return;
  if(t.tagName==='A'&&t.dataset.open)e.preventDefault();
@@ -1678,6 +1716,7 @@ document.addEventListener('click',e=>{
  if(t.dataset.pa){const [p,a]=t.dataset.pa.split('|');return paAct(p,a)}
  if(t.dataset.cn){const [l,d,a]=t.dataset.cn.split('|');return cnAct(l,d,a)}
  if(t.dataset.cnnew!==undefined){if(!logArr().length)return toast('Ajoutez d\'abord des logements');const [l,c,o]=t.dataset.cnnew.split('|');return editCn(l||logArr()[0].id,null,c?[c,o]:null)}
+ if(t.dataset.accdel){const id=t.dataset.accdel;return ask('Retirer cet accès ? La personne ne pourra plus se connecter.').then(async ok=>{if(!ok)return;try{await accApi('suppr',{id});const j=await accApi('liste');S.accListe=j.liste;render()}catch(e){info((e&&e.message)||String(e))}})}
  if(t.dataset.moelev){e.preventDefault();if(readonly)return toast('Lecture seule');const [lid,i]=t.dataset.moelev.split('|');const c=JSON.parse(JSON.stringify(S.logs[lid]));if(c.moe&&c.moe[+i]){c.moe[+i].st='Levé';c.moe[+i].lev=today();c.journal=[...(c.journal||[]),{d:today(),t:'Remarque MOE '+c.moe[+i].n+' levée'}];c.maj=today();save('logements',lid,c);renderPanel&&S.open&&renderPanel();render()}return}
  if(t.dataset.gw!==undefined){const v=t.dataset.gw;S.gw=v==='-1'?(S.gw||0)-1:v==='+1'?(S.gw||0)+1:+v;return render()}
  if(t.dataset.pw!==undefined){const v=t.dataset.pw;S.pw=v==='-1'?(S.pw||0)-1:v==='+1'?(S.pw||0)+1:+v;return render()}
@@ -1724,9 +1763,11 @@ document.addEventListener('change',e=>{
  if(t.classList&&t.classList.contains('crfile'))return importCR(t);
  if(t.classList&&t.classList.contains('planfile'))return importPlan(t);
  if(t.classList&&t.classList.contains('bailfile'))return importBail(t);
+ if(t.classList&&t.classList.contains('finfile'))return importFin(t);
  if(t.classList&&t.classList.contains('insfile'))return importIns(t);
  if(t.dataset.paph&&S.open)uploadPA(t);
  if(t.dataset.tkph&&QR&&t.files&&t.files[0]){qrTk(t.dataset.tkph,'done',t.files[0]);t.value=''}
+ if(t.dataset.accrole){const id=t.dataset.accrole,r=t.value;accApi('role',{id,r}).then(()=>accApi('liste')).then(j=>{S.accListe=j.liste;render();toast('Accès modifié')}).catch(e=>info((e&&e.message)||String(e)));return}
  if(t.dataset.penst){if(readonly)return toast('Lecture seule');const x=penD().list.find(y=>y.id===t.dataset.penst);if(x){x.st=t.value;savePen();render()}return}
  if(t.dataset.tkadm&&S.open){if(readonly)return toast('Lecture seule');const tid=t.dataset.tkadm,v=t.value,l0=S.logs[S.open],tt=TK.find(x=>x.id===tid);if((v==='go'||v==='ok')&&tkS(l0,tt).st==='todo'){const lk=tkLock(l0,tt);if(lk.length){renderPanel();return info('🔒 '+tt.lib+' verrouillé :\n• '+lk.join('\n• '))}}tkSet(S.open,tid,v,{n:(SY.conf||{}).n||S.cfg.cdt||'Conducteur',e:S.cfg.entreprise||''});return renderPanel()}
  if(t.dataset.rdvst&&S.open){const id=t.dataset.rdvst,v=t.value;return upd(l=>{const r=(l.rdv||[]).find(x=>x.id===id);l.rdv=(l.rdv||[]).map(x=>x.id===id?{...x,st:v}:x);if(r)l.journal=[...(l.journal||[]),{d:today(),t:'RDV '+r.type+' du '+new Date(r.dt).toLocaleString('fr-FR')+' : '+v+(v==='Locataire absent'?' (trace conservée)':'')}]})}
@@ -1750,7 +1791,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('sheet').classLis
 const VH=[];let vhBack=false;
 function majRetour(){const br=$('btnRetour');if(!br)return;const qm=!!(QR||SY.qrOnly),sh=$('sheet').classList.contains('on');br.style.display=(!qm&&(sh||S.open||S.view!=='tableau'))?'':'none'}
 try{new MutationObserver(majRetour).observe($('sheet'),{attributes:true,attributeFilter:['class']})}catch(e){}
-function route(){const h=location.hash.slice(1);S.view=['tableau','logements','vt','planning','tiroirs','reserves','reglages','reseaux','decouvertes','balance','insertion','penalites','cr'].includes(h)?h:'tableau';if(!vhBack&&VH[VH.length-1]!==S.view)VH.push(S.view);vhBack=false;if(VH.length>30)VH.shift();render()}
+function route(){const h=location.hash.slice(1);S.view=['tableau','logements','vt','planning','tiroirs','reserves','reglages','reseaux','decouvertes','balance','insertion','penalites','cr','finance'].includes(h)?h:'tableau';if(!vhBack&&VH[VH.length-1]!==S.view)VH.push(S.view);vhBack=false;if(VH.length>30)VH.shift();render()}
 function retour(){if(S.open||$('sheet').classList.contains('on'))return closePanel();if(VH.length>1){VH.pop();vhBack=true;location.hash=VH[VH.length-1]}else if(S.view!=='tableau'){vhBack=true;VH.length=0;VH.push('tableau');location.hash='tableau'}}
 addEventListener('hashchange',route);
 
